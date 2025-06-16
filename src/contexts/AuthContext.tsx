@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -47,14 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     const getInitialSession = async () => {
       try {
+        console.log('Getting initial session...')
         const { data: { session }, error } = await supabase.auth.getSession()
         
         if (!mounted) return
 
         if (error) {
           console.error('Error getting session:', error)
-          setLoading(false)
-          return
+        } else {
+          console.log('Initial session:', session?.user?.email || 'No session')
         }
 
         setSession(session)
@@ -62,12 +64,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (session?.user) {
           await fetchProfile(session.user.id)
-        } else {
-          setLoading(false)
         }
+        
+        setInitialized(true)
+        setLoading(false)
       } catch (error) {
         console.error('Error in getInitialSession:', error)
         if (mounted) {
+          setInitialized(true)
           setLoading(false)
         }
       }
@@ -81,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
 
-      console.log('Auth state changed:', event, session?.user?.email)
+      console.log('Auth state changed:', event, session?.user?.email || 'No user')
       
       setSession(session)
       setUser(session?.user ?? null)
@@ -90,6 +94,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await fetchProfile(session.user.id)
       } else {
         setProfile(null)
+      }
+      
+      if (initialized) {
         setLoading(false)
       }
     })
@@ -98,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [initialized])
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -112,9 +119,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Error fetching profile:', error)
-        // If it's a table not found error or similar, we'll just set profile to null
-        // This allows the app to continue working even if the profile doesn't exist
-        setProfile(null)
+        // Create a basic profile if it doesn't exist
+        const user = await supabase.auth.getUser()
+        if (user.data.user) {
+          const basicProfile = {
+            id: userId,
+            email: user.data.user.email!,
+            full_name: user.data.user.user_metadata?.full_name || null,
+            role: user.data.user.user_metadata?.role || null,
+            company: user.data.user.user_metadata?.company || null,
+            avatar_url: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+          setProfile(basicProfile)
+        }
       } else {
         console.log('Profile fetched:', data)
         setProfile(data)
@@ -122,13 +141,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error in fetchProfile:', error)
       setProfile(null)
-    } finally {
-      setLoading(false)
     }
   }
 
   const signUp = async (email: string, password: string, userData?: Partial<Profile>) => {
     try {
+      setLoading(true)
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -169,11 +187,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error in signUp:', error)
       return { error }
+    } finally {
+      setLoading(false)
     }
   }
 
   const signIn = async (email: string, password: string) => {
     try {
+      setLoading(true)
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -182,14 +203,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error in signIn:', error)
       return { error }
+    } finally {
+      setLoading(false)
     }
   }
 
   const signOut = async () => {
     try {
+      setLoading(true)
       await supabase.auth.signOut()
+      setProfile(null)
     } catch (error) {
       console.error('Error in signOut:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -217,6 +244,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       setLoading(true)
       await fetchProfile(user.id)
+      setLoading(false)
     }
   }
 
