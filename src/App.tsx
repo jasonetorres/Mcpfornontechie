@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Learn from './pages/Learn';
@@ -20,34 +21,42 @@ import JoinCommunity from './pages/JoinCommunity';
 import BeginnerPath from './pages/BeginnerPath';
 import IntermediatePath from './pages/IntermediatePath';
 import AdvancedPath from './pages/AdvancedPath';
+import Profile from './pages/Profile';
+import Dashboard from './pages/Dashboard';
+import Achievements from './pages/Achievements';
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/learn" element={<Learn />} />
-          <Route path="/demo" element={<Demo />} />
-          <Route path="/examples" element={<Examples />} />
-          <Route path="/resources" element={<Resources />} />
-          <Route path="/templates" element={<Templates />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/guides" element={<Guides />} />
-          <Route path="/talk-resources" element={<TalkResources />} />
-          <Route path="/start-building" element={<StartBuilding />} />
-          <Route path="/platform-comparison" element={<PlatformComparison />} />
-          <Route path="/office-hours" element={<OfficeHours />} />
-          <Route path="/success-stories" element={<SuccessStories />} />
-          <Route path="/request-template" element={<RequestTemplate />} />
-          <Route path="/submit-template" element={<SubmitTemplate />} />
-          <Route path="/join-community" element={<JoinCommunity />} />
-          <Route path="/beginner-path" element={<BeginnerPath />} />
-          <Route path="/intermediate-path" element={<IntermediatePath />} />
-          <Route path="/advanced-path" element={<AdvancedPath />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/learn" element={<Learn />} />
+            <Route path="/demo" element={<Demo />} />
+            <Route path="/examples" element={<Examples />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/guides" element={<Guides />} />
+            <Route path="/talk-resources" element={<TalkResources />} />
+            <Route path="/start-building" element={<StartBuilding />} />
+            <Route path="/platform-comparison" element={<PlatformComparison />} />
+            <Route path="/office-hours" element={<OfficeHours />} />
+            <Route path="/success-stories" element={<SuccessStories />} />
+            <Route path="/request-template" element={<RequestTemplate />} />
+            <Route path="/submit-template" element={<SubmitTemplate />} />
+            <Route path="/join-community" element={<JoinCommunity />} />
+            <Route path="/beginner-path" element={<BeginnerPath />} />
+            <Route path="/intermediate-path" element={<IntermediatePath />} />
+            <Route path="/advanced-path" element={<AdvancedPath />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/achievements" element={<Achievements />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </AuthProvider>
   );
 }
 

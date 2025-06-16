@@ -1,17 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Clock, ArrowRight, Play, Book, Users, Zap, Shield, Database } from 'lucide-react';
+import { useLearningProgress } from '../hooks/useLearningProgress';
+import { useAuth } from '../contexts/AuthContext';
 
 function IntermediatePath() {
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-
-  const toggleStep = (stepIndex: number) => {
-    if (completedSteps.includes(stepIndex)) {
-      setCompletedSteps(completedSteps.filter(i => i !== stepIndex));
-    } else {
-      setCompletedSteps([...completedSteps, stepIndex]);
-    }
-  };
+  const { user } = useAuth();
+  const { completedSteps, loading, toggleStep, getProgressPercentage } = useLearningProgress('intermediate');
 
   const pathSteps = [
     {
@@ -96,7 +91,7 @@ function IntermediatePath() {
     }
   ];
 
-  const progressPercentage = (completedSteps.length / pathSteps.length) * 100;
+  const progressPercentage = getProgressPercentage(pathSteps.length);
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
@@ -117,6 +112,19 @@ function IntermediatePath() {
             </div>
           </div>
         </div>
+
+        {/* Auth Prompt for Non-Users */}
+        {!user && (
+          <div className="mb-12 bg-blue-600/20 border border-blue-500/30 rounded-xl p-6 text-center">
+            <h3 className="text-lg font-semibold text-white mb-2">Track Your Progress</h3>
+            <p className="text-blue-200 mb-4">
+              Sign up for a free account to save your progress and unlock personalized features
+            </p>
+            <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200">
+              Create Free Account
+            </button>
+          </div>
+        )}
 
         {/* Progress Bar */}
         <div className="mb-12">
@@ -140,11 +148,14 @@ function IntermediatePath() {
               <div className="p-6 border-b border-white/10">
                 <div className="flex items-start space-x-4">
                   <button
-                    onClick={() => toggleStep(index)}
+                    onClick={() => user && toggleStep(index)}
+                    disabled={!user || loading}
                     className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                       completedSteps.includes(index)
                         ? 'bg-yellow-500 text-white'
-                        : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                        : user
+                        ? 'bg-gray-600 text-gray-300 hover:bg-gray-500 cursor-pointer'
+                        : 'bg-gray-600 text-gray-300 cursor-not-allowed'
                     }`}
                   >
                     {completedSteps.includes(index) ? (

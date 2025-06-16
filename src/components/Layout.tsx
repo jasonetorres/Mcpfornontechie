@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import UserMenu from './UserMenu';
+import AuthModal from './AuthModal';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,7 +11,10 @@ interface LayoutProps {
 
 function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const location = useLocation();
+  const { user, loading } = useAuth();
 
   const navItems = [
     { name: 'Learn', href: '/learn', icon: Book },
@@ -18,6 +24,11 @@ function Layout({ children }: LayoutProps) {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const openAuthModal = (mode: 'signin' | 'signup') => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
@@ -52,12 +63,35 @@ function Layout({ children }: LayoutProps) {
               </div>
             </div>
 
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-white"
-            >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            <div className="flex items-center space-x-4">
+              {!loading && (
+                user ? (
+                  <UserMenu />
+                ) : (
+                  <div className="hidden md:flex items-center space-x-3">
+                    <button
+                      onClick={() => openAuthModal('signin')}
+                      className="text-gray-300 hover:text-white transition-colors duration-200"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => openAuthModal('signup')}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+                )
+              )}
+
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden text-white"
+              >
+                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -80,6 +114,31 @@ function Layout({ children }: LayoutProps) {
                   <span>{item.name}</span>
                 </Link>
               ))}
+              
+              {!loading && !user && (
+                <div className="border-t border-white/10 pt-2 mt-2">
+                  <button
+                    onClick={() => {
+                      openAuthModal('signin');
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200 w-full"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Sign In</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      openAuthModal('signup');
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200 w-full"
+                  >
+                    <Users className="w-4 h-4" />
+                    <span>Sign Up</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -117,6 +176,13 @@ function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultMode={authMode}
+      />
     </div>
   );
 }
