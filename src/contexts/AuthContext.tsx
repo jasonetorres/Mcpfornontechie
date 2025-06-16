@@ -77,18 +77,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
-      if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist, but don't try to create it here
-        // Profile creation should happen during sign-up or be handled by database triggers
-        console.log('Profile not found for user:', userId)
+      if (error) {
+        console.error('Error fetching profile:', error)
         setProfile(null)
-      } else if (!error) {
+      } else {
+        // data will be null if no profile exists, or the profile object if found
         setProfile(data)
       }
     } catch (error) {
       console.error('Error fetching profile:', error)
+      setProfile(null)
     } finally {
       setLoading(false)
     }
