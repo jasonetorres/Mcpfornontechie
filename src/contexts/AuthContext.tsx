@@ -42,21 +42,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let mounted = true
+
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user.id)
-      } else {
-        setLoading(false)
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (!mounted) return
+
+        if (error) {
+          console.error('Error getting session:', error)
+          setLoading(false)
+          return
+        }
+
+        setSession(session)
+        setUser(session?.user ?? null)
+        
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error in getInitialSession:', error)
+        if (mounted) {
+          setLoading(false)
+        }
       }
-    })
+    }
+
+    getInitialSession()
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return
+
+      console.log('Auth state changed:', event, session?.user?.email)
+      
       setSession(session)
       setUser(session?.user ?? null)
       
@@ -68,11 +94,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user:', userId)
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -81,13 +112,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Error fetching profile:', error)
+        // If it's a table not found error or similar, we'll just set profile to null
+        // This allows the app to continue working even if the profile doesn't exist
         setProfile(null)
       } else {
-        // data will be null if no profile exists, or the profile object if found
+        console.log('Profile fetched:', data)
         setProfile(data)
       }
     } catch (error) {
-      console.error('Error fetching profile:', error)
+      console.error('Error in fetchProfile:', error)
       setProfile(null)
     } finally {
       setLoading(false)
@@ -95,74 +128,94 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, userData?: Partial<Profile>) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: userData?.full_name,
-          role: userData?.role,
-          company: userData?.company
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: userData?.full_name,
+            role: userData?.role,
+            company: userData?.company
+          }
         }
-      }
-    })
+      })
 
-    if (!error && data.user && data.session) {
-      // Only create profile if user is confirmed and we have a session
-      try {
-        const profileData = {
-          id: data.user.id,
-          email: data.user.email!,
-          full_name: userData?.full_name || null,
-          role: userData?.role || null,
-          company: userData?.company || null,
-          avatar_url: null,
-        }
+      if (!error && data.user) {
+        // Try to create profile, but don't fail if it doesn't work
+        try {
+          const profileData = {
+            id: data.user.id,
+            email: data.user.email!,
+            full_name: userData?.full_name || null,
+            role: userData?.role || null,
+            company: userData?.company || null,
+            avatar_url: null,
+          }
 
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert(profileData)
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert(profileData)
 
-        if (profileError) {
+          if (profileError) {
+            console.error('Error creating profile:', profileError)
+          }
+        } catch (profileError) {
           console.error('Error creating profile:', profileError)
         }
-      } catch (profileError) {
-        console.error('Error creating profile:', profileError)
       }
-    }
 
-    return { error }
+      return { error }
+    } catch (error) {
+      console.error('Error in signUp:', error)
+      return { error }
+    }
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { error }
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      return { error }
+    } catch (error) {
+      console.error('Error in signIn:', error)
+      return { error }
+    }
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Error in signOut:', error)
+    }
   }
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: new Error('No user logged in') }
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', user.id)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', user.id)
 
-    if (!error) {
-      setProfile(prev => prev ? { ...prev, ...updates } : null)
+      if (!error) {
+        setProfile(prev => prev ? { ...prev, ...updates } : null)
+      }
+
+      return { error }
+    } catch (error) {
+      console.error('Error in updateProfile:', error)
+      return { error }
     }
-
-    return { error }
   }
 
   const refreshProfile = async () => {
     if (user) {
+      setLoading(true)
       await fetchProfile(user.id)
     }
   }
