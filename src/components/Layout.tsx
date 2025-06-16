@@ -116,22 +116,22 @@ function Layout({ children }: LayoutProps) {
               {/* Auth Status */}
               {user ? (
                 <div className="flex items-center space-x-3">
-                  {/* User Status Indicator */}
-                  <div className="hidden md:flex items-center space-x-2 text-green-300 text-sm">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span>Signed in as {profile?.full_name || user.email}</span>
+                  {/* User Status Indicator - Only show on larger screens */}
+                  <div className="hidden lg:flex items-center space-x-2 text-green-300 text-sm bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>Signed in</span>
                   </div>
                   <UserMenu />
                 </div>
               ) : (
                 <div className="hidden md:flex items-center space-x-3">
-                  <div className="flex items-center space-x-2 text-gray-400 text-sm">
+                  <div className="flex items-center space-x-2 text-gray-400 text-sm bg-gray-500/10 px-3 py-1 rounded-full border border-gray-500/20">
                     <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
                     <span>Not signed in</span>
                   </div>
                   <button
                     onClick={() => openAuthModal('signin')}
-                    className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center space-x-1"
+                    className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-white/10"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>Sign In</span>
@@ -163,7 +163,7 @@ function Layout({ children }: LayoutProps) {
               <div className="px-3 py-2 border-b border-white/10 mb-2">
                 {user ? (
                   <div className="flex items-center space-x-2 text-green-300">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     <span className="text-sm">Signed in as {profile?.full_name || user.email}</span>
                   </div>
                 ) : (
