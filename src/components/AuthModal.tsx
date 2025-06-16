@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 interface AuthModalProps {
   isOpen: boolean
-  onClose: () => void
+  onClose: (wasSuccessfulSignup?: boolean) => void
   defaultMode?: 'signin' | 'signup'
 }
 
@@ -53,7 +53,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
         if (error) {
           setError(error.message)
         } else {
-          onClose()
+          onClose(true) // Pass true to indicate successful signup
         }
       } else {
         const { error } = await signIn(formData.email, formData.password)
@@ -61,7 +61,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
         if (error) {
           setError(error.message)
         } else {
-          onClose()
+          onClose(false) // Pass false for signin
         }
       }
     } catch (err) {
@@ -94,7 +94,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-white/10 rounded-xl max-w-md w-full p-6 relative">
         <button
-          onClick={onClose}
+          onClick={() => onClose()}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200"
         >
           <X className="w-5 h-5" />

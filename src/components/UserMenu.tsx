@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { User, Settings, LogOut, BookOpen, Trophy } from 'lucide-react'
+import { User, Settings, LogOut, BookOpen, Trophy, ChevronDown } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function UserMenu() {
@@ -18,7 +18,7 @@ export default function UserMenu() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 text-white hover:text-blue-400 transition-colors duration-200"
+        className="flex items-center space-x-2 text-white hover:text-blue-400 transition-colors duration-200 bg-white/5 hover:bg-white/10 rounded-lg px-3 py-2"
       >
         <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
           {profile.avatar_url ? (
@@ -27,7 +27,13 @@ export default function UserMenu() {
             <User className="w-4 h-4 text-white" />
           )}
         </div>
-        <span className="hidden md:block">{profile.full_name || profile.email}</span>
+        <div className="hidden md:block text-left">
+          <div className="text-sm font-medium">{profile.full_name || 'User'}</div>
+          {profile.role && (
+            <div className="text-xs text-gray-400">{profile.role}</div>
+          )}
+        </div>
+        <ChevronDown className="w-4 h-4 text-gray-400" />
       </button>
 
       {isOpen && (

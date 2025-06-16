@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import UserMenu from './UserMenu';
 import AuthModal from './AuthModal';
@@ -13,8 +13,10 @@ function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
   const location = useLocation();
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   const navItems = [
     { name: 'Learn', href: '/learn', icon: Book },
@@ -30,8 +32,55 @@ function Layout({ children }: LayoutProps) {
     setIsAuthModalOpen(true);
   };
 
+  // Show notification when user signs in
+  useEffect(() => {
+    if (user && profile && !loading) {
+      setNotificationMessage(`Welcome back, ${profile.full_name || profile.email}!`);
+      setShowNotification(true);
+      
+      // Hide notification after 4 seconds
+      const timer = setTimeout(() => {
+        setShowNotification(false);
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [user, profile, loading]);
+
+  // Handle auth modal close with success notification for new signups
+  const handleAuthModalClose = (wasSuccessfulSignup?: boolean) => {
+    setIsAuthModalOpen(false);
+    
+    if (wasSuccessfulSignup) {
+      setNotificationMessage('Account created successfully! Welcome to MCP Academy!');
+      setShowNotification(true);
+      
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 4000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+      {/* Success Notification */}
+      {showNotification && (
+        <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-right duration-300">
+          <div className="bg-green-600/90 backdrop-blur-md border border-green-500/30 rounded-lg p-4 shadow-lg max-w-sm">
+            <div className="flex items-center space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-200 flex-shrink-0" />
+              <p className="text-green-100 font-medium">{notificationMessage}</p>
+              <button
+                onClick={() => setShowNotification(false)}
+                className="text-green-200 hover:text-white transition-colors duration-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,9 +120,10 @@ function Layout({ children }: LayoutProps) {
                   <div className="hidden md:flex items-center space-x-3">
                     <button
                       onClick={() => openAuthModal('signin')}
-                      className="text-gray-300 hover:text-white transition-colors duration-200"
+                      className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center space-x-1"
                     >
-                      Sign In
+                      <LogIn className="w-4 h-4" />
+                      <span>Sign In</span>
                     </button>
                     <button
                       onClick={() => openAuthModal('signup')}
@@ -180,7 +230,7 @@ function Layout({ children }: LayoutProps) {
       {/* Auth Modal */}
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)}
+        onClose={handleAuthModalClose}
         defaultMode={authMode}
       />
     </div>
