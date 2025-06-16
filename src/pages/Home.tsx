@@ -95,7 +95,16 @@ function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="pt-16 pb-20 px-4 sm:px-6 lg:px-8">
+      <section className="pt-16 pb-20 px-4 sm:px-6 lg:px-8 relative">
+        {/* Bolt Badge - Top Right */}
+        <div className="absolute top-8 right-8 z-10">
+          <img 
+            src="/white_circle_360x360.png" 
+            alt="Powered by Bolt" 
+            className="w-16 h-16 md:w-20 md:h-20 opacity-80 hover:opacity-100 transition-opacity duration-200"
+          />
+        </div>
+
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
             <div className="inline-flex items-center space-x-2 bg-blue-500/20 text-blue-300 px-4 py-2 rounded-full mb-6">
