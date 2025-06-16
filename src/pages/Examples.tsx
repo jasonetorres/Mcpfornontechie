@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Play, ExternalLink, Users, MessageSquare, Workflow, Database, FileSpreadsheet, Calendar, ShoppingCart, BarChart3, Filter } from 'lucide-react';
+import { Play, ExternalLink, Users, MessageSquare, Workflow, Database, FileSpreadsheet, Calendar, ShoppingCart, BarChart3, Filter, Code, Download, CheckCircle } from 'lucide-react';
 
 function Examples() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedComplexity, setSelectedComplexity] = useState('all');
+  const [activeTutorial, setActiveTutorial] = useState<number | null>(null);
+  const [tutorialStep, setTutorialStep] = useState(0);
 
   const categories = [
     { id: 'all', name: 'All Examples', icon: Database },
@@ -31,6 +33,41 @@ function Examples() {
         'Share contact information',
         'Track member engagement'
       ],
+      tutorial: {
+        steps: [
+          {
+            title: 'Prepare Your Data',
+            content: 'Create a Google Sheet with member information',
+            code: `// Sample CSV structure
+Name,Role,Contributions,Email,Join_Date
+Sarah Chen,Community Manager,45,sarah@example.com,2024-01-15
+Mike Rodriguez,Developer,38,mike@example.com,2024-02-01
+Lisa Park,Designer,42,lisa@example.com,2024-01-20`,
+            action: 'Create the spreadsheet with this sample data'
+          },
+          {
+            title: 'Set Up Zapier Integration',
+            content: 'Connect Google Sheets to ChatGPT via Zapier',
+            code: `// Zapier Webhook Configuration
+{
+  "trigger": "webhook",
+  "action": "google_sheets_lookup",
+  "ai_prompt": "Answer questions about community members using the provided data"
+}`,
+            action: 'Configure the Zapier automation'
+          },
+          {
+            title: 'Test Your Bot',
+            content: 'Try asking questions about your community members',
+            code: `// Example questions to test:
+"Who is our top contributor?"
+"Find all marketing team members"
+"What's Sarah's email address?"
+"How many contributions does Mike have?"`,
+            action: 'Test with these sample questions'
+          }
+        ]
+      },
       demoUrl: '#',
       tutorialUrl: '#',
       templateUrl: '#'
@@ -51,6 +88,46 @@ function Examples() {
         'Create targeted content',
         'Track campaign performance'
       ],
+      tutorial: {
+        steps: [
+          {
+            title: 'Set Up Customer Database',
+            content: 'Create an Airtable base with customer information',
+            code: `// Customer data structure
+{
+  "customer_id": "CUST001",
+  "name": "Acme Corp",
+  "industry": "Technology",
+  "size": "Enterprise",
+  "last_purchase": "2024-01-15",
+  "engagement_score": 85
+}`,
+            action: 'Import your customer data into Airtable'
+          },
+          {
+            title: 'Configure AI Segmentation',
+            content: 'Set up Make.com to analyze customer data',
+            code: `// Segmentation logic
+if (customer.size === "Enterprise" && customer.engagement_score > 80) {
+  segment = "High-Value Enterprise";
+} else if (customer.industry === "Healthcare") {
+  segment = "Healthcare Focused";
+} else {
+  segment = "General";
+}`,
+            action: 'Create segmentation rules in Make.com'
+          },
+          {
+            title: 'Generate Personalized Content',
+            content: 'Use Claude API to create targeted messaging',
+            code: `// Content generation prompt
+"Create a personalized email for ${customer.name} in the ${customer.industry} industry. 
+They are a ${customer.size} company with engagement score ${customer.engagement_score}.
+Focus on solutions relevant to their industry and company size."`,
+            action: 'Test content generation with sample customers'
+          }
+        ]
+      },
       demoUrl: '#',
       tutorialUrl: '#',
       templateUrl: '#'
@@ -71,126 +148,46 @@ function Examples() {
         'Resource allocation insights',
         'Timeline predictions'
       ],
-      demoUrl: '#',
-      tutorialUrl: '#',
-      templateUrl: '#'
-    },
-    {
-      id: 4,
-      title: 'Sales Lead Scorer',
-      description: 'Prioritize prospects using historical data',
-      category: 'sales',
-      role: 'Sales Professional',
-      dataSource: 'Sales pipeline',
-      complexity: 'Advanced',
-      duration: '3-5 days',
-      tools: ['Salesforce', 'Zapier', 'Custom API'],
-      features: [
-        'Lead scoring automation',
-        'Conversion probability',
-        'Next best action suggestions',
-        'Pipeline forecasting'
-      ],
-      demoUrl: '#',
-      tutorialUrl: '#',
-      templateUrl: '#'
-    },
-    {
-      id: 5,
-      title: 'Content Recommendation Engine',
-      description: 'Suggest relevant content based on user behavior',
-      category: 'marketing',
-      role: 'Content Manager',
-      dataSource: 'Analytics data',
-      complexity: 'Intermediate',
-      duration: '2-3 days',
-      tools: ['Google Analytics', 'Bubble', 'OpenAI'],
-      features: [
-        'Personalized content suggestions',
-        'Engagement optimization',
-        'Content performance analysis',
-        'Audience segmentation'
-      ],
-      demoUrl: '#',
-      tutorialUrl: '#',
-      templateUrl: '#'
-    },
-    {
-      id: 6,
-      title: 'Employee Onboarding Assistant',
-      description: 'Answer new hire questions using company docs',
-      category: 'operations',
-      role: 'People Operations',
-      dataSource: 'HR documents',
-      complexity: 'Beginner',
-      duration: '4-6 hours',
-      tools: ['SharePoint', 'Power Platform', 'Azure AI'],
-      features: [
-        'Answer policy questions',
-        'Provide process guidance',
-        'Share relevant documents',
-        'Track onboarding progress'
-      ],
-      demoUrl: '#',
-      tutorialUrl: '#',
-      templateUrl: '#'
-    },
-    {
-      id: 7,
-      title: 'Inventory Management Assistant',
-      description: 'Monitor stock levels and predict reorder needs',
-      category: 'operations',
-      role: 'Operations Manager',
-      dataSource: 'Inventory database',
-      complexity: 'Intermediate',
-      duration: '1-2 days',
-      tools: ['Excel', 'Power BI', 'Azure AI'],
-      features: [
-        'Stock level monitoring',
-        'Reorder predictions',
-        'Supplier recommendations',
-        'Cost optimization'
-      ],
-      demoUrl: '#',
-      tutorialUrl: '#',
-      templateUrl: '#'
-    },
-    {
-      id: 8,
-      title: 'Customer Support Classifier',
-      description: 'Automatically categorize and route support tickets',
-      category: 'operations',
-      role: 'Customer Success',
-      dataSource: 'Support ticket system',
-      complexity: 'Advanced',
-      duration: '2-4 days',
-      tools: ['Zendesk', 'Zapier', 'Custom ML'],
-      features: [
-        'Automatic ticket classification',
-        'Priority assignment',
-        'Agent routing',
-        'Response suggestions'
-      ],
-      demoUrl: '#',
-      tutorialUrl: '#',
-      templateUrl: '#'
-    },
-    {
-      id: 9,
-      title: 'Event Planning Assistant',
-      description: 'Coordinate events using attendee and venue data',
-      category: 'community',
-      role: 'Event Coordinator',
-      dataSource: 'Event management system',
-      complexity: 'Beginner',
-      duration: '3-5 hours',
-      tools: ['Eventbrite', 'Google Sheets', 'ChatGPT'],
-      features: [
-        'Attendee management',
-        'Venue recommendations',
-        'Schedule optimization',
-        'Communication automation'
-      ],
+      tutorial: {
+        steps: [
+          {
+            title: 'Set Up Project Database',
+            content: 'Create a Notion database for project tracking',
+            code: `// Project database properties
+{
+  "project_name": "Website Redesign",
+  "status": "In Progress",
+  "completion": 65,
+  "due_date": "2024-03-15",
+  "team_members": ["Alice", "Bob", "Carol"],
+  "risks": ["Design approval pending", "Resource constraints"]
+}`,
+            action: 'Create your project database in Notion'
+          },
+          {
+            title: 'Connect to Power Automate',
+            content: 'Set up automated data extraction',
+            code: `// Power Automate flow
+1. Trigger: Daily at 9 AM
+2. Get Notion database items
+3. Filter active projects
+4. Send to GPT-4 for analysis
+5. Generate status report`,
+            action: 'Configure the Power Automate workflow'
+          },
+          {
+            title: 'Generate Status Reports',
+            content: 'AI analyzes project data and creates reports',
+            code: `// GPT-4 prompt for status reports
+"Analyze the following project data and create a executive summary:
+- Highlight projects at risk
+- Identify resource bottlenecks  
+- Suggest priority actions
+- Predict completion dates"`,
+            action: 'Test report generation with your project data'
+          }
+        ]
+      },
       demoUrl: '#',
       tutorialUrl: '#',
       templateUrl: '#'
@@ -212,6 +209,29 @@ function Examples() {
     }
   };
 
+  const startTutorial = (exampleId: number) => {
+    setActiveTutorial(exampleId);
+    setTutorialStep(0);
+  };
+
+  const nextTutorialStep = () => {
+    const currentExample = examples.find(e => e.id === activeTutorial);
+    if (currentExample && tutorialStep < currentExample.tutorial.steps.length - 1) {
+      setTutorialStep(tutorialStep + 1);
+    }
+  };
+
+  const prevTutorialStep = () => {
+    if (tutorialStep > 0) {
+      setTutorialStep(tutorialStep - 1);
+    }
+  };
+
+  const closeTutorial = () => {
+    setActiveTutorial(null);
+    setTutorialStep(0);
+  };
+
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -219,7 +239,7 @@ function Examples() {
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-white mb-4">Real-World MCP Examples</h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            See how non-technical professionals are using MCP to supercharge their work
+            See how non-technical professionals are using MCP to supercharge their work with interactive tutorials
           </p>
         </div>
 
@@ -327,18 +347,148 @@ function Examples() {
               
               {/* Actions */}
               <div className="flex space-x-2">
-                <button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-1">
+                <button 
+                  onClick={() => startTutorial(example.id)}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-1"
+                >
                   <Play className="w-3 h-3" />
-                  <span>Demo</span>
+                  <span>Start Tutorial</span>
                 </button>
                 <button className="flex-1 border border-white/20 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors duration-200 flex items-center justify-center space-x-1">
-                  <ExternalLink className="w-3 h-3" />
-                  <span>Tutorial</span>
+                  <Download className="w-3 h-3" />
+                  <span>Template</span>
                 </button>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Tutorial Modal */}
+        {activeTutorial && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-white/10 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+              {(() => {
+                const currentExample = examples.find(e => e.id === activeTutorial);
+                const currentStep = currentExample?.tutorial.steps[tutorialStep];
+                
+                if (!currentExample || !currentStep) return null;
+
+                return (
+                  <>
+                    {/* Header */}
+                    <div className="p-6 border-b border-white/10">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h2 className="text-2xl font-bold text-white">{currentExample.title}</h2>
+                          <p className="text-gray-300">Interactive Tutorial</p>
+                        </div>
+                        <button
+                          onClick={closeTutorial}
+                          className="text-gray-400 hover:text-white transition-colors duration-200"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      
+                      {/* Progress */}
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-gray-300">
+                            Step {tutorialStep + 1} of {currentExample.tutorial.steps.length}
+                          </span>
+                          <span className="text-sm text-blue-300">
+                            {Math.round(((tutorialStep + 1) / currentExample.tutorial.steps.length) * 100)}% Complete
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${((tutorialStep + 1) / currentExample.tutorial.steps.length) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6 overflow-y-auto max-h-[60vh]">
+                      <h3 className="text-xl font-semibold text-white mb-4">{currentStep.title}</h3>
+                      <p className="text-gray-300 mb-6">{currentStep.content}</p>
+                      
+                      {/* Code Block */}
+                      <div className="bg-slate-800 rounded-lg overflow-hidden mb-6">
+                        <div className="flex items-center justify-between p-3 border-b border-white/10">
+                          <span className="text-gray-300 text-sm font-medium">Code Example</span>
+                          <button
+                            onClick={() => navigator.clipboard.writeText(currentStep.code)}
+                            className="text-gray-400 hover:text-white transition-colors duration-200 text-sm"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                        <pre className="p-4 text-sm text-gray-300 overflow-x-auto">
+                          <code>{currentStep.code}</code>
+                        </pre>
+                      </div>
+
+                      {/* Action Item */}
+                      <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <CheckCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <h4 className="text-blue-300 font-medium mb-1">Action Required:</h4>
+                            <p className="text-blue-200 text-sm">{currentStep.action}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="p-6 border-t border-white/10">
+                      <div className="flex justify-between">
+                        <button
+                          onClick={prevTutorialStep}
+                          disabled={tutorialStep === 0}
+                          className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                            tutorialStep === 0
+                              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                              : 'bg-white/10 text-white hover:bg-white/20'
+                          }`}
+                        >
+                          Previous
+                        </button>
+                        
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={closeTutorial}
+                            className="px-6 py-2 border border-white/20 text-white rounded-lg font-medium hover:bg-white/10 transition-colors duration-200"
+                          >
+                            Close
+                          </button>
+                          
+                          {tutorialStep < currentExample.tutorial.steps.length - 1 ? (
+                            <button
+                              onClick={nextTutorialStep}
+                              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all duration-200"
+                            >
+                              Next Step
+                            </button>
+                          ) : (
+                            <button
+                              onClick={closeTutorial}
+                              className="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white rounded-lg font-medium transition-all duration-200"
+                            >
+                              Complete Tutorial
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        )}
 
         {/* No Results */}
         {filteredExamples.length === 0 && (
