@@ -80,28 +80,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist, create one
-        const { data: userData } = await supabase.auth.getUser()
-        if (userData.user) {
-          const newProfile = {
-            id: userData.user.id,
-            email: userData.user.email!,
-            full_name: userData.user.user_metadata?.full_name || null,
-            role: null,
-            company: null,
-            avatar_url: null,
-          }
-
-          const { data: createdProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert(newProfile)
-            .select()
-            .single()
-
-          if (!createError) {
-            setProfile(createdProfile)
-          }
-        }
+        // Profile doesn't exist, but don't try to create it here
+        // Profile creation should happen during sign-up or be handled by database triggers
+        console.log('Profile not found for user:', userId)
+        setProfile(null)
       } else if (!error) {
         setProfile(data)
       }
@@ -117,22 +99,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
       options: {
-        data: userData
+        data: {
+          full_name: userData?.full_name,
+          role: userData?.role,
+          company: userData?.company
+        }
       }
     })
 
-    if (!error && data.user) {
-      // Create profile
-      const profileData = {
-        id: data.user.id,
-        email: data.user.email!,
-        full_name: userData?.full_name || null,
-        role: userData?.role || null,
-        company: userData?.company || null,
-        avatar_url: null,
-      }
+    if (!error && data.user && data.session) {
+      // Only create profile if user is confirmed and we have a session
+      try {
+        const profileData = {
+          id: data.user.id,
+          email: data.user.email!,
+          full_name: userData?.full_name || null,
+          role: userData?.role || null,
+          company: userData?.company || null,
+          avatar_url: null,
+        }
 
-      await supabase.from('profiles').insert(profileData)
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert(profileData)
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError)
+        }
+      } catch (profileError) {
+        console.error('Error creating profile:', profileError)
+      }
     }
 
     return { error }
