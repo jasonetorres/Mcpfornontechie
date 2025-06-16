@@ -149,6 +149,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         localStorage.setItem('mock-profile', JSON.stringify(profileData))
         setProfile(profileData)
+        
+        // Initialize user achievements and progress
+        initializeUserData(data.user.id)
       }
 
       return { error }
@@ -218,6 +221,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshProfile = async () => {
     if (user) {
       await fetchProfile(user.id)
+    }
+  }
+
+  const initializeUserData = (userId: string) => {
+    // Initialize achievements
+    const achievementsKey = `achievements-${userId}`
+    if (!localStorage.getItem(achievementsKey)) {
+      localStorage.setItem(achievementsKey, JSON.stringify([]))
+    }
+
+    // Initialize progress
+    const progressKey = 'mock-progress'
+    const existingProgress = localStorage.getItem(progressKey)
+    if (!existingProgress) {
+      localStorage.setItem(progressKey, JSON.stringify([]))
+    }
+
+    // Initialize tutorial completions
+    const tutorialKey = 'tutorial-completions'
+    const existingTutorials = localStorage.getItem(tutorialKey)
+    if (!existingTutorials) {
+      localStorage.setItem(tutorialKey, JSON.stringify([]))
     }
   }
 

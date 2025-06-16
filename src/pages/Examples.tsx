@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Play, ExternalLink, Users, MessageSquare, Workflow, Database, FileSpreadsheet, Calendar, ShoppingCart, BarChart3, Filter, Code, Download, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useAchievements } from '../hooks/useAchievements';
 
 function Examples() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -8,6 +9,7 @@ function Examples() {
   const [activeTutorial, setActiveTutorial] = useState<number | null>(null);
   const [tutorialStep, setTutorialStep] = useState(0);
   const { user } = useAuth();
+  const { checkAchievements } = useAchievements();
 
   const categories = [
     { id: 'all', name: 'All Examples', icon: Database },
@@ -244,6 +246,11 @@ Focus on solutions relevant to their industry and company size."`,
       localStorage.setItem('tutorial-completions', JSON.stringify(existingCompletions));
       
       console.log('Tutorial completed:', completionData);
+      
+      // Check for achievements after completing tutorial
+      setTimeout(() => {
+        checkAchievements();
+      }, 100);
     }
     
     setActiveTutorial(null);

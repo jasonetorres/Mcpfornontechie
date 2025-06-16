@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useAchievements } from '../hooks/useAchievements';
 
 function Templates() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [copiedTemplate, setCopiedTemplate] = useState('');
+  const { user } = useAuth();
+  const { markTemplateUsed } = useAchievements();
 
   const categories = [
     { id: 'all', name: 'All Templates', icon: Database },
@@ -225,6 +229,15 @@ function Templates() {
     setTimeout(() => setCopiedTemplate(''), 2000);
   };
 
+  const handleTemplateDownload = (templateId: number) => {
+    if (user) {
+      markTemplateUsed(templateId.toString());
+      console.log(`Template ${templateId} downloaded by user ${user.id}`);
+    }
+    // Here you would typically trigger the actual download
+    console.log('Downloading template:', templateId);
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'Beginner': return 'bg-green-500/20 text-green-400';
@@ -243,6 +256,11 @@ function Templates() {
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Ready-to-use templates to jumpstart your MCP projects. No coding required!
           </p>
+          {user && (
+            <div className="mt-4 text-green-300">
+              ✅ Signed in - Template usage will be tracked for achievements!
+            </div>
+          )}
         </div>
 
         {/* Filters */}
@@ -390,7 +408,10 @@ function Templates() {
 
                 {/* Actions */}
                 <div className="flex space-x-3">
-                  <button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                  <button 
+                    onClick={() => handleTemplateDownload(template.id)}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                  >
                     <Download className="w-4 h-4" />
                     <span>Use Template</span>
                   </button>

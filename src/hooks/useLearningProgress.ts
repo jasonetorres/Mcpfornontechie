@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useAchievements } from './useAchievements'
 
 export type PathType = 'beginner' | 'intermediate' | 'advanced'
 
@@ -15,6 +16,7 @@ interface LearningProgress {
 
 export function useLearningProgress(pathType: PathType) {
   const { user } = useAuth()
+  const { checkAchievements } = useAchievements()
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -81,6 +83,12 @@ export function useLearningProgress(pathType: PathType) {
       }
 
       localStorage.setItem('mock-progress', JSON.stringify(allProgress))
+      
+      // Check for new achievements after updating progress
+      setTimeout(() => {
+        checkAchievements()
+      }, 100)
+      
     } catch (error) {
       console.error('Error updating learning progress:', error)
     } finally {
