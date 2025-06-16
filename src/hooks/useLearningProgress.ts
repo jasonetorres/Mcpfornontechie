@@ -17,14 +17,12 @@ interface LearningProgress {
 export function useLearningProgress(pathType: PathType) {
   const { user } = useAuth()
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (user) {
       fetchProgress()
     } else {
       setCompletedSteps([])
-      setLoading(false)
     }
   }, [user, pathType])
 
@@ -45,8 +43,6 @@ export function useLearningProgress(pathType: PathType) {
       }
     } catch (error) {
       console.error('Error fetching learning progress:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -91,7 +87,7 @@ export function useLearningProgress(pathType: PathType) {
 
   return {
     completedSteps,
-    loading,
+    loading: false, // Removed loading state
     toggleStep,
     getProgressPercentage,
     refreshProgress: fetchProgress

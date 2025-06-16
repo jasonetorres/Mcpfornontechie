@@ -17,7 +17,6 @@ interface AuthContextType {
   user: User | null
   profile: Profile | null
   session: Session | null
-  loading: boolean
   signUp: (email: string, password: string, userData?: Partial<Profile>) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
@@ -39,7 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
@@ -54,7 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (error) {
           console.error('❌ Error getting session:', error)
-          setLoading(false)
           return
         }
 
@@ -65,15 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           console.log('👤 User found, fetching profile...')
           await fetchProfile(session.user.id)
-        } else {
-          console.log('👤 No user, setting loading to false')
-          setLoading(false)
         }
       } catch (error) {
         console.error('❌ Error in getInitialSession:', error)
-        if (mounted) {
-          setLoading(false)
-        }
       }
     }
 
@@ -96,7 +87,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         console.log('👤 No user in auth change, clearing profile')
         setProfile(null)
-        setLoading(false)
       }
     })
 
@@ -141,15 +131,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('❌ Error in fetchProfile:', error)
       setProfile(null)
-    } finally {
-      console.log('✅ Setting loading to false after profile fetch')
-      setLoading(false)
     }
   }
 
   const signUp = async (email: string, password: string, userData?: Partial<Profile>) => {
     try {
-      setLoading(true)
       console.log('🔄 Signing up user:', email)
       
       const { data, error } = await supabase.auth.signUp({
@@ -195,14 +181,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('❌ Error in signUp:', error)
       return { error }
-    } finally {
-      // Don't set loading to false here - let the auth state change handle it
     }
   }
 
   const signIn = async (email: string, password: string) => {
     try {
-      setLoading(true)
       console.log('🔄 Signing in user:', email)
       
       const { error } = await supabase.auth.signInWithPassword({
@@ -218,14 +201,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('❌ Error in signIn:', error)
       return { error }
-    } finally {
-      // Don't set loading to false here - let the auth state change handle it
     }
   }
 
   const signOut = async () => {
     try {
-      setLoading(true)
       console.log('🔄 Signing out user')
       
       await supabase.auth.signOut()
@@ -234,8 +214,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('✅ User signed out successfully')
     } catch (error) {
       console.error('❌ Error in signOut:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -261,7 +239,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshProfile = async () => {
     if (user) {
-      setLoading(true)
       await fetchProfile(user.id)
     }
   }
@@ -270,7 +247,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     profile,
     session,
-    loading,
     signUp,
     signIn,
     signOut,
@@ -278,7 +254,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshProfile,
   }
 
-  console.log('🔄 AuthProvider render - loading:', loading, 'user:', user?.email || 'none', 'profile:', profile?.email || 'none')
+  console.log('🔄 AuthProvider render - user:', user?.email || 'none', 'profile:', profile?.email || 'none')
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

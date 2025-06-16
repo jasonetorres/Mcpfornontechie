@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Loader } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import UserMenu from './UserMenu';
 import AuthModal from './AuthModal';
@@ -16,7 +16,7 @@ function Layout({ children }: LayoutProps) {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const location = useLocation();
-  const { user, profile, loading } = useAuth();
+  const { user, profile } = useAuth();
 
   const navItems = [
     { name: 'Learn', href: '/learn', icon: Book },
@@ -34,7 +34,7 @@ function Layout({ children }: LayoutProps) {
 
   // Show notification when user signs in
   useEffect(() => {
-    if (user && profile && !loading) {
+    if (user && profile) {
       setNotificationMessage(`Welcome back, ${profile.full_name || profile.email}!`);
       setShowNotification(true);
       
@@ -45,7 +45,7 @@ function Layout({ children }: LayoutProps) {
 
       return () => clearTimeout(timer);
     }
-  }, [user, profile, loading]);
+  }, [user, profile]);
 
   // Handle auth modal close with success notification for new signups
   const handleAuthModalClose = (wasSuccessfulSignup?: boolean) => {
@@ -114,12 +114,7 @@ function Layout({ children }: LayoutProps) {
 
             <div className="flex items-center space-x-4">
               {/* Auth Status */}
-              {loading ? (
-                <div className="flex items-center space-x-2 text-gray-300">
-                  <Loader className="w-4 h-4 animate-spin" />
-                  <span className="hidden md:inline text-sm">Loading...</span>
-                </div>
-              ) : user ? (
+              {user ? (
                 <div className="flex items-center space-x-3">
                   {/* User Status Indicator */}
                   <div className="hidden md:flex items-center space-x-2 text-green-300 text-sm">
@@ -166,12 +161,7 @@ function Layout({ children }: LayoutProps) {
             <div className="px-2 pt-2 pb-3 space-y-1">
               {/* Mobile Auth Status */}
               <div className="px-3 py-2 border-b border-white/10 mb-2">
-                {loading ? (
-                  <div className="flex items-center space-x-2 text-gray-300">
-                    <Loader className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Loading...</span>
-                  </div>
-                ) : user ? (
+                {user ? (
                   <div className="flex items-center space-x-2 text-green-300">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span className="text-sm">Signed in as {profile?.full_name || user.email}</span>
@@ -200,7 +190,7 @@ function Layout({ children }: LayoutProps) {
                 </Link>
               ))}
               
-              {!loading && !user && (
+              {!user && (
                 <div className="border-t border-white/10 pt-2 mt-2">
                   <button
                     onClick={() => {
@@ -225,7 +215,7 @@ function Layout({ children }: LayoutProps) {
                 </div>
               )}
 
-              {!loading && user && (
+              {user && (
                 <div className="border-t border-white/10 pt-2 mt-2">
                   <Link
                     to="/profile"
