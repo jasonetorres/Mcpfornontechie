@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Users, MessageSquare, Calendar, Trophy, Star, ArrowRight, ExternalLink, Heart, Zap, BookOpen } from 'lucide-react';
 
 function Community() {
@@ -233,9 +234,12 @@ function Community() {
                 Connect with like-minded professionals, share your projects, get help, and learn from others building with MCP.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+                <Link
+                  to="/join-community"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+                >
                   Join Discord Community
-                </button>
+                </Link>
                 <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
                   Browse Forum
                 </button>
@@ -324,9 +328,12 @@ function Community() {
                     </div>
                   </div>
                   
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
+                  <Link
+                    to="/office-hours"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 block text-center"
+                  >
                     Register
-                  </button>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -367,10 +374,13 @@ function Community() {
                     </div>
                   </div>
                   
-                  <button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                  <Link
+                    to="/learn"
+                    className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                  >
                     <span>Start Learning</span>
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Link>
                 </div>
               ))}
             </div>

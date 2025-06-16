@@ -22,7 +22,7 @@ function Resources() {
           description: 'Compare popular platforms for building MCP connections',
           type: 'Comparison',
           duration: '10 min read',
-          url: '#',
+          url: '/platform-comparison',
           icon: FileText
         },
         {
@@ -107,7 +107,7 @@ function Resources() {
           description: 'Ask questions and share your MCP projects',
           type: 'Community',
           duration: 'Ongoing',
-          url: '/community',
+          url: '/join-community',
           icon: FileText
         },
         {
@@ -115,7 +115,7 @@ function Resources() {
           description: 'Live Q&A sessions with MCP experts',
           type: 'Live',
           duration: '1 hour',
-          url: '#',
+          url: '/office-hours',
           icon: Video
         },
         {
@@ -123,7 +123,7 @@ function Resources() {
           description: 'Real examples from the community',
           type: 'Case Studies',
           duration: '5-10 min each',
-          url: '#',
+          url: '/success-stories',
           icon: FileText
         }
       ]
@@ -317,13 +317,13 @@ function Resources() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/templates"
+              to="/start-building"
               className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
             >
-              Browse Templates
+              Start Building Now
             </Link>
             <Link
-              to="/community"
+              to="/join-community"
               className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
             >
               Join Community

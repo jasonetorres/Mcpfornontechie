@@ -10,6 +10,13 @@ import Templates from './pages/Templates';
 import Community from './pages/Community';
 import Guides from './pages/Guides';
 import TalkResources from './pages/TalkResources';
+import StartBuilding from './pages/StartBuilding';
+import PlatformComparison from './pages/PlatformComparison';
+import OfficeHours from './pages/OfficeHours';
+import SuccessStories from './pages/SuccessStories';
+import RequestTemplate from './pages/RequestTemplate';
+import SubmitTemplate from './pages/SubmitTemplate';
+import JoinCommunity from './pages/JoinCommunity';
 
 function App() {
   return (
@@ -25,6 +32,13 @@ function App() {
           <Route path="/community" element={<Community />} />
           <Route path="/guides" element={<Guides />} />
           <Route path="/talk-resources" element={<TalkResources />} />
+          <Route path="/start-building" element={<StartBuilding />} />
+          <Route path="/platform-comparison" element={<PlatformComparison />} />
+          <Route path="/office-hours" element={<OfficeHours />} />
+          <Route path="/success-stories" element={<SuccessStories />} />
+          <Route path="/request-template" element={<RequestTemplate />} />
+          <Route path="/submit-template" element={<SubmitTemplate />} />
+          <Route path="/join-community" element={<JoinCommunity />} />
         </Routes>
       </Layout>
     </Router>

@@ -250,7 +250,7 @@ function Home() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">No-Code Guides</h3>
               <p className="text-gray-300 mb-4">Step-by-step tutorials for popular platforms</p>
-              <Link to="/guides" className="text-blue-400 hover:text-blue-300 flex items-center space-x-1 mx-auto">
+              <Link to="/guides" className="text-blue-400 hover:text-blue-300 flex items-center space-x-1 justify-center">
                 <span>Browse Guides</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -262,7 +262,7 @@ function Home() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Community Support</h3>
               <p className="text-gray-300 mb-4">Join other non-developers building with AI</p>
-              <Link to="/community" className="text-blue-400 hover:text-blue-300 flex items-center space-x-1 mx-auto">
+              <Link to="/join-community" className="text-blue-400 hover:text-blue-300 flex items-center space-x-1 justify-center">
                 <span>Join Community</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -274,7 +274,7 @@ function Home() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Template Library</h3>
               <p className="text-gray-300 mb-4">Ready-to-use templates for common use cases</p>
-              <Link to="/templates" className="text-blue-400 hover:text-blue-300 flex items-center space-x-1 mx-auto">
+              <Link to="/templates" className="text-blue-400 hover:text-blue-300 flex items-center space-x-1 justify-center">
                 <span>Get Templates</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -289,7 +289,7 @@ function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
-                to="/templates"
+                to="/start-building"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
               >
                 Start Your First Project
