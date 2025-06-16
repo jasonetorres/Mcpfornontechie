@@ -17,6 +17,9 @@ import SuccessStories from './pages/SuccessStories';
 import RequestTemplate from './pages/RequestTemplate';
 import SubmitTemplate from './pages/SubmitTemplate';
 import JoinCommunity from './pages/JoinCommunity';
+import BeginnerPath from './pages/BeginnerPath';
+import IntermediatePath from './pages/IntermediatePath';
+import AdvancedPath from './pages/AdvancedPath';
 
 function App() {
   return (
@@ -39,6 +42,9 @@ function App() {
           <Route path="/request-template" element={<RequestTemplate />} />
           <Route path="/submit-template" element={<SubmitTemplate />} />
           <Route path="/join-community" element={<JoinCommunity />} />
+          <Route path="/beginner-path" element={<BeginnerPath />} />
+          <Route path="/intermediate-path" element={<IntermediatePath />} />
+          <Route path="/advanced-path" element={<AdvancedPath />} />
         </Routes>
       </Layout>
     </Router>

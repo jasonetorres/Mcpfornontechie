@@ -12,6 +12,7 @@ function StartBuilding() {
       description: 'Never worked with AI or data connections before',
       duration: '2-3 weeks',
       difficulty: 'Beginner',
+      route: '/beginner-path',
       steps: [
         {
           title: 'Understand MCP Fundamentals',
@@ -56,6 +57,7 @@ function StartBuilding() {
       description: 'Comfortable with spreadsheets and online tools',
       duration: '1-2 weeks',
       difficulty: 'Intermediate',
+      route: '/intermediate-path',
       steps: [
         {
           title: 'Review MCP Architecture',
@@ -100,6 +102,7 @@ function StartBuilding() {
       description: 'Advanced with automation and integrations',
       duration: '3-5 days',
       difficulty: 'Advanced',
+      route: '/advanced-path',
       steps: [
         {
           title: 'Master MCP Protocol',
@@ -270,13 +273,27 @@ function StartBuilding() {
                           </span>
                         ))}
                       </div>
-                      <button className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+                      <Link
+                        to={currentPath.route}
+                        className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 w-fit"
+                      >
                         <span>{step.action}</span>
                         <ArrowRight className="w-4 h-4" />
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Start Path Button */}
+              <div className="mt-8 text-center">
+                <Link
+                  to={currentPath.route}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
+                >
+                  <span>Start {currentPath.title} Path</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
               </div>
             </div>
           </div>
