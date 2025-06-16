@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 export type PathType = 'beginner' | 'intermediate' | 'advanced'
@@ -17,6 +16,7 @@ interface LearningProgress {
 export function useLearningProgress(pathType: PathType) {
   const { user } = useAuth()
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -30,15 +30,16 @@ export function useLearningProgress(pathType: PathType) {
     if (!user) return
 
     try {
-      const { data, error } = await supabase
-        .from('learning_progress')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('path_type', pathType)
-        .eq('completed', true)
-
-      if (!error && data) {
-        const completed = data.map(item => item.step_index)
+      // Get progress from localStorage for demo
+      const progressData = localStorage.getItem('mock-progress')
+      if (progressData) {
+        const allProgress = JSON.parse(progressData)
+        const userProgress = allProgress.filter((item: LearningProgress) => 
+          item.user_id === user.id && 
+          item.path_type === pathType && 
+          item.completed
+        )
+        const completed = userProgress.map((item: LearningProgress) => item.step_index)
         setCompletedSteps(completed)
       }
     } catch (error) {
@@ -49,35 +50,41 @@ export function useLearningProgress(pathType: PathType) {
   const toggleStep = async (stepIndex: number) => {
     if (!user) return
 
+    setLoading(true)
     const isCompleted = completedSteps.includes(stepIndex)
 
     try {
+      const progressData = localStorage.getItem('mock-progress')
+      let allProgress = progressData ? JSON.parse(progressData) : []
+
       if (isCompleted) {
         // Remove completion
-        await supabase
-          .from('learning_progress')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('path_type', pathType)
-          .eq('step_index', stepIndex)
-
+        allProgress = allProgress.filter((item: LearningProgress) => 
+          !(item.user_id === user.id && 
+            item.path_type === pathType && 
+            item.step_index === stepIndex)
+        )
         setCompletedSteps(prev => prev.filter(i => i !== stepIndex))
       } else {
         // Add completion
-        await supabase
-          .from('learning_progress')
-          .insert({
-            user_id: user.id,
-            path_type: pathType,
-            step_index: stepIndex,
-            completed: true,
-            completed_at: new Date().toISOString()
-          })
-
+        const newProgress = {
+          id: 'progress-' + Date.now(),
+          user_id: user.id,
+          path_type: pathType,
+          step_index: stepIndex,
+          completed: true,
+          completed_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        }
+        allProgress.push(newProgress)
         setCompletedSteps(prev => [...prev, stepIndex])
       }
+
+      localStorage.setItem('mock-progress', JSON.stringify(allProgress))
     } catch (error) {
       console.error('Error updating learning progress:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -87,7 +94,7 @@ export function useLearningProgress(pathType: PathType) {
 
   return {
     completedSteps,
-    loading: false, // Removed loading state
+    loading,
     toggleStep,
     getProgressPercentage,
     refreshProgress: fetchProgress

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Play, ExternalLink, Users, MessageSquare, Workflow, Database, FileSpreadsheet, Calendar, ShoppingCart, BarChart3, Filter, Code, Download, CheckCircle } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 function Examples() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedComplexity, setSelectedComplexity] = useState('all');
   const [activeTutorial, setActiveTutorial] = useState<number | null>(null);
   const [tutorialStep, setTutorialStep] = useState(0);
+  const { user } = useAuth();
 
   const categories = [
     { id: 'all', name: 'All Examples', icon: Database },
@@ -227,6 +229,27 @@ Focus on solutions relevant to their industry and company size."`,
     }
   };
 
+  const completeTutorial = () => {
+    // Track tutorial completion if user is logged in
+    if (user && activeTutorial) {
+      const completionData = {
+        tutorialId: activeTutorial,
+        completedAt: new Date().toISOString(),
+        userId: user.id
+      };
+      
+      // Store in localStorage for demo
+      const existingCompletions = JSON.parse(localStorage.getItem('tutorial-completions') || '[]');
+      existingCompletions.push(completionData);
+      localStorage.setItem('tutorial-completions', JSON.stringify(existingCompletions));
+      
+      console.log('Tutorial completed:', completionData);
+    }
+    
+    setActiveTutorial(null);
+    setTutorialStep(0);
+  };
+
   const closeTutorial = () => {
     setActiveTutorial(null);
     setTutorialStep(0);
@@ -241,6 +264,11 @@ Focus on solutions relevant to their industry and company size."`,
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             See how non-technical professionals are using MCP to supercharge their work with interactive tutorials
           </p>
+          {user && (
+            <div className="mt-4 text-green-300">
+              ✅ Signed in - Your tutorial progress will be tracked!
+            </div>
+          )}
         </div>
 
         {/* Filters */}
@@ -474,7 +502,7 @@ Focus on solutions relevant to their industry and company size."`,
                             </button>
                           ) : (
                             <button
-                              onClick={closeTutorial}
+                              onClick={completeTutorial}
                               className="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white rounded-lg font-medium transition-all duration-200"
                             >
                               Complete Tutorial
