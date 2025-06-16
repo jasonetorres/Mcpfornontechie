@@ -208,10 +208,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔄 Signing out user')
       
-      await supabase.auth.signOut()
+      // Clear local state first for immediate UI feedback
       setProfile(null)
+      setUser(null)
+      setSession(null)
       
-      console.log('✅ User signed out successfully')
+      // Then sign out from Supabase
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error('❌ Error signing out:', error)
+        // If there's an error, we might want to restore the state
+        // but for now, we'll keep the user signed out locally
+      } else {
+        console.log('✅ User signed out successfully')
+      }
     } catch (error) {
       console.error('❌ Error in signOut:', error)
     }
