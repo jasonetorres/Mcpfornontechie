@@ -121,8 +121,8 @@ if (customer.size === "Enterprise" && customer.engagement_score > 80) {
             title: 'Generate Personalized Content',
             content: 'Use Claude API to create targeted messaging',
             code: `// Content generation prompt
-"Create a personalized email for ${customer.name} in the ${customer.industry} industry. 
-They are a ${customer.size} company with engagement score ${customer.engagement_score}.
+"Create a personalized email for \${customer.name} in the \${customer.industry} industry. 
+They are a \${customer.size} company with engagement score \${customer.engagement_score}.
 Focus on solutions relevant to their industry and company size."`,
             action: 'Test content generation with sample customers'
           }
