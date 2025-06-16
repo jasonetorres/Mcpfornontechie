@@ -40,7 +40,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -48,30 +47,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     const getInitialSession = async () => {
       try {
-        console.log('Getting initial session...')
+        console.log('🔄 Getting initial session...')
         const { data: { session }, error } = await supabase.auth.getSession()
         
         if (!mounted) return
 
         if (error) {
-          console.error('Error getting session:', error)
-        } else {
-          console.log('Initial session:', session?.user?.email || 'No session')
+          console.error('❌ Error getting session:', error)
+          setLoading(false)
+          return
         }
 
+        console.log('✅ Initial session:', session?.user?.email || 'No session')
         setSession(session)
         setUser(session?.user ?? null)
         
         if (session?.user) {
+          console.log('👤 User found, fetching profile...')
           await fetchProfile(session.user.id)
+        } else {
+          console.log('👤 No user, setting loading to false')
+          setLoading(false)
         }
-        
-        setInitialized(true)
-        setLoading(false)
       } catch (error) {
-        console.error('Error in getInitialSession:', error)
+        console.error('❌ Error in getInitialSession:', error)
         if (mounted) {
-          setInitialized(true)
           setLoading(false)
         }
       }
@@ -85,18 +85,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
 
-      console.log('Auth state changed:', event, session?.user?.email || 'No user')
+      console.log('🔄 Auth state changed:', event, session?.user?.email || 'No user')
       
       setSession(session)
       setUser(session?.user ?? null)
       
       if (session?.user) {
+        console.log('👤 User in auth change, fetching profile...')
         await fetchProfile(session.user.id)
       } else {
+        console.log('👤 No user in auth change, clearing profile')
         setProfile(null)
-      }
-      
-      if (initialized) {
         setLoading(false)
       }
     })
@@ -105,11 +104,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false
       subscription.unsubscribe()
     }
-  }, [initialized])
+  }, [])
 
   const fetchProfile = async (userId: string) => {
     try {
-      console.log('Fetching profile for user:', userId)
+      console.log('🔍 Fetching profile for user:', userId)
       
       const { data, error } = await supabase
         .from('profiles')
@@ -118,16 +117,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle()
 
       if (error) {
-        console.error('Error fetching profile:', error)
+        console.error('❌ Error fetching profile:', error)
         // Create a basic profile if it doesn't exist
-        const user = await supabase.auth.getUser()
-        if (user.data.user) {
+        const { data: userData } = await supabase.auth.getUser()
+        if (userData.user) {
+          console.log('🔧 Creating basic profile from user metadata')
           const basicProfile = {
             id: userId,
-            email: user.data.user.email!,
-            full_name: user.data.user.user_metadata?.full_name || null,
-            role: user.data.user.user_metadata?.role || null,
-            company: user.data.user.user_metadata?.company || null,
+            email: userData.user.email!,
+            full_name: userData.user.user_metadata?.full_name || null,
+            role: userData.user.user_metadata?.role || null,
+            company: userData.user.user_metadata?.company || null,
             avatar_url: null,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -135,18 +135,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setProfile(basicProfile)
         }
       } else {
-        console.log('Profile fetched:', data)
+        console.log('✅ Profile fetched:', data?.email)
         setProfile(data)
       }
     } catch (error) {
-      console.error('Error in fetchProfile:', error)
+      console.error('❌ Error in fetchProfile:', error)
       setProfile(null)
+    } finally {
+      console.log('✅ Setting loading to false after profile fetch')
+      setLoading(false)
     }
   }
 
   const signUp = async (email: string, password: string, userData?: Partial<Profile>) => {
     try {
       setLoading(true)
+      console.log('🔄 Signing up user:', email)
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -160,6 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
 
       if (!error && data.user) {
+        console.log('✅ User signed up successfully')
         // Try to create profile, but don't fail if it doesn't work
         try {
           const profileData = {
@@ -176,45 +182,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .insert(profileData)
 
           if (profileError) {
-            console.error('Error creating profile:', profileError)
+            console.error('❌ Error creating profile:', profileError)
+          } else {
+            console.log('✅ Profile created successfully')
           }
         } catch (profileError) {
-          console.error('Error creating profile:', profileError)
+          console.error('❌ Error creating profile:', profileError)
         }
       }
 
       return { error }
     } catch (error) {
-      console.error('Error in signUp:', error)
+      console.error('❌ Error in signUp:', error)
       return { error }
     } finally {
-      setLoading(false)
+      // Don't set loading to false here - let the auth state change handle it
     }
   }
 
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true)
+      console.log('🔄 Signing in user:', email)
+      
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
+      
+      if (!error) {
+        console.log('✅ User signed in successfully')
+      }
+      
       return { error }
     } catch (error) {
-      console.error('Error in signIn:', error)
+      console.error('❌ Error in signIn:', error)
       return { error }
     } finally {
-      setLoading(false)
+      // Don't set loading to false here - let the auth state change handle it
     }
   }
 
   const signOut = async () => {
     try {
       setLoading(true)
+      console.log('🔄 Signing out user')
+      
       await supabase.auth.signOut()
       setProfile(null)
+      
+      console.log('✅ User signed out successfully')
     } catch (error) {
-      console.error('Error in signOut:', error)
+      console.error('❌ Error in signOut:', error)
     } finally {
       setLoading(false)
     }
@@ -235,7 +254,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return { error }
     } catch (error) {
-      console.error('Error in updateProfile:', error)
+      console.error('❌ Error in updateProfile:', error)
       return { error }
     }
   }
@@ -244,7 +263,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       setLoading(true)
       await fetchProfile(user.id)
-      setLoading(false)
     }
   }
 
@@ -259,6 +277,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateProfile,
     refreshProfile,
   }
+
+  console.log('🔄 AuthProvider render - loading:', loading, 'user:', user?.email || 'none', 'profile:', profile?.email || 'none')
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
