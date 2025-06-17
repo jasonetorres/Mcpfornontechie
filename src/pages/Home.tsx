@@ -142,7 +142,7 @@ function Home() {
           <div className="mb-8">
             <div className="inline-flex items-center space-x-2 bg-matrix-primary/20 text-matrix-primary px-4 py-2 rounded-full mb-6">
               <Play className="w-4 h-4" />
-              <span className="text-sm font-medium">Supporting: "The Missing Link" Talk</span>
+              <span className="text-sm font-medium">Learn MCP - No Coding Required</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
               The{' '}
@@ -151,8 +151,8 @@ function Home() {
               </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Unleash AI's full potential without coding. Learn how MCP connects AI to YOUR data, 
-              making it truly useful for community managers, marketers, project managers, and all non-technical professionals.
+              Master the Model Context Protocol (MCP) and unleash AI's full potential without coding. 
+              Perfect for community managers, marketers, project managers, and all non-technical professionals.
             </p>
           </div>
           
@@ -255,20 +255,20 @@ function Home() {
         </div>
       </section>
 
-      {/* Quick Demo Preview */}
+      {/* Interactive Demo Preview */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">Live Demo Preview</h2>
+            <h2 className="text-4xl font-bold text-foreground mb-4">See MCP in Action</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Get a taste of what we'll build together during the talk
+              Experience how MCP transforms AI from generic to context-aware
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Demo Steps */}
             <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Demo Steps</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-6">How It Works</h3>
               <div className="space-y-4">
                 {demoSteps.map((step, index) => (
                   <div 
@@ -420,12 +420,12 @@ function Home() {
         </div>
       </section>
 
-      {/* Quick Links */}
+      {/* Learning Resources */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-foreground mb-4">Take Action After the Talk</h2>
+          <h2 className="text-4xl font-bold text-foreground mb-4">Everything You Need to Succeed</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-            Ready to start building? Here's everything you need to get started
+            From beginner tutorials to advanced templates - we've got you covered
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -433,8 +433,8 @@ function Home() {
               <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center mb-4 mx-auto">
                 <Book className="w-6 h-6 text-primary-foreground" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">No-Code Guides</h3>
-              <p className="text-muted-foreground mb-4">Step-by-step tutorials for popular platforms</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Step-by-Step Guides</h3>
+              <p className="text-muted-foreground mb-4">Comprehensive tutorials for every skill level</p>
               <button 
                 onClick={() => handleNavigation('/guides')}
                 className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center"
@@ -448,8 +448,8 @@ function Home() {
               <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center mb-4 mx-auto">
                 <Users className="w-6 h-6 text-primary-foreground" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Community Support</h3>
-              <p className="text-muted-foreground mb-4">Join other non-developers building with AI</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Active Community</h3>
+              <p className="text-muted-foreground mb-4">Connect with thousands of MCP builders</p>
               <button 
                 onClick={() => handleNavigation('/join-community')}
                 className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center"
@@ -463,8 +463,8 @@ function Home() {
               <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center mb-4 mx-auto">
                 <Workflow className="w-6 h-6 text-primary-foreground" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Template Library</h3>
-              <p className="text-muted-foreground mb-4">Ready-to-use templates for common use cases</p>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Ready-to-Use Templates</h3>
+              <p className="text-muted-foreground mb-4">Pre-built solutions for common use cases</p>
               <button 
                 onClick={() => handleNavigation('/templates')}
                 className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center"
@@ -477,10 +477,10 @@ function Home() {
 
           {/* Call to Action */}
           <div className="mt-16 bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8">
-            <h3 className="text-2xl font-bold text-foreground mb-4">Ready to Connect AI to Your Data?</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-4">Ready to Transform Your Work with AI?</h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Don't let AI remain a black box. Start building context-aware AI solutions that actually understand your business.
-              The possibilities are endless with MCP!
+              Join thousands of non-developers who are already building amazing AI-powered solutions with MCP.
+              Start your journey today!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
@@ -490,10 +490,10 @@ function Home() {
                 Start Your First Project
               </button>
               <button 
-                onClick={() => handleNavigation('/talk-resources')}
+                onClick={() => handleNavigation('/learn')}
                 className="border border-border text-foreground px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors duration-200"
               >
-                Download Slides
+                Explore Learning Paths
               </button>
             </div>
           </div>

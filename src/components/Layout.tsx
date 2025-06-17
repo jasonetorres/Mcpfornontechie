@@ -340,18 +340,17 @@ function Layout({ children }: LayoutProps) {
             </Link>
             
             <div className="flex space-x-6 text-muted-foreground">
-              <Link to="/talk-resources" className="hover:text-foreground transition-colors duration-200">Talk Resources</Link>
               <Link to="/templates" className="hover:text-foreground transition-colors duration-200">Templates</Link>
               <Link to="/community" className="hover:text-foreground transition-colors duration-200">Community</Link>
               <Link to="/guides" className="hover:text-foreground transition-colors duration-200">Guides</Link>
               <Link to="/pricing" className="hover:text-foreground transition-colors duration-200">Pricing</Link>
+              <Link to="/success-stories" className="hover:text-foreground transition-colors duration-200">Success Stories</Link>
             </div>
           </div>
           
           <div className="mt-8 pt-8 border-t border-border text-center">
             <p className="text-muted-foreground">
-              © 2025 MCP Academy. Empowering non-developers to build with AI. 
-              <span className="text-matrix-primary ml-2">Supporting "The Missing Link" talk</span>
+              © 2025 MCP Academy. Empowering non-developers to build with AI.
             </p>
           </div>
         </div>

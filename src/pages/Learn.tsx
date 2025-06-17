@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 function Learn() {
   const [activeTab, setActiveTab] = useState('basics');
-  const [codeCopied, setCodeCopied] = useState('');
+  const [codeCopied, setCopiedTemplate] = useState('');
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setTimeout(() => window.scrollTo(0, 0), 100);
+  };
 
   const copyCode = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
-    setCodeCopied(id);
-    setTimeout(() => setCodeCopied(''), 2000);
+    setCopiedTemplate(id);
+    setTimeout(() => setCopiedTemplate(''), 2000);
   };
 
   const codeExamples = {
@@ -341,13 +347,13 @@ all tasks assigned to me this week and summarize them."`
             ))}
           </div>
           <div className="mt-8 text-center">
-            <Link
-              to="/examples"
+            <button
+              onClick={() => handleNavigation('/templates')}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
             >
-              <span>See Real Examples</span>
+              <span>Browse Templates</span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -486,10 +492,10 @@ all tasks assigned to me this week and summarize them."`
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/examples"
+              to="/demo"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
             >
-              Try Interactive Examples
+              Try Interactive Demo
             </Link>
             <Link
               to="/templates"

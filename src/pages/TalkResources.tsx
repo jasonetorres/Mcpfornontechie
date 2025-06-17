@@ -12,32 +12,32 @@ function TalkResources() {
 
   const downloadResources = [
     {
-      title: 'Complete Slide Deck',
-      description: 'Full presentation slides from "The Missing Link" talk',
+      title: 'MCP Learning Guide',
+      description: 'Comprehensive guide to understanding and implementing MCP',
       type: 'PDF',
-      size: '12.4 MB',
+      size: '8.2 MB',
       downloads: 1247,
       icon: FileText
     },
     {
-      title: 'Speaker Notes & Script',
-      description: 'Detailed talking points and presentation notes',
+      title: 'Platform Setup Guides',
+      description: 'Step-by-step setup instructions for popular platforms',
       type: 'PDF',
-      size: '3.2 MB',
+      size: '5.1 MB',
       downloads: 892,
       icon: FileText
     },
     {
-      title: 'Demo Data Files',
-      description: 'Sample community member data used in the live demo',
+      title: 'Sample Data Files',
+      description: 'Example datasets for practicing MCP implementations',
       type: 'CSV',
       size: '156 KB',
       downloads: 1456,
       icon: Code
     },
     {
-      title: 'MCP Configuration Templates',
-      description: 'Ready-to-use configuration files for the demo',
+      title: 'Template Collection',
+      description: 'Ready-to-use MCP configuration templates',
       type: 'JSON',
       size: '24 KB',
       downloads: 1123,
@@ -47,25 +47,25 @@ function TalkResources() {
 
   const videoResources = [
     {
-      title: 'Full Talk Recording',
-      description: 'Complete recording of "The Missing Link" presentation',
-      duration: '45 min',
+      title: 'MCP Fundamentals',
+      description: 'Complete introduction to Model Context Protocol concepts',
+      duration: '25 min',
       views: '12.4K',
       thumbnail: '🎥'
     },
     {
       title: 'Live Demo Walkthrough',
-      description: 'Step-by-step breakdown of the live demonstration',
+      description: 'Step-by-step breakdown of building your first MCP connection',
       duration: '15 min',
       views: '8.7K',
       thumbnail: '🖥️'
     },
     {
-      title: 'Q&A Session',
-      description: 'Audience questions and detailed answers',
-      duration: '20 min',
+      title: 'Platform Comparison',
+      description: 'Detailed comparison of no-code platforms for MCP',
+      duration: '18 min',
       views: '5.2K',
-      thumbnail: '❓'
+      thumbnail: '⚖️'
     }
   ];
 
@@ -92,7 +92,7 @@ function TalkResources() {
       path: '/join-community'
     },
     {
-      title: 'Get Hands-On Help',
+      title: 'Get Expert Help',
       description: 'Attend our weekly office hours for personalized guidance',
       action: 'Register for Office Hours',
       icon: '🤝',
@@ -102,8 +102,8 @@ function TalkResources() {
 
   const additionalResources = [
     {
-      title: 'MCP Fundamentals Course',
-      description: 'Free 2-hour course covering all the basics',
+      title: 'MCP Learning Paths',
+      description: 'Structured courses covering all skill levels',
       type: 'Course',
       path: '/learn'
     },
@@ -133,7 +133,7 @@ function TalkResources() {
     
     // Create a mock download
     const element = document.createElement('a');
-    const file = new Blob([`# ${resourceTitle}\n\nThis is a demo file for the MCP Academy talk resources.\n\nThank you for attending "The Missing Link" presentation!`], { type: 'text/plain' });
+    const file = new Blob([`# ${resourceTitle}\n\nThis is a demo file for MCP Academy resources.\n\nThank you for using MCP Academy to learn the Model Context Protocol!`], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
     element.download = `${resourceTitle.replace(/\s+/g, '-').toLowerCase()}.txt`;
     document.body.appendChild(element);
@@ -152,9 +152,9 @@ function TalkResources() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">Talk Resources</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">Learning Resources</h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Everything from "The Missing Link: Unleashing AI's Full Potential for Non-Developers with MCP"
+            Everything you need to master MCP - guides, templates, videos, and community support
           </p>
         </div>
 
@@ -192,7 +192,7 @@ function TalkResources() {
 
         {/* Video Resources */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8">Video Resources</h2>
+          <h2 className="text-2xl font-bold text-white mb-8">Video Tutorials</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {videoResources.map((video, index) => (
               <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300">
@@ -272,9 +272,9 @@ function TalkResources() {
 
         {/* Contact & Support */}
         <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-4">Questions About the Talk?</h3>
+          <h3 className="text-2xl font-bold text-white mb-4">Need Additional Help?</h3>
           <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Have questions about the presentation or need help getting started with MCP? We're here to help!
+            Our community and expert team are here to help you succeed with MCP.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
@@ -288,7 +288,7 @@ function TalkResources() {
               onClick={() => handleNavigation('/office-hours')}
               className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
             >
-              Contact Speaker
+              Schedule Office Hours
             </button>
           </div>
         </div>
