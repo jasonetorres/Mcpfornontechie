@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../hooks/useSubscription';
 import UserMenu from './UserMenu';
@@ -18,7 +18,7 @@ function Layout({ children }: LayoutProps) {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const location = useLocation();
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { getSubscriptionPlan, isActive } = useSubscription();
 
   const navItems = [
@@ -51,7 +51,7 @@ function Layout({ children }: LayoutProps) {
 
   // Show notification when user signs in
   useEffect(() => {
-    if (user && profile) {
+    if (user && profile && !authLoading) {
       setNotificationMessage(`Welcome back, ${profile.full_name || profile.email}!`);
       setShowNotification(true);
       
@@ -62,7 +62,7 @@ function Layout({ children }: LayoutProps) {
 
       return () => clearTimeout(timer);
     }
-  }, [user, profile]);
+  }, [user, profile, authLoading]);
 
   // Handle auth modal close with success notification for new signups
   const handleAuthModalClose = (wasSuccessfulSignup?: boolean) => {
@@ -96,6 +96,18 @@ function Layout({ children }: LayoutProps) {
               >
                 <X className="w-4 h-4" />
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Overlay for Auth */}
+      {authLoading && (
+        <div className="fixed top-20 right-4 z-50">
+          <div className="bg-card/90 backdrop-blur-md border border-border rounded-lg p-4 shadow-lg">
+            <div className="flex items-center space-x-3">
+              <Loader2 className="w-5 h-5 text-matrix-primary animate-spin flex-shrink-0" />
+              <p className="text-foreground font-medium">Loading your account...</p>
             </div>
           </div>
         </div>
@@ -174,15 +186,21 @@ function Layout({ children }: LayoutProps) {
                   <button
                     onClick={() => openAuthModal('signin')}
                     className="text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-muted"
+                    disabled={authLoading}
                   >
-                    <LogIn className="w-4 h-4" />
-                    <span>Sign In</span>
+                    {authLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <LogIn className="w-4 h-4" />
+                    )}
+                    <span>{authLoading ? 'Loading...' : 'Sign In'}</span>
                   </button>
                   <button
                     onClick={() => openAuthModal('signup')}
-                    className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                    disabled={authLoading}
+                    className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Sign Up
+                    {authLoading ? 'Loading...' : 'Sign Up'}
                   </button>
                 </div>
               )}
@@ -215,7 +233,7 @@ function Layout({ children }: LayoutProps) {
                 ) : (
                   <div className="flex items-center space-x-2 text-muted-foreground">
                     <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
-                    <span className="text-sm">Not signed in</span>
+                    <span className="text-sm">{authLoading ? 'Loading...' : 'Not signed in'}</span>
                   </div>
                 )}
               </div>
@@ -258,20 +276,22 @@ function Layout({ children }: LayoutProps) {
                       openAuthModal('signin');
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200 w-full"
+                    disabled={authLoading}
+                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200 w-full disabled:opacity-50"
                   >
-                    <LogIn className="w-4 h-4" />
-                    <span>Sign In</span>
+                    {authLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                    <span>{authLoading ? 'Loading...' : 'Sign In'}</span>
                   </button>
                   <button
                     onClick={() => {
                       openAuthModal('signup');
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200 w-full"
+                    disabled={authLoading}
+                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200 w-full disabled:opacity-50"
                   >
                     <Users className="w-4 h-4" />
-                    <span>Sign Up</span>
+                    <span>{authLoading ? 'Loading...' : 'Sign Up'}</span>
                   </button>
                 </div>
               )}

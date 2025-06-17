@@ -22,6 +22,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>
   refreshProfile: () => Promise<void>
+  loading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -38,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
@@ -50,6 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(userData)
         setSession({ user: userData } as any)
         fetchProfile(userData.id)
+      } else {
+        setLoading(false)
       }
     }
 
@@ -73,6 +77,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('👤 No user in auth change, clearing profile')
         setProfile(null)
       }
+      
+      setLoading(false)
     })
 
     return () => {
@@ -119,6 +125,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, userData?: Partial<Profile>) => {
     try {
       console.log('🔄 Signing up user:', email)
+      
+      // Simulate network delay for realistic experience
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -171,6 +180,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       console.log('🔄 Signing in user:', email)
+      
+      // Simulate network delay for realistic experience
+      await new Promise(resolve => setTimeout(resolve, 800))
       
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -279,9 +291,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     updateProfile,
     refreshProfile,
+    loading,
   }
 
-  console.log('🔄 AuthProvider render - user:', user?.email || 'none', 'profile:', profile?.email || 'none')
+  console.log('🔄 AuthProvider render - user:', user?.email || 'none', 'profile:', profile?.email || 'none', 'loading:', loading)
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
