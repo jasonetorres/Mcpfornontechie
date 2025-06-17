@@ -44,20 +44,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true
 
-    // Check for existing mock user
-    const checkExistingUser = () => {
-      const mockUser = localStorage.getItem('mock-user')
-      if (mockUser && mounted) {
-        const userData = JSON.parse(mockUser)
-        setUser(userData)
-        setSession({ user: userData } as any)
-        fetchProfile(userData.id)
-      } else {
-        setLoading(false)
+    // Check for existing session on mount
+    const initializeAuth = async () => {
+      try {
+        console.log('🔄 Initializing auth...')
+        
+        // Check for existing mock user
+        const mockUser = localStorage.getItem('mock-user')
+        if (mockUser && mounted) {
+          const userData = JSON.parse(mockUser)
+          console.log('✅ Found existing user:', userData.email)
+          
+          // Create a proper session object
+          const mockSession = {
+            access_token: 'mock-token-' + Date.now(),
+            user: userData,
+            expires_at: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+            expires_in: 24 * 60 * 60,
+            refresh_token: 'mock-refresh-' + Date.now(),
+            token_type: 'bearer'
+          } as Session
+
+          setUser(userData)
+          setSession(mockSession)
+          await fetchProfile(userData.id)
+        }
+      } catch (error) {
+        console.error('❌ Error initializing auth:', error)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
       }
     }
 
-    checkExistingUser()
+    initializeAuth()
 
     // Listen for auth changes
     const {
@@ -78,7 +99,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(null)
       }
       
-      setLoading(false)
+      if (mounted) {
+        setLoading(false)
+      }
     })
 
     return () => {
@@ -95,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const mockProfile = localStorage.getItem('mock-profile')
       if (mockProfile) {
         const profileData = JSON.parse(mockProfile)
+        console.log('✅ Found existing profile:', profileData.email)
         setProfile(profileData)
         return
       }
@@ -113,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           created_at: userData.created_at || new Date().toISOString(),
           updated_at: new Date().toISOString()
         }
+        console.log('✅ Created new profile:', basicProfile.email)
         localStorage.setItem('mock-profile', JSON.stringify(basicProfile))
         setProfile(basicProfile)
       }
@@ -125,6 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, userData?: Partial<Profile>) => {
     try {
       console.log('🔄 Signing up user:', email)
+      setLoading(true)
       
       // Simulate network delay for realistic experience
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -162,47 +188,90 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ...data.user,
           created_at: now
         }
+        
+        // Update state immediately
+        setUser(userWithTimestamp)
+        setProfile(profileData)
+        
+        // Create session
+        const mockSession = {
+          access_token: 'mock-token-' + Date.now(),
+          user: userWithTimestamp,
+          expires_at: Date.now() + (24 * 60 * 60 * 1000),
+          expires_in: 24 * 60 * 60,
+          refresh_token: 'mock-refresh-' + Date.now(),
+          token_type: 'bearer'
+        } as Session
+        setSession(mockSession)
+        
+        // Store in localStorage
         localStorage.setItem('mock-user', JSON.stringify(userWithTimestamp))
         localStorage.setItem('mock-profile', JSON.stringify(profileData))
-        setProfile(profileData)
         
         // Initialize user achievements and progress
         initializeUserData(data.user.id)
+        
+        console.log('✅ Auth state updated immediately')
       }
 
       return { error }
     } catch (error) {
       console.error('❌ Error in signUp:', error)
       return { error }
+    } finally {
+      setLoading(false)
     }
   }
 
   const signIn = async (email: string, password: string) => {
     try {
       console.log('🔄 Signing in user:', email)
+      setLoading(true)
       
       // Simulate network delay for realistic experience
       await new Promise(resolve => setTimeout(resolve, 800))
       
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
       
-      if (!error) {
+      if (!error && data.user) {
         console.log('✅ User signed in successfully')
+        
+        // Update state immediately
+        setUser(data.user)
+        
+        // Create session
+        const mockSession = {
+          access_token: 'mock-token-' + Date.now(),
+          user: data.user,
+          expires_at: Date.now() + (24 * 60 * 60 * 1000),
+          expires_in: 24 * 60 * 60,
+          refresh_token: 'mock-refresh-' + Date.now(),
+          token_type: 'bearer'
+        } as Session
+        setSession(mockSession)
+        
+        // Fetch and set profile
+        await fetchProfile(data.user.id)
+        
+        console.log('✅ Auth state updated immediately')
       }
       
       return { error }
     } catch (error) {
       console.error('❌ Error in signIn:', error)
       return { error }
+    } finally {
+      setLoading(false)
     }
   }
 
   const signOut = async () => {
     try {
       console.log('🔄 Signing out user')
+      setLoading(true)
       
       // Clear local state first for immediate UI feedback
       setProfile(null)
@@ -219,6 +288,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('❌ Error in signOut:', error)
+    } finally {
+      setLoading(false)
     }
   }
 

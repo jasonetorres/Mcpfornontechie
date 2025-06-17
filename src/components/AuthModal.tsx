@@ -60,9 +60,6 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
         // Show processing message
         setSuccess('Creating your account...')
         
-        // Simulate realistic signup delay
-        await new Promise(resolve => setTimeout(resolve, 2000))
-
         const { error } = await signUp(formData.email, formData.password, {
           full_name: formData.fullName,
           role: formData.role,
@@ -76,31 +73,30 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           setSuccess('Account created successfully! Welcome to MCP Academy!')
           setStep('success')
           
-          // Close modal after showing success
+          // Close modal after showing success - reduced delay for better UX
           setTimeout(() => {
             onClose(true)
-          }, 2000)
+            resetForm()
+          }, 1500)
         }
       } else {
         // Show processing message
         setSuccess('Signing you in...')
         
-        // Simulate realistic signin delay
-        await new Promise(resolve => setTimeout(resolve, 1500))
-
         const { error } = await signIn(formData.email, formData.password)
         
         if (error) {
           setError(error.message)
           setStep('form')
         } else {
-          setSuccess('Welcome back! Redirecting to your dashboard...')
+          setSuccess('Welcome back! You are now signed in.')
           setStep('success')
           
-          // Close modal after showing success
+          // Close modal after showing success - reduced delay for better UX
           setTimeout(() => {
             onClose(false)
-          }, 1500)
+            resetForm()
+          }, 1000)
         }
       }
     } catch (err) {
@@ -123,11 +119,17 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
     setError(null)
     setSuccess(null)
     setStep('form')
+    setLoading(false)
   }
 
   const switchMode = () => {
     setMode(mode === 'signin' ? 'signup' : 'signin')
     resetForm()
+  }
+
+  const handleClose = () => {
+    resetForm()
+    onClose()
   }
 
   if (!isOpen) return null
@@ -136,7 +138,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
     <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-xl max-w-md w-full p-6 relative shadow-lg">
         <button
-          onClick={() => onClose()}
+          onClick={handleClose}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors duration-200"
           disabled={loading}
         >

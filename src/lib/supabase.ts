@@ -24,6 +24,7 @@ const createMockClient = () => ({
         id: 'mock-user-' + Date.now(),
         email: credentials.email,
         user_metadata: credentials.options?.data || {},
+        created_at: new Date().toISOString(),
         getSession: () => Promise.resolve({ 
           data: { 
             session: { 
@@ -37,7 +38,10 @@ const createMockClient = () => ({
           error: null 
         })
       }
+      
+      // Store immediately for synchronous access
       localStorage.setItem('mock-user', JSON.stringify(mockUser))
+      
       return Promise.resolve({ data: { user: mockUser }, error: null })
     },
     signInWithPassword: (credentials: any) => {
@@ -46,6 +50,7 @@ const createMockClient = () => ({
         id: 'mock-user-' + Date.now(),
         email: credentials.email,
         user_metadata: { full_name: 'Demo User' },
+        created_at: new Date().toISOString(),
         getSession: () => Promise.resolve({ 
           data: { 
             session: { 
@@ -59,7 +64,10 @@ const createMockClient = () => ({
           error: null 
         })
       }
+      
+      // Store immediately for synchronous access
       localStorage.setItem('mock-user', JSON.stringify(mockUser))
+      
       return Promise.resolve({ data: { user: mockUser }, error: null })
     },
     signOut: () => {
@@ -69,21 +77,43 @@ const createMockClient = () => ({
       return Promise.resolve({ error: null })
     },
     onAuthStateChange: (callback: any) => {
-      // Simulate auth state changes
-      setTimeout(() => {
+      // Simulate auth state changes with immediate callback
+      const checkAuthState = () => {
         const mockUser = localStorage.getItem('mock-user')
         if (mockUser) {
           const userData = JSON.parse(mockUser)
-          callback('SIGNED_IN', { user: userData })
+          const mockSession = {
+            access_token: 'mock-token-' + Date.now(),
+            user: userData,
+            expires_at: Date.now() + (24 * 60 * 60 * 1000),
+            expires_in: 24 * 60 * 60,
+            refresh_token: 'mock-refresh-' + Date.now(),
+            token_type: 'bearer'
+          }
+          callback('SIGNED_IN', mockSession)
         } else {
-          callback('SIGNED_OUT', { user: null })
+          callback('SIGNED_OUT', null)
         }
-      }, 100)
+      }
+      
+      // Check immediately
+      setTimeout(checkAuthState, 50)
+      
+      // Listen for storage changes (for cross-tab sync)
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'mock-user') {
+          checkAuthState()
+        }
+      }
+      
+      window.addEventListener('storage', handleStorageChange)
       
       return {
         data: {
           subscription: {
-            unsubscribe: () => {}
+            unsubscribe: () => {
+              window.removeEventListener('storage', handleStorageChange)
+            }
           }
         }
       }
