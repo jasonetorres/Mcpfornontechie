@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
+import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 
 function Learn() {
   const [activeTab, setActiveTab] = useState('basics');
@@ -282,6 +282,61 @@ all tasks assigned to me this week and summarize them."`
           </p>
         </div>
 
+        {/* Featured Course */}
+        <div className="mb-16">
+          <div className="bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8">
+            <div className="flex items-center space-x-3 mb-4">
+              <GraduationCap className="w-8 h-8 text-matrix-primary" />
+              <span className="text-matrix-primary font-semibold">Featured Course</span>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  MCP Basics: Complete In-Depth Course
+                </h2>
+                <p className="text-matrix-secondary mb-6">
+                  Everything you need to understand and implement MCP, explained in simple terms for non-technical people. Build your first working MCP connection step-by-step.
+                </p>
+                <div className="flex items-center space-x-6 mb-6">
+                  <div className="flex items-center space-x-2">
+                    <BookOpen className="w-4 h-4 text-matrix-primary" />
+                    <span className="text-matrix-secondary">8 comprehensive modules</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Play className="w-4 h-4 text-green-400" />
+                    <span className="text-green-300">2.5 hours total</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleNavigation('/mcp-basics')}
+                  className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
+                >
+                  <GraduationCap className="w-5 h-5" />
+                  <span>Start Complete Course</span>
+                </button>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-6">
+                <h3 className="text-white font-semibold mb-4">What You'll Learn:</h3>
+                <div className="space-y-3">
+                  {[
+                    'What MCP is using simple analogies (USB-C for AI)',
+                    'How to choose the right no-code platform',
+                    'Build your first working MCP connection step-by-step',
+                    'Security and privacy best practices',
+                    'Real-world use cases and examples',
+                    'Advanced concepts and next steps'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start space-x-2">
+                      <div className="w-1.5 h-1.5 bg-matrix-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-gray-300">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* What is MCP Section */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-white mb-8">What is MCP?</h2>
@@ -491,6 +546,12 @@ all tasks assigned to me this week and summarize them."`
             anyone can build an MCP server for any resource.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => handleNavigation('/mcp-basics')}
+              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+            >
+              Take Complete Course
+            </button>
             <Link
               to="/demo"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
