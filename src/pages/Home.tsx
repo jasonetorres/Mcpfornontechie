@@ -7,6 +7,7 @@ function Home() {
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
+    console.log('Navigating to:', path); // Debug log
     navigate(path);
     // Ensure page scrolls to top after navigation
     setTimeout(() => window.scrollTo(0, 0), 100);
