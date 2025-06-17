@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 
 function Examples() {
   const [activeTab, setActiveTab] = useState('basics');
-  const [codeCopied, setCodeCopied] = useState('');
+  const [codeCopied, setCopiedTemplate] = useState('');
 
   const copyCode = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
-    setCodeCopied(id);
-    setTimeout(() => setCodeCopied(''), 2000);
+    setCopiedTemplate(id);
+    setTimeout(() => setCopiedTemplate(''), 2000);
   };
 
   const codeExamples = {
@@ -265,6 +265,37 @@ all tasks assigned to me this week and summarize them."`
     }
   ];
 
+  const realExamples = [
+    {
+      title: 'Community Q&A Assistant',
+      description: 'Sarah Chen automated community member lookups, saving 4 hours daily',
+      impact: '95% faster response time',
+      tools: ['Zapier', 'Google Sheets', 'ChatGPT'],
+      category: 'Community Management'
+    },
+    {
+      title: 'Marketing Campaign Generator',
+      description: 'Mike Rodriguez increased email conversion rates by 300%',
+      impact: '$180K additional monthly revenue',
+      tools: ['Airtable', 'Claude AI', 'Mailchimp'],
+      category: 'Marketing'
+    },
+    {
+      title: 'Project Status Reporter',
+      description: 'Lisa Park eliminated manual reporting, saving 5 hours weekly',
+      impact: '90% improvement in project visibility',
+      tools: ['Notion', 'GPT-4', 'Slack'],
+      category: 'Project Management'
+    },
+    {
+      title: 'Lead Scoring System',
+      description: 'David Kim improved lead qualification accuracy by 60%',
+      impact: '$250K additional quarterly revenue',
+      tools: ['Power Platform', 'Salesforce', 'Azure AI'],
+      category: 'Sales'
+    }
+  ];
+
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -311,6 +342,48 @@ all tasks assigned to me this week and summarize them."`
           </div>
         </div>
 
+        {/* Real Examples Section */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-foreground mb-8">Real Success Stories</h2>
+          <p className="text-muted-foreground mb-8">
+            See how non-developers are already transforming their work with MCP:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {realExamples.map((example, index) => (
+              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6 hover:bg-card transition-all duration-300">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-foreground">{example.title}</h3>
+                  <span className="px-2 py-1 bg-matrix-primary/20 text-matrix-primary rounded text-xs">
+                    {example.category}
+                  </span>
+                </div>
+                <p className="text-muted-foreground mb-3">{example.description}</p>
+                <div className="bg-green-500/20 rounded-lg p-3 mb-4">
+                  <p className="text-green-400 font-semibold text-sm">
+                    Impact: {example.impact}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {example.tools.map((tool, toolIndex) => (
+                    <span key={toolIndex} className="px-2 py-1 bg-muted text-muted-foreground rounded text-xs">
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link
+              to="/success-stories"
+              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
+            >
+              <span>See All Success Stories</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
         {/* Popular MCP Servers */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-foreground mb-8">Popular MCP Servers You Should Try</h2>
@@ -342,10 +415,10 @@ all tasks assigned to me this week and summarize them."`
           </div>
           <div className="mt-8 text-center">
             <Link
-              to="/examples"
+              to="/templates"
               className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
             >
-              <span>See Real Examples</span>
+              <span>Browse Templates</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -381,7 +454,7 @@ all tasks assigned to me this week and summarize them."`
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-foreground">{path.title}</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    path.difficulty === 'Beginner' ? 'bg-matrix-primary/20 text-matrix-primary' :
+                    path.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' :
                     path.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
                     'bg-red-500/20 text-red-400'
                   }`}>
@@ -486,10 +559,10 @@ all tasks assigned to me this week and summarize them."`
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/examples"
+              to="/demo"
               className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200"
             >
-              Try Interactive Examples
+              Try Interactive Demo
             </Link>
             <Link
               to="/templates"
