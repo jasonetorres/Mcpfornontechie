@@ -8,6 +8,7 @@ function Home() {
 
   const handleNavigation = (path: string) => {
     navigate(path);
+    // Ensure page scrolls to top after navigation
     setTimeout(() => window.scrollTo(0, 0), 100);
   };
 
