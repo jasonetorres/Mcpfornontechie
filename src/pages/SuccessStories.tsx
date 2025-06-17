@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Star, Users, Clock, TrendingUp, ArrowRight, Play, ExternalLink, Filter } from 'lucide-react';
 
 function SuccessStories() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedImpact, setSelectedImpact] = useState('all');
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setTimeout(() => window.scrollTo(0, 0), 100);
+  };
 
   const categories = [
     { id: 'all', name: 'All Stories' },
@@ -210,16 +216,6 @@ function SuccessStories() {
     }
   };
 
-  const handleStartProject = () => {
-    // Navigate to start building page
-    window.location.href = '/start-building';
-  };
-
-  const handleShareStory = () => {
-    // Navigate to submit template page for sharing stories
-    window.location.href = '/submit-template';
-  };
-
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -402,20 +398,20 @@ function SuccessStories() {
 
                 {/* Actions */}
                 <div className="flex space-x-4">
-                  <Link
-                    to="/demo"
+                  <button
+                    onClick={() => handleNavigation('/demo')}
                     className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
                   >
                     <Play className="w-4 h-4" />
                     <span>Watch Demo</span>
-                  </Link>
-                  <Link
-                    to="/templates"
+                  </button>
+                  <button
+                    onClick={() => handleNavigation('/templates')}
                     className="flex-1 border border-white/20 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors duration-200 flex items-center justify-center space-x-2"
                   >
                     <ExternalLink className="w-4 h-4" />
                     <span>Try Template</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -430,14 +426,14 @@ function SuccessStories() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              onClick={handleStartProject}
+              onClick={() => handleNavigation('/start-building')}
               className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
             >
               <span>Start Your Project</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <button 
-              onClick={handleShareStory}
+              onClick={() => handleNavigation('/submit-template')}
               className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200 flex items-center justify-center space-x-2"
             >
               <span>Share Your Story</span>

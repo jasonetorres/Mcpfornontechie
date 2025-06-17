@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Play, Book, Usb, Database, Shield, Brain, Users, MessageSquare, Workflow, ArrowRight, ExternalLink, Code } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Play, Book, Usb, Database, Shield, Brain, Users, MessageSquare, Workflow, ArrowRight, ExternalLink, Code, Globe } from 'lucide-react';
 
 function Home() {
   const [demoStep, setDemoStep] = useState(0);
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setTimeout(() => window.scrollTo(0, 0), 100);
+  };
 
   const mcpBenefits = [
     {
@@ -151,20 +157,20 @@ function Home() {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link 
-              to="/demo"
+            <button 
+              onClick={() => handleNavigation('/demo')}
               className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-4 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-200 transform hover:scale-105"
             >
               <Play className="w-5 h-5" />
               <span>Watch Live Demo</span>
-            </Link>
-            <Link 
-              to="/learn"
+            </button>
+            <button 
+              onClick={() => handleNavigation('/learn')}
               className="border border-border text-foreground px-8 py-4 rounded-lg font-semibold hover:bg-muted transition-colors duration-200 flex items-center space-x-2"
             >
               <Book className="w-5 h-5" />
               <span>Start Learning</span>
-            </Link>
+            </button>
           </div>
 
           {/* MCP Benefits Grid */}
@@ -237,13 +243,13 @@ function Home() {
               ))}
             </div>
             <div className="text-center mt-8">
-              <Link
-                to="/learn"
+              <button
+                onClick={() => handleNavigation('/learn')}
                 className="inline-flex items-center space-x-2 text-matrix-primary hover:text-matrix-secondary transition-colors duration-200"
               >
                 <span>Explore all MCP servers</span>
                 <ExternalLink className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -285,13 +291,13 @@ function Home() {
                 ))}
               </div>
               <div className="mt-6">
-                <Link 
-                  to="/demo"
+                <button 
+                  onClick={() => handleNavigation('/demo')}
                   className="w-full bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold flex items-center justify-center space-x-2 transition-all duration-200"
                 >
                   <Play className="w-5 h-5" />
                   <span>Try Full Interactive Demo</span>
-                </Link>
+                </button>
               </div>
             </div>
 
@@ -403,13 +409,13 @@ function Home() {
           </div>
 
           <div className="text-center mt-8">
-            <Link
-              to="/resources"
+            <button
+              onClick={() => handleNavigation('/resources')}
               className="inline-flex items-center space-x-2 text-matrix-primary hover:text-matrix-secondary transition-colors duration-200"
             >
               <Code className="w-4 h-4" />
               <span>View complete prompt library</span>
-            </Link>
+            </button>
           </div>
         </div>
       </section>
@@ -429,10 +435,13 @@ function Home() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">No-Code Guides</h3>
               <p className="text-muted-foreground mb-4">Step-by-step tutorials for popular platforms</p>
-              <Link to="/guides" className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center">
+              <button 
+                onClick={() => handleNavigation('/guides')}
+                className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center"
+              >
                 <span>Browse Guides</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
             
             <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
@@ -441,10 +450,13 @@ function Home() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Community Support</h3>
               <p className="text-muted-foreground mb-4">Join other non-developers building with AI</p>
-              <Link to="/join-community" className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center">
+              <button 
+                onClick={() => handleNavigation('/join-community')}
+                className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center"
+              >
                 <span>Join Community</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
             
             <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
@@ -453,10 +465,13 @@ function Home() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Template Library</h3>
               <p className="text-muted-foreground mb-4">Ready-to-use templates for common use cases</p>
-              <Link to="/templates" className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center">
+              <button 
+                onClick={() => handleNavigation('/templates')}
+                className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1 justify-center"
+              >
                 <span>Get Templates</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -468,18 +483,18 @@ function Home() {
               The possibilities are endless with MCP!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                to="/start-building"
+              <button 
+                onClick={() => handleNavigation('/start-building')}
                 className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200"
               >
                 Start Your First Project
-              </Link>
-              <Link 
-                to="/talk-resources"
+              </button>
+              <button 
+                onClick={() => handleNavigation('/talk-resources')}
                 className="border border-border text-foreground px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors duration-200"
               >
                 Download Slides
-              </Link>
+              </button>
             </div>
           </div>
         </div>

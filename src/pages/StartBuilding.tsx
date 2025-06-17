@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Clock, Users, Zap, Database, MessageSquare, Workflow, Star, Play } from 'lucide-react';
 
 function StartBuilding() {
   const [selectedPath, setSelectedPath] = useState('beginner');
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setTimeout(() => window.scrollTo(0, 0), 100);
+  };
 
   const buildingPaths = [
     {
@@ -273,13 +279,13 @@ function StartBuilding() {
                           </span>
                         ))}
                       </div>
-                      <Link
-                        to={currentPath.route}
+                      <button
+                        onClick={() => handleNavigation(currentPath.route)}
                         className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 w-fit"
                       >
                         <span>{step.action}</span>
                         <ArrowRight className="w-4 h-4" />
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -287,13 +293,13 @@ function StartBuilding() {
 
               {/* Start Path Button */}
               <div className="mt-8 text-center">
-                <Link
-                  to={currentPath.route}
+                <button
+                  onClick={() => handleNavigation(currentPath.route)}
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
                 >
                   <span>Start {currentPath.title} Path</span>
                   <ArrowRight className="w-5 h-5" />
-                </Link>
+                </button>
               </div>
             </div>
           </div>
@@ -334,20 +340,20 @@ function StartBuilding() {
                 </div>
                 
                 <div className="flex space-x-3">
-                  <Link
-                    to="/templates"
+                  <button
+                    onClick={() => handleNavigation('/templates')}
                     className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
                   >
                     <Zap className="w-4 h-4" />
                     <span>Use Template</span>
-                  </Link>
-                  <Link
-                    to="/demo"
+                  </button>
+                  <button
+                    onClick={() => handleNavigation('/demo')}
                     className="px-4 py-2 border border-white/20 text-white rounded-lg font-medium hover:bg-white/10 transition-colors duration-200 flex items-center space-x-2"
                   >
                     <Play className="w-4 h-4" />
                     <span>Demo</span>
-                  </Link>
+                  </button>
                 </div>
               </div>
             ))}
@@ -406,18 +412,18 @@ function StartBuilding() {
             Join thousands of non-developers who are already building amazing AI-powered solutions with MCP.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/templates"
+            <button
+              onClick={() => handleNavigation('/templates')}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
             >
               Start with a Template
-            </Link>
-            <Link
-              to="/join-community"
+            </button>
+            <button
+              onClick={() => handleNavigation('/join-community')}
               className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
             >
               Join the Community
-            </Link>
+            </button>
           </div>
         </div>
       </div>
