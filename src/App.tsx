@@ -24,6 +24,8 @@ import AdvancedPath from './pages/AdvancedPath';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Achievements from './pages/Achievements';
+import Pricing from './pages/Pricing';
+import Success from './pages/Success';
 
 function App() {
   return (
@@ -53,6 +55,8 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/achievements" element={<Achievements />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/success" element={<Success />} />
           </Routes>
         </Layout>
       </Router>

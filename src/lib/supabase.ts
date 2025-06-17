@@ -15,7 +15,19 @@ const createMockClient = () => ({
       const mockUser = {
         id: 'mock-user-' + Date.now(),
         email: credentials.email,
-        user_metadata: credentials.options?.data || {}
+        user_metadata: credentials.options?.data || {},
+        getSession: () => Promise.resolve({ 
+          data: { 
+            session: { 
+              access_token: 'mock-token-' + Date.now(),
+              user: {
+                id: 'mock-user-' + Date.now(),
+                email: credentials.email
+              }
+            } 
+          }, 
+          error: null 
+        })
       }
       localStorage.setItem('mock-user', JSON.stringify(mockUser))
       return Promise.resolve({ data: { user: mockUser }, error: null })
@@ -25,7 +37,19 @@ const createMockClient = () => ({
       const mockUser = {
         id: 'mock-user-' + Date.now(),
         email: credentials.email,
-        user_metadata: { full_name: 'Demo User' }
+        user_metadata: { full_name: 'Demo User' },
+        getSession: () => Promise.resolve({ 
+          data: { 
+            session: { 
+              access_token: 'mock-token-' + Date.now(),
+              user: {
+                id: 'mock-user-' + Date.now(),
+                email: credentials.email
+              }
+            } 
+          }, 
+          error: null 
+        })
       }
       localStorage.setItem('mock-user', JSON.stringify(mockUser))
       return Promise.resolve({ data: { user: mockUser }, error: null })
@@ -41,7 +65,8 @@ const createMockClient = () => ({
       setTimeout(() => {
         const mockUser = localStorage.getItem('mock-user')
         if (mockUser) {
-          callback('SIGNED_IN', { user: JSON.parse(mockUser) })
+          const userData = JSON.parse(mockUser)
+          callback('SIGNED_IN', { user: userData })
         } else {
           callback('SIGNED_OUT', { user: null })
         }
@@ -64,6 +89,24 @@ const createMockClient = () => ({
             const profile = localStorage.getItem('mock-profile')
             return Promise.resolve({ 
               data: profile ? JSON.parse(profile) : null, 
+              error: null 
+            })
+          }
+          if (table === 'stripe_user_subscriptions') {
+            // Mock subscription data
+            const mockSubscription = {
+              customer_id: 'cus_mock123',
+              subscription_id: 'sub_mock123',
+              subscription_status: 'active',
+              price_id: 'price_1Rax2LRWDp0Sz2pAkHFvLJ9K', // Pro plan
+              current_period_start: Math.floor(Date.now() / 1000),
+              current_period_end: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days from now
+              cancel_at_period_end: false,
+              payment_method_brand: 'visa',
+              payment_method_last4: '4242'
+            }
+            return Promise.resolve({ 
+              data: mockSubscription, 
               error: null 
             })
           }
@@ -183,6 +226,146 @@ export type Database = {
           completed?: boolean
           completed_at?: string | null
           created_at?: string
+        }
+      }
+      stripe_customers: {
+        Row: {
+          id: number
+          user_id: string
+          customer_id: string
+          created_at: string
+          updated_at: string
+          deleted_at: string | null
+        }
+        Insert: {
+          user_id: string
+          customer_id: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Update: {
+          user_id?: string
+          customer_id?: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+      }
+      stripe_subscriptions: {
+        Row: {
+          id: number
+          customer_id: string
+          subscription_id: string | null
+          price_id: string | null
+          current_period_start: number | null
+          current_period_end: number | null
+          cancel_at_period_end: boolean
+          payment_method_brand: string | null
+          payment_method_last4: string | null
+          status: string
+          created_at: string
+          updated_at: string
+          deleted_at: string | null
+        }
+        Insert: {
+          customer_id: string
+          subscription_id?: string | null
+          price_id?: string | null
+          current_period_start?: number | null
+          current_period_end?: number | null
+          cancel_at_period_end?: boolean
+          payment_method_brand?: string | null
+          payment_method_last4?: string | null
+          status: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Update: {
+          customer_id?: string
+          subscription_id?: string | null
+          price_id?: string | null
+          current_period_start?: number | null
+          current_period_end?: number | null
+          cancel_at_period_end?: boolean
+          payment_method_brand?: string | null
+          payment_method_last4?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+      }
+      stripe_orders: {
+        Row: {
+          id: number
+          checkout_session_id: string
+          payment_intent_id: string
+          customer_id: string
+          amount_subtotal: number
+          amount_total: number
+          currency: string
+          payment_status: string
+          status: string
+          created_at: string
+          updated_at: string
+          deleted_at: string | null
+        }
+        Insert: {
+          checkout_session_id: string
+          payment_intent_id: string
+          customer_id: string
+          amount_subtotal: number
+          amount_total: number
+          currency: string
+          payment_status: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Update: {
+          checkout_session_id?: string
+          payment_intent_id?: string
+          customer_id?: string
+          amount_subtotal?: number
+          amount_total?: number
+          currency?: string
+          payment_status?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+      }
+    }
+    Views: {
+      stripe_user_subscriptions: {
+        Row: {
+          customer_id: string
+          subscription_id: string | null
+          subscription_status: string
+          price_id: string | null
+          current_period_start: number | null
+          current_period_end: number | null
+          cancel_at_period_end: boolean
+          payment_method_brand: string | null
+          payment_method_last4: string | null
+        }
+      }
+      stripe_user_orders: {
+        Row: {
+          customer_id: string
+          order_id: number
+          checkout_session_id: string
+          payment_intent_id: string
+          amount_subtotal: number
+          amount_total: number
+          currency: string
+          payment_status: string
+          order_status: string
+          order_date: string
         }
       }
     }

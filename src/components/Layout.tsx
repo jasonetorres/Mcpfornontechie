@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useSubscription } from '../hooks/useSubscription';
 import UserMenu from './UserMenu';
 import AuthModal from './AuthModal';
 
@@ -18,12 +19,14 @@ function Layout({ children }: LayoutProps) {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const location = useLocation();
   const { user, profile } = useAuth();
+  const { getSubscriptionPlan, isActive } = useSubscription();
 
   const navItems = [
     { name: 'Learn', href: '/learn', icon: Book },
     { name: 'Live Demo', href: '/demo', icon: Play },
     { name: 'Examples', href: '/examples', icon: Zap },
     { name: 'Resources', href: '/resources', icon: Users },
+    { name: 'Pricing', href: '/pricing', icon: CreditCard },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -75,6 +78,9 @@ function Layout({ children }: LayoutProps) {
       }, 4000);
     }
   };
+
+  const currentPlan = user ? getSubscriptionPlan() : null;
+  const hasActiveSub = user ? isActive() : false;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
@@ -146,7 +152,9 @@ function Layout({ children }: LayoutProps) {
                   {/* User Status Indicator - Only show on larger screens */}
                   <div className="hidden lg:flex items-center space-x-2 text-matrix-primary text-sm bg-matrix-primary/10 px-3 py-1 rounded-full border border-matrix-primary/20">
                     <div className="w-2 h-2 bg-matrix-primary rounded-full animate-pulse"></div>
-                    <span>Signed in</span>
+                    <span>
+                      {currentPlan && hasActiveSub ? `${currentPlan} Plan` : 'Free Plan'}
+                    </span>
                   </div>
                   <UserMenu />
                 </div>
@@ -191,7 +199,10 @@ function Layout({ children }: LayoutProps) {
                 {user ? (
                   <div className="flex items-center space-x-2 text-matrix-primary">
                     <div className="w-2 h-2 bg-matrix-primary rounded-full animate-pulse"></div>
-                    <span className="text-sm">Signed in as {profile?.full_name || user.email}</span>
+                    <span className="text-sm">
+                      Signed in as {profile?.full_name || user.email} 
+                      {currentPlan && hasActiveSub && ` (${currentPlan})`}
+                    </span>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2 text-muted-foreground">
@@ -289,6 +300,7 @@ function Layout({ children }: LayoutProps) {
               <Link to="/templates" className="hover:text-foreground transition-colors duration-200">Templates</Link>
               <Link to="/community" className="hover:text-foreground transition-colors duration-200">Community</Link>
               <Link to="/guides" className="hover:text-foreground transition-colors duration-200">Guides</Link>
+              <Link to="/pricing" className="hover:text-foreground transition-colors duration-200">Pricing</Link>
             </div>
           </div>
           
