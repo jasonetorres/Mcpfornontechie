@@ -1,7 +1,15 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Download, Play, FileText, Video, Code, Users, ArrowRight, ExternalLink } from 'lucide-react';
 
 function TalkResources() {
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setTimeout(() => window.scrollTo(0, 0), 100);
+  };
+
   const downloadResources = [
     {
       title: 'Complete Slide Deck',
@@ -66,25 +74,29 @@ function TalkResources() {
       title: 'Choose Your Platform',
       description: 'Select the no-code platform that best fits your needs',
       action: 'Platform Comparison Guide',
-      icon: '🛠️'
+      icon: '🛠️',
+      path: '/platform-comparison'
     },
     {
       title: 'Start with a Template',
       description: 'Use our pre-built templates to get up and running quickly',
       action: 'Browse Templates',
-      icon: '📋'
+      icon: '📋',
+      path: '/templates'
     },
     {
       title: 'Join the Community',
       description: 'Connect with other non-developers building with MCP',
       action: 'Join Discord',
-      icon: '👥'
+      icon: '👥',
+      path: '/join-community'
     },
     {
       title: 'Get Hands-On Help',
       description: 'Attend our weekly office hours for personalized guidance',
       action: 'Register for Office Hours',
-      icon: '🤝'
+      icon: '🤝',
+      path: '/office-hours'
     }
   ];
 
@@ -93,27 +105,47 @@ function TalkResources() {
       title: 'MCP Fundamentals Course',
       description: 'Free 2-hour course covering all the basics',
       type: 'Course',
-      url: '/learn'
+      path: '/learn'
     },
     {
       title: 'Platform Setup Guides',
       description: 'Step-by-step guides for Zapier, Power Platform, and more',
       type: 'Guides',
-      url: '/guides'
+      path: '/guides'
     },
     {
       title: 'Success Stories',
       description: 'Real examples from community members',
       type: 'Case Studies',
-      url: '/examples'
+      path: '/success-stories'
     },
     {
       title: 'Troubleshooting FAQ',
       description: 'Common issues and solutions',
       type: 'FAQ',
-      url: '#'
+      path: '/guides'
     }
   ];
+
+  const handleDownload = (resourceTitle: string) => {
+    // Simulate file download
+    console.log(`Downloading: ${resourceTitle}`);
+    
+    // Create a mock download
+    const element = document.createElement('a');
+    const file = new Blob([`# ${resourceTitle}\n\nThis is a demo file for the MCP Academy talk resources.\n\nThank you for attending "The Missing Link" presentation!`], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${resourceTitle.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const handleVideoPlay = (videoTitle: string) => {
+    // Simulate video play - in production this would open a video player or redirect to video
+    console.log(`Playing video: ${videoTitle}`);
+    handleNavigation('/demo'); // Redirect to demo page as placeholder
+  };
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
@@ -144,7 +176,10 @@ function TalkResources() {
                       <span>{resource.size}</span>
                       <span>{resource.downloads.toLocaleString()} downloads</span>
                     </div>
-                    <button className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+                    <button 
+                      onClick={() => handleDownload(resource.title)}
+                      className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2"
+                    >
                       <Download className="w-4 h-4" />
                       <span>Download</span>
                     </button>
@@ -171,7 +206,10 @@ function TalkResources() {
                     <span>{video.duration}</span>
                     <span>{video.views} views</span>
                   </div>
-                  <button className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                  <button 
+                    onClick={() => handleVideoPlay(video.title)}
+                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                  >
                     <Play className="w-4 h-4" />
                     <span>Watch</span>
                   </button>
@@ -192,7 +230,10 @@ function TalkResources() {
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
                     <p className="text-green-200 mb-4">{step.description}</p>
-                    <button className="text-green-300 hover:text-green-200 transition-colors duration-200 flex items-center space-x-1">
+                    <button 
+                      onClick={() => handleNavigation(step.path)}
+                      className="text-green-300 hover:text-green-200 transition-colors duration-200 flex items-center space-x-1"
+                    >
                       <span>{step.action}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
@@ -217,7 +258,10 @@ function TalkResources() {
                       {resource.type}
                     </span>
                   </div>
-                  <button className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
+                  <button 
+                    onClick={() => handleNavigation(resource.path)}
+                    className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
+                  >
                     <ExternalLink className="w-5 h-5" />
                   </button>
                 </div>
@@ -233,11 +277,17 @@ function TalkResources() {
             Have questions about the presentation or need help getting started with MCP? We're here to help!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2">
+            <button 
+              onClick={() => handleNavigation('/join-community')}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
+            >
               <Users className="w-5 h-5" />
               <span>Join Community</span>
             </button>
-            <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
+            <button 
+              onClick={() => handleNavigation('/office-hours')}
+              className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+            >
               Contact Speaker
             </button>
           </div>
