@@ -30,7 +30,7 @@ export default function UserMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center space-x-2 text-foreground hover:text-matrix-primary transition-colors duration-200 bg-muted/50 hover:bg-muted rounded-lg px-3 py-2 border border-border"
       >
-        <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center overflow-hidden">
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
           ) : (
@@ -61,7 +61,7 @@ export default function UserMenu() {
             {/* User Info Header */}
             <div className="p-4 border-b border-border bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
                   {profile.avatar_url ? (
                     <img src={profile.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
                   ) : (

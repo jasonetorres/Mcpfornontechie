@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           full_name: userData.user_metadata?.full_name || null,
           role: userData.user_metadata?.role || null,
           company: userData.user_metadata?.company || null,
-          avatar_url: null,
+          avatar_url: userData.user_metadata?.avatar_url || null,
           created_at: userData.created_at || new Date().toISOString(),
           updated_at: new Date().toISOString()
         }
@@ -218,6 +218,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const updated = { ...existing, ...updates, updated_at: new Date().toISOString() }
       localStorage.setItem('mock-profile', JSON.stringify(updated))
       setProfile(updated)
+      
+      // Also update the user metadata if avatar_url is being updated
+      if (updates.avatar_url !== undefined) {
+        const mockUser = localStorage.getItem('mock-user')
+        if (mockUser) {
+          const userData = JSON.parse(mockUser)
+          userData.user_metadata = { ...userData.user_metadata, avatar_url: updates.avatar_url }
+          localStorage.setItem('mock-user', JSON.stringify(userData))
+        }
+      }
+      
       return { error: null }
     } catch (error) {
       console.error('❌ Error in updateProfile:', error)
