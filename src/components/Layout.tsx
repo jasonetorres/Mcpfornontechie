@@ -23,10 +23,9 @@ function Layout({ children }: LayoutProps) {
 
   const navItems = [
     { name: 'Learn', href: '/learn', icon: Book },
-    { name: 'Live Demo', href: '/demo', icon: Play },
+    { name: 'Demo', href: '/demo', icon: Play },
     { name: 'Examples', href: '/examples', icon: Zap },
     { name: 'Resources', href: '/resources', icon: Users },
-    { name: 'Pricing', href: '/pricing', icon: CreditCard },
   ];
 
   const isCurrentPathActive = (path: string) => location.pathname === path;
@@ -106,34 +105,46 @@ function Layout({ children }: LayoutProps) {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/20 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
+            {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
                 <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">MCP Academy</span>
-              <span className="text-sm text-matrix-primary bg-matrix-primary/20 px-2 py-1 rounded-full">For Non-Developers</span>
+              <span className="hidden sm:inline text-sm text-matrix-primary bg-matrix-primary/20 px-2 py-1 rounded-full">For Non-Developers</span>
             </Link>
             
-            <div className="hidden md:block">
-              <div className="flex items-center space-x-8">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`flex items-center space-x-1 transition-colors duration-200 ${
-                      isCurrentPathActive(item.href)
-                        ? 'text-matrix-primary'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </Link>
-                ))}
-              </div>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-6">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`flex items-center space-x-1 transition-colors duration-200 ${
+                    isCurrentPathActive(item.href)
+                      ? 'text-matrix-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                </Link>
+              ))}
+              <Link
+                to="/pricing"
+                className={`flex items-center space-x-1 transition-colors duration-200 ${
+                  isCurrentPathActive('/pricing')
+                    ? 'text-matrix-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>Pricing</span>
+              </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Right Side Actions */}
+            <div className="flex items-center space-x-3">
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -146,24 +157,20 @@ function Layout({ children }: LayoutProps) {
                 )}
               </button>
 
-              {/* Auth Status */}
+              {/* User Section */}
               {user ? (
                 <div className="flex items-center space-x-3">
-                  {/* User Status Indicator - Only show on larger screens */}
+                  {/* Plan Status - Desktop Only */}
                   <div className="hidden lg:flex items-center space-x-2 text-matrix-primary text-sm bg-matrix-primary/10 px-3 py-1 rounded-full border border-matrix-primary/20">
                     <div className="w-2 h-2 bg-matrix-primary rounded-full animate-pulse"></div>
                     <span>
-                      {currentPlan && hasActiveSub ? `${currentPlan} Plan` : 'Free Plan'}
+                      {currentPlan && hasActiveSub ? `${currentPlan}` : 'Free'}
                     </span>
                   </div>
                   <UserMenu />
                 </div>
               ) : (
                 <div className="hidden md:flex items-center space-x-3">
-                  <div className="flex items-center space-x-2 text-muted-foreground text-sm bg-muted/50 px-3 py-1 rounded-full border border-border">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
-                    <span>Not signed in</span>
-                  </div>
                   <button
                     onClick={() => openAuthModal('signin')}
                     className="text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-muted"
@@ -180,6 +187,7 @@ function Layout({ children }: LayoutProps) {
                 </div>
               )}
 
+              {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="md:hidden text-foreground"
@@ -194,13 +202,13 @@ function Layout({ children }: LayoutProps) {
         {isMenuOpen && (
           <div className="md:hidden bg-background/40 backdrop-blur-md border-t border-border">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {/* Mobile Auth Status */}
+              {/* Mobile User Status */}
               <div className="px-3 py-2 border-b border-border mb-2">
                 {user ? (
                   <div className="flex items-center space-x-2 text-matrix-primary">
                     <div className="w-2 h-2 bg-matrix-primary rounded-full animate-pulse"></div>
                     <span className="text-sm">
-                      Signed in as {profile?.full_name || user.email} 
+                      {profile?.full_name || user.email} 
                       {currentPlan && hasActiveSub && ` (${currentPlan})`}
                     </span>
                   </div>
@@ -212,6 +220,7 @@ function Layout({ children }: LayoutProps) {
                 )}
               </div>
 
+              {/* Mobile Navigation Links */}
               {navItems.map((item) => (
                 <Link
                   key={item.name}
@@ -228,6 +237,20 @@ function Layout({ children }: LayoutProps) {
                 </Link>
               ))}
               
+              <Link
+                to="/pricing"
+                className={`flex items-center space-x-2 px-3 py-2 transition-colors duration-200 ${
+                  isCurrentPathActive('/pricing')
+                    ? 'text-matrix-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>Pricing</span>
+              </Link>
+              
+              {/* Mobile Auth Actions */}
               {!user && (
                 <div className="border-t border-border pt-2 mt-2">
                   <button
@@ -253,6 +276,7 @@ function Layout({ children }: LayoutProps) {
                 </div>
               )}
 
+              {/* Mobile User Menu Links */}
               {user && (
                 <div className="border-t border-border pt-2 mt-2">
                   <Link
