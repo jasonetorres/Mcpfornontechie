@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Play, Pause, RotateCcw, CheckCircle, ArrowRight, Database, MessageSquare, Zap } from 'lucide-react';
 
 function Demo() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const navigate = useNavigate();
 
   const demoSteps = [
     {
@@ -116,6 +118,14 @@ function Demo() {
         });
       }, 3000);
     }
+  };
+
+  const handleStartBuilding = () => {
+    navigate('/start-building');
+  };
+
+  const handleViewTemplates = () => {
+    navigate('/templates');
   };
 
   const currentStepData = demoSteps[currentStep];
@@ -339,10 +349,16 @@ function Demo() {
               You've seen how MCP transforms AI from generic to context-aware. Now it's time to connect AI to YOUR data.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+              <button 
+                onClick={handleStartBuilding}
+                className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+              >
                 Start Building Now
               </button>
-              <button className="border border-border text-foreground px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors duration-200">
+              <button 
+                onClick={handleViewTemplates}
+                className="border border-border text-foreground px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors duration-200"
+              >
                 View Templates
               </button>
             </div>
