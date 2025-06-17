@@ -125,8 +125,8 @@ function Demo() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">Interactive MCP Demo</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold text-foreground mb-4">Interactive MCP Demo</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Experience how MCP transforms AI from generic to context-aware
           </p>
         </div>
@@ -135,14 +135,14 @@ function Demo() {
         <div className="flex justify-center space-x-4 mb-12">
           <button
             onClick={togglePlay}
-            className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-200"
+            className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-200"
           >
             {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             <span>{isPlaying ? 'Pause' : 'Auto Play'}</span>
           </button>
           <button
             onClick={resetDemo}
-            className="border border-white/20 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200 flex items-center space-x-2"
+            className="border border-border text-foreground px-6 py-3 rounded-lg font-semibold hover:bg-muted transition-colors duration-200 flex items-center space-x-2"
           >
             <RotateCcw className="w-5 h-5" />
             <span>Reset</span>
@@ -157,10 +157,10 @@ function Demo() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
                     completedSteps.includes(index)
-                      ? 'bg-green-500 text-white'
+                      ? 'bg-matrix-primary text-primary-foreground'
                       : index === currentStep
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-600 text-gray-300'
+                      ? 'bg-matrix-secondary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
                   }`}
                 >
                   {completedSteps.includes(index) ? (
@@ -172,7 +172,7 @@ function Demo() {
                 {index < demoSteps.length - 1 && (
                   <div
                     className={`w-16 h-1 mx-2 transition-all duration-300 ${
-                      completedSteps.includes(index) ? 'bg-green-500' : 'bg-gray-600'
+                      completedSteps.includes(index) ? 'bg-matrix-primary' : 'bg-muted'
                     }`}
                   />
                 )}
@@ -180,7 +180,7 @@ function Demo() {
             ))}
           </div>
           <div className="text-center">
-            <span className="text-gray-300">
+            <span className="text-muted-foreground">
               Step {currentStep + 1} of {demoSteps.length}
             </span>
           </div>
@@ -189,23 +189,23 @@ function Demo() {
         {/* Main Demo Area */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Step Info */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-8">
+          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-8">
             <div className="text-center mb-6">
               <div className="text-6xl mb-4">{currentStepData.visual}</div>
-              <h2 className="text-2xl font-bold text-white mb-2">{currentStepData.title}</h2>
-              <p className="text-blue-300">{currentStepData.description}</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">{currentStepData.title}</h2>
+              <p className="text-matrix-primary">{currentStepData.description}</p>
             </div>
 
             {/* Step-specific content */}
             {currentStepData.id === 1 && (
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-3">Sample Data: {currentStepData.content.dataSource}</h4>
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="text-foreground font-semibold mb-3">Sample Data: {currentStepData.content.dataSource}</h4>
                 <div className="space-y-2">
                   {currentStepData.content.sampleData.map((member: any, index: number) => (
-                    <div key={index} className="bg-slate-700/50 rounded p-3 text-sm">
-                      <div className="text-white font-medium">{member.name}</div>
-                      <div className="text-gray-300">{member.role} • {member.contributions} contributions</div>
-                      <div className="text-gray-400">{member.email}</div>
+                    <div key={index} className="bg-card/50 rounded p-3 text-sm">
+                      <div className="text-foreground font-medium">{member.name}</div>
+                      <div className="text-muted-foreground">{member.role} • {member.contributions} contributions</div>
+                      <div className="text-muted-foreground">{member.email}</div>
                     </div>
                   ))}
                 </div>
@@ -213,13 +213,13 @@ function Demo() {
             )}
 
             {currentStepData.id === 2 && (
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-3">MCP Features:</h4>
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="text-foreground font-semibold mb-3">MCP Features:</h4>
                 <div className="space-y-2">
                   {currentStepData.content.features.map((feature: string, index: number) => (
                     <div key={index} className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      <span className="text-gray-300">{feature}</span>
+                      <CheckCircle className="w-4 h-4 text-matrix-primary" />
+                      <span className="text-muted-foreground">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -227,11 +227,11 @@ function Demo() {
             )}
 
             {currentStepData.id === 3 && (
-              <div className="bg-slate-800/50 rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-3">Try These Questions:</h4>
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="text-foreground font-semibold mb-3">Try These Questions:</h4>
                 <div className="space-y-2">
                   {currentStepData.content.questions.map((question: string, index: number) => (
-                    <div key={index} className="bg-blue-500/20 rounded p-2 text-blue-200">
+                    <div key={index} className="bg-matrix-primary/20 rounded p-2 text-matrix-primary">
                       "{question}"
                     </div>
                   ))}
@@ -241,21 +241,21 @@ function Demo() {
           </div>
 
           {/* AI Response Area */}
-          <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-xl p-8">
+          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-8">
             <div className="flex items-center space-x-2 mb-4">
-              <MessageSquare className="w-5 h-5 text-blue-400" />
-              <h3 className="text-lg font-semibold text-white">AI Response</h3>
+              <MessageSquare className="w-5 h-5 text-matrix-primary" />
+              <h3 className="text-lg font-semibold text-foreground">AI Response</h3>
             </div>
 
             {(currentStepData.id === 0 || currentStepData.id === 4) && (
               <div className="space-y-4">
-                <div className="bg-blue-500/20 rounded-lg p-4">
-                  <div className="text-blue-300 font-medium mb-2">Question:</div>
-                  <div className="text-blue-200">"{currentStepData.content.question}"</div>
+                <div className="bg-matrix-primary/20 rounded-lg p-4">
+                  <div className="text-matrix-primary font-medium mb-2">Question:</div>
+                  <div className="text-matrix-secondary">"{currentStepData.content.question}"</div>
                 </div>
-                <div className="bg-slate-800/50 rounded-lg p-4">
-                  <div className="text-gray-300 font-medium mb-2">AI Response:</div>
-                  <div className="text-gray-200 whitespace-pre-line">{currentStepData.content.aiResponse}</div>
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <div className="text-muted-foreground font-medium mb-2">AI Response:</div>
+                  <div className="text-foreground whitespace-pre-line">{currentStepData.content.aiResponse}</div>
                 </div>
                 <div className="bg-purple-500/20 rounded-lg p-4">
                   <div className="text-purple-300 font-medium mb-2">Explanation:</div>
@@ -266,11 +266,11 @@ function Demo() {
 
             {currentStepData.id === 1 && (
               <div className="text-center py-8">
-                <Database className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-                <div className="text-gray-300">Connecting to your data source...</div>
-                <div className="mt-4 bg-green-500/20 rounded-lg p-4">
-                  <div className="text-green-300">✅ Connection established!</div>
-                  <div className="text-green-200 text-sm mt-1">AI can now access your community data</div>
+                <Database className="w-16 h-16 text-matrix-primary mx-auto mb-4" />
+                <div className="text-muted-foreground">Connecting to your data source...</div>
+                <div className="mt-4 bg-matrix-primary/20 rounded-lg p-4">
+                  <div className="text-matrix-primary">✅ Connection established!</div>
+                  <div className="text-matrix-secondary text-sm mt-1">AI can now access your community data</div>
                 </div>
               </div>
             )}
@@ -278,7 +278,7 @@ function Demo() {
             {currentStepData.id === 2 && (
               <div className="text-center py-8">
                 <Zap className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                <div className="text-gray-300 mb-4">MCP Bridge Active</div>
+                <div className="text-muted-foreground mb-4">MCP Bridge Active</div>
                 <div className="bg-purple-500/20 rounded-lg p-4">
                   <div className="text-purple-200">AI is now connected to your data through a secure MCP bridge. It can understand and query your information while maintaining full security and control.</div>
                 </div>
@@ -287,10 +287,10 @@ function Demo() {
 
             {currentStepData.id === 3 && (
               <div className="text-center py-8">
-                <MessageSquare className="w-16 h-16 text-green-400 mx-auto mb-4" />
-                <div className="text-gray-300 mb-4">Ready for Questions!</div>
-                <div className="bg-green-500/20 rounded-lg p-4">
-                  <div className="text-green-200">AI is now ready to answer specific questions about your community data. Try asking any of the sample questions!</div>
+                <MessageSquare className="w-16 h-16 text-matrix-primary mx-auto mb-4" />
+                <div className="text-muted-foreground mb-4">Ready for Questions!</div>
+                <div className="bg-matrix-primary/20 rounded-lg p-4">
+                  <div className="text-matrix-secondary">AI is now ready to answer specific questions about your community data. Try asking any of the sample questions!</div>
                 </div>
               </div>
             )}
@@ -304,15 +304,15 @@ function Demo() {
             disabled={currentStep === 0}
             className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
               currentStep === 0
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-white/10 text-white hover:bg-white/20'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'bg-muted text-foreground hover:bg-accent'
             }`}
           >
             Previous
           </button>
 
           <div className="text-center">
-            <div className="text-gray-300 text-sm">
+            <div className="text-muted-foreground text-sm">
               {currentStep === demoSteps.length - 1 ? 'Demo Complete!' : 'Click Next to continue'}
             </div>
           </div>
@@ -322,8 +322,8 @@ function Demo() {
             disabled={currentStep === demoSteps.length - 1}
             className={`px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-200 ${
               currentStep === demoSteps.length - 1
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground'
             }`}
           >
             <span>Next</span>
@@ -333,16 +333,16 @@ function Demo() {
 
         {/* Call to Action */}
         {currentStep === demoSteps.length - 1 && (
-          <div className="mt-16 bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-8 text-center">
-            <h3 className="text-2xl font-bold text-white mb-4">Ready to Build Your Own?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+          <div className="mt-16 bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8 text-center">
+            <h3 className="text-2xl font-bold text-foreground mb-4">Ready to Build Your Own?</h3>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               You've seen how MCP transforms AI from generic to context-aware. Now it's time to connect AI to YOUR data.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+              <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200">
                 Start Building Now
               </button>
-              <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
+              <button className="border border-border text-foreground px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors duration-200">
                 View Templates
               </button>
             </div>
