@@ -261,6 +261,7 @@ function Layout({ children }: LayoutProps) {
               <Link to="/talk-resources" className="hover:text-white transition-colors duration-200">Talk Resources</Link>
               <Link to="/templates" className="hover:text-white transition-colors duration-200">Templates</Link>
               <Link to="/community" className="hover:text-white transition-colors duration-200">Community</Link>
+              <Link to="/guides" className="hover:text-white transition-colors duration-200">Guides</Link>
             </div>
           </div>
           

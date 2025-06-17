@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Trophy, Clock, TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
+import { BookOpen, Trophy, Clock, TrendingUp, ArrowRight, CheckCircle, Users, Play } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Dashboard() {
-  const { profile } = useAuth()
+  const { user, profile } = useAuth()
 
   // Mock data - in a real app, this would come from your database
   const learningStats = {
@@ -19,19 +19,22 @@ export default function Dashboard() {
       type: 'completed',
       title: 'Completed "Understanding MCP Fundamentals"',
       path: 'Beginner Path',
-      time: '2 hours ago'
+      time: '2 hours ago',
+      url: '/beginner-path'
     },
     {
       type: 'started',
       title: 'Started "Choose Your Platform"',
       path: 'Beginner Path',
-      time: '1 day ago'
+      time: '1 day ago',
+      url: '/beginner-path'
     },
     {
       type: 'achievement',
       title: 'Earned "First Steps" achievement',
       path: 'General',
-      time: '2 days ago'
+      time: '2 days ago',
+      url: '/achievements'
     }
   ]
 
@@ -49,14 +52,38 @@ export default function Dashboard() {
       path: 'Resources',
       duration: '15 min',
       url: '/platform-comparison'
+    },
+    {
+      title: 'Community Q&A Template',
+      description: 'Try our most popular template for community management',
+      path: 'Templates',
+      duration: '30 min',
+      url: '/templates'
     }
   ]
 
-  if (!profile) {
+  if (!user) {
     return (
       <div className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="text-white">Loading dashboard...</div>
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-12">
+            <BookOpen className="w-16 h-16 text-blue-400 mx-auto mb-6" />
+            <h1 className="text-3xl font-bold text-white mb-4">Sign In to View Dashboard</h1>
+            <p className="text-gray-300 mb-8">
+              Create an account to track your learning progress and access personalized features
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+                Sign Up Now
+              </button>
+              <Link
+                to="/learn"
+                className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+              >
+                Explore Learning Paths
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -68,7 +95,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-3xl font-bold text-white mb-2">
-            Welcome back, {profile.full_name || 'there'}! 👋
+            Welcome back, {profile?.full_name || 'there'}! 👋
           </h1>
           <p className="text-gray-300">
             Continue your MCP learning journey and track your progress
@@ -116,7 +143,11 @@ export default function Dashboard() {
             <h2 className="text-xl font-bold text-white mb-6">Recent Activity</h2>
             <div className="space-y-4">
               {recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3 p-3 bg-slate-800/50 rounded-lg">
+                <Link
+                  key={index}
+                  to={activity.url}
+                  className="flex items-start space-x-3 p-3 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition-colors duration-200"
+                >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                     activity.type === 'completed' ? 'bg-green-500/20' :
                     activity.type === 'started' ? 'bg-blue-500/20' :
@@ -125,7 +156,7 @@ export default function Dashboard() {
                     {activity.type === 'completed' ? (
                       <CheckCircle className="w-4 h-4 text-green-400" />
                     ) : activity.type === 'started' ? (
-                      <BookOpen className="w-4 h-4 text-blue-400" />
+                      <Play className="w-4 h-4 text-blue-400" />
                     ) : (
                       <Trophy className="w-4 h-4 text-purple-400" />
                     )}
@@ -134,7 +165,7 @@ export default function Dashboard() {
                     <div className="text-white font-medium">{activity.title}</div>
                     <div className="text-gray-400 text-sm">{activity.path} • {activity.time}</div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -144,22 +175,23 @@ export default function Dashboard() {
             <h2 className="text-xl font-bold text-white mb-6">Recommended Next</h2>
             <div className="space-y-4">
               {recommendedNext.map((item, index) => (
-                <div key={index} className="p-4 bg-slate-800/50 rounded-lg">
+                <Link
+                  key={index}
+                  to={item.url}
+                  className="block p-4 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition-colors duration-200"
+                >
                   <h3 className="text-white font-semibold mb-2">{item.title}</h3>
                   <p className="text-gray-300 text-sm mb-3">{item.description}</p>
                   <div className="flex items-center justify-between">
                     <div className="text-gray-400 text-xs">
                       {item.path} • {item.duration}
                     </div>
-                    <Link
-                      to={item.url}
-                      className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center space-x-1"
-                    >
+                    <div className="flex items-center space-x-1 text-blue-400">
                       <span className="text-sm">Continue</span>
                       <ArrowRight className="w-3 h-3" />
-                    </Link>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -191,6 +223,28 @@ export default function Dashboard() {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-12 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-white mb-4">Ready to Continue Learning?</h3>
+          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+            Pick up where you left off or explore new areas of MCP to expand your knowledge.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/beginner-path"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+            >
+              Continue Learning Path
+            </Link>
+            <Link
+              to="/templates"
+              className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+            >
+              Try a Template
+            </Link>
           </div>
         </div>
       </div>

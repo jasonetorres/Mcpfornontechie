@@ -44,6 +44,12 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           return
         }
 
+        if (formData.password.length < 6) {
+          setError('Password must be at least 6 characters')
+          setLoading(false)
+          return
+        }
+
         const { error } = await signUp(formData.email, formData.password, {
           full_name: formData.fullName,
           role: formData.role,
@@ -163,6 +169,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
                 value={formData.password}
                 onChange={handleInputChange}
                 required
+                minLength={6}
                 className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                 placeholder="••••••••"
               />
@@ -181,6 +188,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     required
+                    minLength={6}
                     className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                     placeholder="••••••••"
                   />

@@ -225,37 +225,43 @@ all tasks assigned to me this week and summarize them."`
       name: 'Google Drive',
       description: 'File access and search capabilities for Google Drive',
       useCase: 'Find documents, search content, organize files',
-      icon: '📁'
+      icon: '📁',
+      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive'
     },
     {
       name: 'YouTube Transcript',
       description: 'Grab and work with YouTube video transcripts',
       useCase: 'Summarize videos, extract key points, create content',
-      icon: '🎥'
+      icon: '🎥',
+      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/youtube-transcript'
     },
     {
       name: 'Google Maps',
       description: 'Location services, directions, and place details',
       useCase: 'Track deliveries, find locations, get directions',
-      icon: '🗺️'
+      icon: '🗺️',
+      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps'
     },
     {
       name: 'Asana',
       description: 'View tasks, projects, workspaces, and comments',
       useCase: 'Project management, task tracking, team coordination',
-      icon: '✅'
+      icon: '✅',
+      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/asana'
     },
     {
       name: 'GitHub',
       description: 'Tools to read, search, and manage repositories',
       useCase: 'Code management, documentation, project tracking',
-      icon: '🐙'
+      icon: '🐙',
+      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/github'
     },
     {
       name: 'Speech',
       description: 'Real-time voice interaction and transcription',
       useCase: 'Voice commands, meeting transcription, accessibility',
-      icon: '🎤'
+      icon: '🎤',
+      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/speech'
     }
   ];
 
@@ -313,15 +319,24 @@ all tasks assigned to me this week and summarize them."`
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mcpServers.map((server, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
                 <div className="text-4xl mb-4">{server.icon}</div>
                 <h3 className="text-lg font-semibold text-white mb-2">{server.name}</h3>
                 <p className="text-gray-300 mb-3 text-sm">{server.description}</p>
-                <div className="bg-blue-500/20 rounded-lg p-3">
+                <div className="bg-blue-500/20 rounded-lg p-3 mb-4">
                   <p className="text-blue-200 text-sm">
                     <strong>Use Case:</strong> {server.useCase}
                   </p>
                 </div>
+                <a
+                  href={server.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center space-x-1 text-sm"
+                >
+                  <span>View on GitHub</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             ))}
           </div>

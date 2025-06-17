@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Book, Clock, Users, Star, ArrowRight, CheckCircle, Play, Download } from 'lucide-react';
 
 function Guides() {
@@ -31,7 +32,63 @@ function Guides() {
         'Your first steps with MCP'
       ],
       author: 'Sarah Chen',
-      authorRole: 'Community Manager'
+      authorRole: 'Community Manager',
+      content: `# MCP Fundamentals: Your Complete Beginner's Guide
+
+## What is MCP and why does it matter?
+
+MCP stands for Model Context Protocol, an open standard created by Anthropic. Think of MCP as the "USB-C for AI" - a universal connector that lets AI agents access your external systems without coding.
+
+### The Problem
+- AI without context can only give generic answers
+- No standard way to connect AI to your systems
+- Each integration required custom development from scratch
+
+### The Solution
+MCP is like USB-C for AI integrations - a universal connector that lets AI agents access your external systems without coding.
+
+## The USB-C Analogy Explained
+
+Just like USB-C works with any device, MCP lets AI connect to any data source:
+- **Universal**: Works with any AI model and any data source
+- **Standardized**: No custom development needed
+- **Secure**: You control what data AI can access
+- **Scalable**: Add new connections easily
+
+## Real-World Examples
+
+### Community Management
+Connect your member database to AI:
+- "Who are our top contributors this month?"
+- "Find all marketing team members"
+- "What's Sarah's email address?"
+
+### Project Management
+Connect your task management to AI:
+- "What projects are behind schedule?"
+- "Generate this week's status report"
+- "Who's overloaded with tasks?"
+
+## Common Misconceptions Debunked
+
+**Myth**: "You need to be a developer to use MCP"
+**Reality**: No-code platforms like Zapier make MCP accessible to everyone
+
+**Myth**: "MCP is just another API"
+**Reality**: MCP is a standardized protocol that works across all AI models
+
+**Myth**: "It's not secure"
+**Reality**: You control exactly what data AI can access
+
+## Your First Steps with MCP
+
+1. **Choose Your Platform**: Start with Zapier for beginners
+2. **Pick Your Data Source**: Google Sheets is perfect for testing
+3. **Connect to AI**: Use ChatGPT or Claude
+4. **Test and Iterate**: Ask questions and refine your setup
+5. **Join the Community**: Share your success and get help
+
+Ready to get started? Check out our [Beginner Path](/beginner-path) for step-by-step guidance!`
     },
     {
       id: 2,
@@ -51,7 +108,50 @@ function Guides() {
         'Troubleshooting common issues'
       ],
       author: 'Mike Rodriguez',
-      authorRole: 'Marketing Director'
+      authorRole: 'Marketing Director',
+      content: `# Zapier + MCP: Building Your First AI Connection
+
+## Setting up your Zapier account
+
+1. Go to [zapier.com](https://zapier.com) and create a free account
+2. Verify your email address
+3. Complete the onboarding flow
+4. Connect your Google account
+
+## Preparing your Google Sheet
+
+Create a new Google Sheet with this structure:
+- Column A: Name
+- Column B: Role  
+- Column C: Contributions
+- Column D: Email
+- Column E: Join Date
+
+Add some sample data to test with.
+
+## Creating the MCP bridge
+
+1. In Zapier, click "Create Zap"
+2. Choose "Webhooks by Zapier" as trigger
+3. Select "Catch Hook"
+4. Copy the webhook URL
+5. Add "OpenAI (ChatGPT)" as action
+6. Connect your Google Sheet as data source
+
+## Testing your AI connection
+
+Try these sample questions:
+- "Who is our top contributor?"
+- "Find all marketing team members"
+- "What's Sarah's email address?"
+
+## Troubleshooting common issues
+
+- **Sheet not found**: Check sharing permissions
+- **API errors**: Verify your OpenAI key
+- **No responses**: Check webhook URL
+
+Need help? Join our [community](/join-community) for support!`
     },
     {
       id: 3,
@@ -71,7 +171,49 @@ function Guides() {
         'Security and compliance considerations'
       ],
       author: 'Lisa Park',
-      authorRole: 'Project Manager'
+      authorRole: 'Project Manager',
+      content: `# Microsoft Power Platform for MCP: Enterprise Guide
+
+## Power Platform Overview
+
+Power Platform consists of:
+- **Power Apps**: Build custom applications
+- **Power Automate**: Automate workflows
+- **Power BI**: Analyze data
+- **Power Virtual Agents**: Create chatbots
+
+## Setting up your environment
+
+1. Sign in to [make.powerapps.com](https://make.powerapps.com)
+2. Create a new environment
+3. Enable required connectors
+4. Set up security groups
+
+## Connecting to enterprise data sources
+
+Power Platform can connect to:
+- SharePoint and OneDrive
+- Dynamics 365
+- SQL Server databases
+- Salesforce
+- SAP systems
+
+## Building custom AI assistants
+
+1. Create a new Power Virtual Agent
+2. Configure topics and entities
+3. Connect to your data sources
+4. Add AI capabilities with Azure OpenAI
+5. Test and deploy
+
+## Security and compliance
+
+- Role-based access control
+- Data loss prevention policies
+- Audit logging
+- Compliance certifications
+
+Ready to build enterprise solutions? Check our [Advanced Path](/advanced-path)!`
     },
     {
       id: 4,
@@ -91,7 +233,51 @@ function Guides() {
         'Measuring success and ROI'
       ],
       author: 'David Kim',
-      authorRole: 'Community Lead'
+      authorRole: 'Community Lead',
+      content: `# Community Management with MCP: A Complete Playbook
+
+## Identifying Pain Points
+
+Common community management challenges:
+- Answering repetitive questions
+- Finding member information quickly
+- Tracking engagement and contributions
+- Generating reports for stakeholders
+
+## Connecting Member Databases
+
+Set up your member data with these fields:
+- Name and contact information
+- Role and expertise
+- Contribution history
+- Engagement metrics
+- Join date and activity
+
+## Automating Common Questions
+
+Use MCP to answer:
+- "Who are our top contributors?"
+- "Find experts in [topic]"
+- "What's [member]'s contact info?"
+- "Show me engagement stats"
+
+## Generating Engagement Insights
+
+AI can help you:
+- Identify trending topics
+- Spot declining engagement
+- Suggest content ideas
+- Recommend member connections
+
+## Measuring Success and ROI
+
+Track these metrics:
+- Response time reduction
+- Member satisfaction scores
+- Time saved per week
+- Community growth rate
+
+Want to see this in action? Try our [Community Q&A template](/templates)!`
     },
     {
       id: 5,
@@ -111,7 +297,55 @@ function Guides() {
         'Performance tracking and optimization'
       ],
       author: 'Emma Wilson',
-      authorRole: 'Growth Manager'
+      authorRole: 'Growth Manager',
+      content: `# Marketing Automation with MCP: From Data to Campaigns
+
+## Customer Data Audit
+
+Start by organizing your customer data:
+- Demographics and firmographics
+- Behavioral data and interactions
+- Purchase history and preferences
+- Engagement metrics
+- Support interactions
+
+## Segmentation Strategies
+
+Use AI to create segments based on:
+- Customer lifetime value
+- Engagement patterns
+- Product usage
+- Industry and company size
+- Geographic location
+
+## Automated Content Generation
+
+AI can help create:
+- Personalized email subject lines
+- Dynamic email content
+- Social media posts
+- Blog post ideas
+- Ad copy variations
+
+## Campaign Personalization
+
+Personalize based on:
+- Customer segment
+- Previous interactions
+- Current lifecycle stage
+- Preferred communication channels
+- Time zone and timing preferences
+
+## Performance Tracking
+
+Monitor these KPIs:
+- Open and click-through rates
+- Conversion rates by segment
+- Revenue attribution
+- Customer acquisition cost
+- Lifetime value impact
+
+Ready to automate your marketing? Check out our [Customer Segmentation template](/templates)!`
     },
     {
       id: 6,
@@ -131,7 +365,54 @@ function Guides() {
         'Compliance considerations'
       ],
       author: 'Alex Thompson',
-      authorRole: 'Security Consultant'
+      authorRole: 'Security Consultant',
+      content: `# Security Best Practices for MCP Implementations
+
+## Understanding MCP Security Model
+
+MCP security is built on:
+- **Principle of least privilege**: Only grant necessary access
+- **Data sovereignty**: You control your data
+- **Transparent operations**: Full audit trail
+- **Secure by default**: Encryption and authentication
+
+## Data Access Controls
+
+Implement these controls:
+- Role-based access control (RBAC)
+- Attribute-based access control (ABAC)
+- Time-limited access tokens
+- IP address restrictions
+- Multi-factor authentication
+
+## Encryption and Secure Transmission
+
+Ensure data protection with:
+- TLS 1.3 for data in transit
+- AES-256 for data at rest
+- End-to-end encryption for sensitive data
+- Key rotation policies
+- Certificate management
+
+## Audit Trails and Monitoring
+
+Track these activities:
+- Data access requests
+- AI query logs
+- User authentication events
+- Configuration changes
+- Error and exception logs
+
+## Compliance Considerations
+
+Address these requirements:
+- GDPR and data privacy
+- SOC 2 compliance
+- HIPAA for healthcare data
+- PCI DSS for payment data
+- Industry-specific regulations
+
+Need help with enterprise security? Book [office hours](/office-hours) with our experts!`
     },
     {
       id: 7,
@@ -151,7 +432,55 @@ function Guides() {
         'Advanced formulas and functions'
       ],
       author: 'Rachel Green',
-      authorRole: 'Operations Manager'
+      authorRole: 'Operations Manager',
+      content: `# Airtable + AI: Building Smart Databases
+
+## Airtable Basics for MCP
+
+Airtable combines:
+- Spreadsheet simplicity
+- Database power
+- API connectivity
+- Automation capabilities
+- Collaboration features
+
+## Structuring Data for AI
+
+Design your base with:
+- Clear field names and types
+- Consistent data formats
+- Linked records for relationships
+- Calculated fields for insights
+- Views for different perspectives
+
+## Setting up AI Integrations
+
+Connect Airtable to AI using:
+- Zapier for simple automations
+- Make.com for complex workflows
+- Direct API calls for custom solutions
+- Airtable's built-in automations
+- Third-party AI services
+
+## Creating Smart Automations
+
+Build automations that:
+- Analyze incoming data
+- Generate insights and summaries
+- Send intelligent notifications
+- Update records based on AI analysis
+- Create reports and dashboards
+
+## Advanced Formulas and Functions
+
+Use these Airtable features:
+- Formula fields for calculations
+- Lookup fields for data retrieval
+- Rollup fields for aggregations
+- Conditional formatting for visualization
+- Scripting for custom logic
+
+Want to see Airtable in action? Try our [Customer Segmentation template](/templates)!`
     },
     {
       id: 8,
@@ -171,7 +500,55 @@ function Guides() {
         'Resource optimization strategies'
       ],
       author: 'Tom Wilson',
-      authorRole: 'Senior PM'
+      authorRole: 'Senior PM',
+      content: `# Project Management Revolution: MCP for PMs
+
+## PM Challenges that MCP Solves
+
+Common project management pain points:
+- Manual status report creation
+- Scattered project information
+- Reactive risk management
+- Resource allocation guesswork
+- Stakeholder communication overhead
+
+## Connecting Project Management Tools
+
+Integrate these tools with AI:
+- Asana, Jira, or Monday.com for tasks
+- Slack or Teams for communication
+- Google Drive or SharePoint for documents
+- Calendars for scheduling
+- Time tracking tools
+
+## Automated Status Reporting
+
+Generate reports that include:
+- Project progress summaries
+- Milestone achievements
+- Risk assessments
+- Resource utilization
+- Next steps and blockers
+
+## Risk Identification with AI
+
+AI can help identify:
+- Schedule risks from task dependencies
+- Budget risks from spending patterns
+- Resource risks from capacity issues
+- Quality risks from testing metrics
+- Stakeholder risks from communication gaps
+
+## Resource Optimization Strategies
+
+Optimize resources by:
+- Analyzing team capacity and skills
+- Predicting project timelines
+- Identifying bottlenecks early
+- Suggesting task reassignments
+- Planning for future projects
+
+Ready to revolutionize your PM workflow? Try our [Project Status Reporter template](/templates)!`
     }
   ];
 
@@ -187,6 +564,18 @@ function Guides() {
       default: return 'bg-gray-500/20 text-gray-400';
     }
   };
+
+  const [selectedGuide, setSelectedGuide] = useState<number | null>(null);
+
+  const openGuide = (guideId: number) => {
+    setSelectedGuide(guideId);
+  };
+
+  const closeGuide = () => {
+    setSelectedGuide(null);
+  };
+
+  const currentGuide = guides.find(g => g.id === selectedGuide);
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
@@ -244,7 +633,10 @@ function Guides() {
                   <span className="text-yellow-300">4.9/5</span>
                 </div>
               </div>
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2">
+              <button 
+                onClick={() => openGuide(1)}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
+              >
                 <Book className="w-5 h-5" />
                 <span>Start Reading</span>
               </button>
@@ -334,11 +726,27 @@ function Guides() {
 
                 {/* Actions */}
                 <div className="flex space-x-3">
-                  <button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                  <button 
+                    onClick={() => openGuide(guide.id)}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                  >
                     <Book className="w-4 h-4" />
                     <span>Read Guide</span>
                   </button>
-                  <button className="px-4 py-2 border border-white/20 text-white rounded-lg font-medium hover:bg-white/10 transition-colors duration-200 flex items-center space-x-2">
+                  <button 
+                    onClick={() => {
+                      const blob = new Blob([guide.content], { type: 'text/markdown' });
+                      const url = window.URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.download = `${guide.title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}.md`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(url);
+                    }}
+                    className="px-4 py-2 border border-white/20 text-white rounded-lg font-medium hover:bg-white/10 transition-colors duration-200 flex items-center space-x-2"
+                  >
                     <Download className="w-4 h-4" />
                     <span>PDF</span>
                   </button>
@@ -353,6 +761,78 @@ function Guides() {
           ))}
         </div>
 
+        {/* Guide Reader Modal */}
+        {selectedGuide && currentGuide && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-white/10 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+              {/* Header */}
+              <div className="p-6 border-b border-white/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">{currentGuide.title}</h2>
+                    <p className="text-gray-300">by {currentGuide.author}</p>
+                  </div>
+                  <button
+                    onClick={closeGuide}
+                    className="text-gray-400 hover:text-white transition-colors duration-200"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                <div className="prose prose-invert max-w-none">
+                  <div className="whitespace-pre-wrap text-gray-300 leading-relaxed">
+                    {currentGuide.content}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-white/10">
+                <div className="flex justify-between">
+                  <div className="flex items-center space-x-4 text-sm text-gray-400">
+                    <span>{currentGuide.readTime} read</span>
+                    <span>•</span>
+                    <span>{currentGuide.readers.toLocaleString()} readers</span>
+                    <span>•</span>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-400">{currentGuide.rating}</span>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => {
+                        const blob = new Blob([currentGuide.content], { type: 'text/markdown' });
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `${currentGuide.title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}.md`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                      }}
+                      className="border border-white/20 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors duration-200"
+                    >
+                      Download
+                    </button>
+                    <button
+                      onClick={closeGuide}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Call to Action */}
         <div className="mt-16 bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-8 text-center">
           <h3 className="text-2xl font-bold text-white mb-4">Want to Contribute a Guide?</h3>
@@ -360,12 +840,18 @@ function Guides() {
             Share your MCP knowledge with the community! We're always looking for new perspectives and use cases.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+            <Link
+              to="/submit-template"
+              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+            >
               Submit Your Guide
-            </button>
-            <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
+            </Link>
+            <Link
+              to="/join-community"
+              className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+            >
               Guide Writing Tips
-            </button>
+            </Link>
           </div>
         </div>
       </div>
