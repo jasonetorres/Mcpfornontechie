@@ -244,6 +244,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!existingTutorials) {
       localStorage.setItem(tutorialKey, JSON.stringify([]))
     }
+
+    // Initialize template usage
+    const templateKey = `templates-${userId}`
+    if (!localStorage.getItem(templateKey)) {
+      localStorage.setItem(templateKey, JSON.stringify([]))
+    }
   }
 
   const value = {

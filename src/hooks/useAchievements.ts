@@ -148,9 +148,14 @@ export function useAchievements() {
       if (savedAchievements) {
         const parsed = JSON.parse(savedAchievements)
         setAchievements(parsed)
+      } else {
+        // Initialize with default achievements for new users
+        setAchievements(ACHIEVEMENTS)
+        saveAchievements(ACHIEVEMENTS)
       }
     } catch (error) {
       console.error('Error loading achievements:', error)
+      setAchievements(ACHIEVEMENTS)
     }
   }
 
@@ -281,10 +286,15 @@ export function useAchievements() {
   const getTotalPoints = () => getEarnedAchievements().reduce((sum, a) => sum + a.points, 0)
   const getCompletionPercentage = () => (getEarnedAchievements().length / achievements.length) * 100
 
+  // Force check achievements when called
+  const forceCheckAchievements = () => {
+    checkAchievements()
+  }
+
   return {
     achievements,
     loading,
-    checkAchievements,
+    checkAchievements: forceCheckAchievements,
     markCommunityJoined,
     markTemplateUsed,
     getEarnedAchievements,

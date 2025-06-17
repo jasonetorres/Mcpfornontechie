@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Trophy, Star, Target, Zap, Users, BookOpen, Award, Lock, Play, Download } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useAchievements } from '../hooks/useAchievements'
@@ -16,8 +17,9 @@ const iconMap = {
 }
 
 export default function Achievements() {
-  const { profile } = useAuth()
+  const { user, profile } = useAuth()
   const { achievements, getTotalPoints, getCompletionPercentage } = useAchievements()
+  const [selectedCategory, setSelectedCategory] = useState('All')
 
   const earnedAchievements = achievements.filter(a => a.earned)
   const totalPoints = getTotalPoints()
@@ -25,17 +27,25 @@ export default function Achievements() {
   const completionPercentage = getCompletionPercentage()
 
   const categories = ['All', 'Getting Started', 'Learning', 'Progress', 'Completion', 'Community', 'Speed', 'Mastery']
-  const [selectedCategory, setSelectedCategory] = React.useState('All')
 
   const filteredAchievements = selectedCategory === 'All' 
     ? achievements 
     : achievements.filter(a => a.category === selectedCategory)
 
-  if (!profile) {
+  if (!user) {
     return (
       <div className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="text-white">Loading achievements...</div>
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-12">
+            <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-6" />
+            <h1 className="text-3xl font-bold text-white mb-4">Sign In to View Achievements</h1>
+            <p className="text-gray-300 mb-8">
+              Create an account to track your progress and unlock achievements as you learn MCP!
+            </p>
+            <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+              Sign Up Now
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -184,12 +194,18 @@ export default function Achievements() {
             You're doing great! Continue your learning journey to unlock more achievements and earn points.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+            <Link
+              to="/learn"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+            >
               Continue Learning
-            </button>
-            <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
+            </Link>
+            <Link
+              to="/beginner-path"
+              className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+            >
               View Learning Paths
-            </button>
+            </Link>
           </div>
         </div>
       </div>
