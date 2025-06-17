@@ -29,7 +29,7 @@ function Layout({ children }: LayoutProps) {
     { name: 'Pricing', href: '/pricing', icon: CreditCard },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isCurrentPathActive = (path: string) => location.pathname === path;
 
   const openAuthModal = (mode: 'signin' | 'signup') => {
     setAuthMode(mode);
@@ -121,7 +121,7 @@ function Layout({ children }: LayoutProps) {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-1 transition-colors duration-200 ${
-                      isActive(item.href)
+                      isCurrentPathActive(item.href)
                         ? 'text-matrix-primary'
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
@@ -217,7 +217,7 @@ function Layout({ children }: LayoutProps) {
                   key={item.name}
                   to={item.href}
                   className={`flex items-center space-x-2 px-3 py-2 transition-colors duration-200 ${
-                    isActive(item.href)
+                    isCurrentPathActive(item.href)
                       ? 'text-matrix-primary'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
