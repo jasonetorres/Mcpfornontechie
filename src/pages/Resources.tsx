@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Book, Users, Workflow, Download, ExternalLink, ArrowRight, Play, FileText, Video, Headphones } from 'lucide-react';
+import { Book, Users, Workflow, Download, ExternalLink, ArrowRight, Play, FileText, Video, Headphones, Code, Globe } from 'lucide-react';
 
 function Resources() {
   const resourceCategories = [
@@ -14,7 +14,7 @@ function Resources() {
           description: 'Complete beginner\'s guide to understanding MCP',
           type: 'Guide',
           duration: '15 min read',
-          url: '/guides',
+          url: '/learn',
           icon: FileText
         },
         {
@@ -30,7 +30,7 @@ function Resources() {
           description: 'Step-by-step checklist for your first MCP project',
           type: 'Checklist',
           duration: '5 min',
-          url: '#',
+          url: '/guides',
           icon: FileText
         }
       ]
@@ -45,7 +45,7 @@ function Resources() {
           description: 'Quick overview of MCP concepts and benefits',
           type: 'Video',
           duration: '5 min',
-          url: '#',
+          url: '/demo',
           icon: Video
         },
         {
@@ -53,7 +53,7 @@ function Resources() {
           description: 'Complete walkthrough using Zapier and Google Sheets',
           type: 'Tutorial',
           duration: '20 min',
-          url: '#',
+          url: '/examples',
           icon: Video
         },
         {
@@ -61,7 +61,7 @@ function Resources() {
           description: 'Complex use cases and best practices',
           type: 'Advanced',
           duration: '35 min',
-          url: '#',
+          url: '/guides',
           icon: Video
         }
       ]
@@ -80,19 +80,19 @@ function Resources() {
           icon: FileText
         },
         {
-          title: 'Data Source Connectors',
-          description: 'Ready-made connectors for popular tools',
-          type: 'Tools',
-          duration: 'Instant',
+          title: 'MCP Server Directory',
+          description: 'Browse 3000+ available MCP servers',
+          type: 'Directory',
+          duration: 'Browse',
           url: '#',
-          icon: FileText
+          icon: Globe
         },
         {
           title: 'MCP Project Planner',
           description: 'Interactive tool to plan your MCP implementation',
           type: 'Tool',
           duration: '10 min',
-          url: '#',
+          url: '/start-building',
           icon: FileText
         }
       ]
@@ -166,6 +166,34 @@ function Resources() {
     }
   ];
 
+  const mcpPromptLibrary = [
+    {
+      category: 'Google Maps',
+      prompt: 'Track the live GPS location of driver ID #{driver_id}. Query Google Maps for real-time traffic data and adjust the estimated delivery time if delays exceed 5 minutes. If ETA changes, update the customer\'s live tracker and send an SMS notification.',
+      useCase: 'Delivery tracking and customer notifications'
+    },
+    {
+      category: 'YouTube Transcript',
+      prompt: 'Get the transcript from this youtube video [link to video]. Then, summarize it into a blog post with key takeaways and actionable insights.',
+      useCase: 'Content creation and video summarization'
+    },
+    {
+      category: 'Google Drive',
+      prompt: 'I have an important marketing budget review meeting in 30 minutes. Find all relevant documents about our marketing budget and performance. Give me a quick summary of our Q1 performance and highlight the key decisions we need to make.',
+      useCase: 'Meeting preparation and document analysis'
+    },
+    {
+      category: 'Asana',
+      prompt: 'Create a new task in my Asana workspace called \'Review Q4 metrics\' and set the due date to next Friday. Then, find all tasks assigned to me that are due this week and summarize them.',
+      useCase: 'Task management and project coordination'
+    },
+    {
+      category: 'GitHub',
+      prompt: 'Create a new branch called hello-world in my angiejones/goose-demo repository. Update the README.md file to say "this was written by goose" and commit it. Open a pull request with your changes.',
+      useCase: 'Code management and version control'
+    }
+  ];
+
   const podcasts = [
     {
       title: 'The AI Context Podcast',
@@ -226,6 +254,36 @@ function Resources() {
                   <span>Access Resources</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* MCP Prompt Library */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-white mb-8">MCP Prompt Library</h2>
+          <p className="text-gray-300 mb-8">
+            Ready-to-use prompts for popular MCP servers. Copy, customize, and use these with your AI agents.
+          </p>
+          <div className="space-y-6">
+            {mcpPromptLibrary.map((example, index) => (
+              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-white">{example.category}</h3>
+                  <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
+                    {example.useCase}
+                  </span>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
+                  <p className="text-gray-300 italic">"{example.prompt}"</p>
+                </div>
+                <button
+                  onClick={() => navigator.clipboard.writeText(example.prompt)}
+                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center space-x-1"
+                >
+                  <Code className="w-4 h-4" />
+                  <span>Copy Prompt</span>
+                </button>
               </div>
             ))}
           </div>

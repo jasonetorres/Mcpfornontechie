@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Book, Usb, Database, Shield, Brain, Users, MessageSquare, Workflow, ArrowRight } from 'lucide-react';
+import { Play, Book, Usb, Database, Shield, Brain, Users, MessageSquare, Workflow, ArrowRight, ExternalLink, Code } from 'lucide-react';
 
 function Home() {
   const [demoStep, setDemoStep] = useState(0);
@@ -92,6 +92,33 @@ function Home() {
     }
   ];
 
+  const popularMCPServers = [
+    {
+      name: 'Google Drive',
+      description: 'File access and search capabilities',
+      icon: '📁',
+      useCase: 'Document management and search'
+    },
+    {
+      name: 'YouTube Transcript',
+      description: 'Extract and work with video transcripts',
+      icon: '🎥',
+      useCase: 'Content creation and analysis'
+    },
+    {
+      name: 'Google Maps',
+      description: 'Location services and directions',
+      icon: '🗺️',
+      useCase: 'Delivery tracking and logistics'
+    },
+    {
+      name: 'Asana',
+      description: 'Project management and task tracking',
+      icon: '✅',
+      useCase: 'Team coordination and reporting'
+    }
+  ];
+
   return (
     <>
       {/* Hero Section */}
@@ -155,8 +182,75 @@ function Home() {
         </div>
       </section>
 
-      {/* Quick Demo Preview */}
+      {/* What is MCP Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">What is MCP?</h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              MCP stands for Model Context Protocol - an open standard that's changing how AI works with data
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-white mb-4">❌ The Problem</h3>
+              <p className="text-red-200 mb-4">
+                AI is amazing, but it doesn't know about YOUR specific data. Without context, AI can only give generic answers.
+              </p>
+              <div className="bg-red-500/20 rounded-lg p-4">
+                <p className="text-red-300 text-sm">
+                  <strong>Before MCP:</strong> Each AI integration required custom development from scratch. 
+                  No standard way to connect AI to your systems like Google Drive, Asana, or Slack.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-white mb-4">✅ The Solution</h3>
+              <p className="text-green-200 mb-4">
+                MCP is like <strong>USB-C for AI</strong> - a universal connector that lets AI access your data 
+                without coding. Created by Anthropic as an open standard.
+              </p>
+              <div className="bg-green-500/20 rounded-lg p-4">
+                <p className="text-green-300 text-sm">
+                  <strong>With MCP:</strong> You don't need to be a developer! Connect AI to any tool 
+                  using standardized MCP servers. Over 3,000 servers available.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Popular MCP Servers */}
+          <div className="mb-16">
+            <h3 className="text-2xl font-bold text-white mb-8 text-center">Popular MCP Servers You Should Try</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {popularMCPServers.map((server, index) => (
+                <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 text-center">
+                  <div className="text-4xl mb-3">{server.icon}</div>
+                  <h4 className="text-white font-semibold mb-2">{server.name}</h4>
+                  <p className="text-gray-300 text-sm mb-3">{server.description}</p>
+                  <div className="bg-blue-500/20 rounded-lg p-2">
+                    <p className="text-blue-300 text-xs">{server.useCase}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link
+                to="/learn"
+                className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors duration-200"
+              >
+                <span>Explore all MCP servers</span>
+                <ExternalLink className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Demo Preview */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">Live Demo Preview</h2>
@@ -244,6 +338,82 @@ function Home() {
         </div>
       </section>
 
+      {/* Example Prompts Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Example MCP Prompts</h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              See how to use natural language to get AI to work with your data through MCP
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                <span>🗺️</span>
+                <span>Google Maps</span>
+              </h3>
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <p className="text-gray-300 text-sm italic">
+                  "Track the live GPS location of driver ID #123. Query Google Maps for real-time traffic data 
+                  and adjust the estimated delivery time if delays exceed 5 minutes."
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                <span>🎥</span>
+                <span>YouTube Transcript</span>
+              </h3>
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <p className="text-gray-300 text-sm italic">
+                  "Get the transcript from this YouTube video [link]. Then, summarize it into a blog post 
+                  with key takeaways and actionable insights."
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                <span>📁</span>
+                <span>Google Drive</span>
+              </h3>
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <p className="text-gray-300 text-sm italic">
+                  "Find all relevant documents about our marketing budget. Give me a quick summary of our Q1 
+                  performance and highlight the key decisions we need to make."
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                <span>✅</span>
+                <span>Asana</span>
+              </h3>
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <p className="text-gray-300 text-sm italic">
+                  "Create a new task called 'Review Q4 metrics' due next Friday. Then find all tasks assigned 
+                  to me this week and summarize them."
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              to="/resources"
+              className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors duration-200"
+            >
+              <Code className="w-4 h-4" />
+              <span>View complete prompt library</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Quick Links */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
@@ -295,6 +465,7 @@ function Home() {
             <h3 className="text-2xl font-bold text-white mb-4">Ready to Connect AI to Your Data?</h3>
             <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
               Don't let AI remain a black box. Start building context-aware AI solutions that actually understand your business.
+              The possibilities are endless with MCP!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
