@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: userData.user_metadata?.role || null,
           company: userData.user_metadata?.company || null,
           avatar_url: null,
-          created_at: new Date().toISOString(),
+          created_at: userData.created_at || new Date().toISOString(),
           updated_at: new Date().toISOString()
         }
         localStorage.setItem('mock-profile', JSON.stringify(basicProfile))
@@ -135,7 +135,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!error && data.user) {
         console.log('✅ User signed up successfully')
         
-        // Create profile
+        // Create profile with current timestamp
+        const now = new Date().toISOString()
         const profileData = {
           id: data.user.id,
           email: data.user.email!,
@@ -143,10 +144,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: userData?.role || null,
           company: userData?.company || null,
           avatar_url: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          created_at: now,
+          updated_at: now
         }
 
+        // Store user with creation timestamp
+        const userWithTimestamp = {
+          ...data.user,
+          created_at: now
+        }
+        localStorage.setItem('mock-user', JSON.stringify(userWithTimestamp))
         localStorage.setItem('mock-profile', JSON.stringify(profileData))
         setProfile(profileData)
         
