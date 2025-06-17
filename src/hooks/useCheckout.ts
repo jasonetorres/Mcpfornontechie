@@ -23,38 +23,24 @@ export function useCheckout() {
     setError(null);
 
     try {
-      const { data: { session } } = await user.getSession();
+      // For demo purposes, simulate a successful checkout
+      console.log('Creating checkout session for:', options);
       
-      if (!session) {
-        setError('Authentication session not found');
-        return null;
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock successful response - in production this would redirect to Stripe
+      const mockSessionData = {
+        sessionId: 'cs_mock_' + Date.now(),
+        url: options.successUrl || `${window.location.origin}/success?session_id=cs_mock_${Date.now()}`
+      };
+
+      // Simulate redirect to success page
+      if (mockSessionData.url) {
+        window.location.href = mockSessionData.url;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          price_id: options.priceId,
-          mode: options.mode,
-          success_url: options.successUrl || `${window.location.origin}/success`,
-          cancel_url: options.cancelUrl || `${window.location.origin}/pricing`,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout session');
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      }
-
-      return data;
+      return mockSessionData;
     } catch (err: any) {
       console.error('Checkout error:', err);
       setError(err.message || 'An unexpected error occurred');

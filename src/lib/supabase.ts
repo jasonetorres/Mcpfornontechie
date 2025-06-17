@@ -9,7 +9,15 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'demo-anon-key
 const createMockClient = () => ({
   auth: {
     getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-    getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+    getUser: (token?: string) => {
+      if (token) {
+        const mockUser = localStorage.getItem('mock-user')
+        if (mockUser) {
+          return Promise.resolve({ data: { user: JSON.parse(mockUser) }, error: null })
+        }
+      }
+      return Promise.resolve({ data: { user: null }, error: null })
+    },
     signUp: (credentials: any) => {
       console.log('Mock signup:', credentials.email)
       const mockUser = {

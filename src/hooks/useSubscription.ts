@@ -35,18 +35,27 @@ export function useSubscription() {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('*')
-        .maybeSingle();
+      // For demo purposes, simulate subscription data
+      const mockSubscription = {
+        customer_id: 'cus_mock123',
+        subscription_id: 'sub_mock123',
+        subscription_status: 'active',
+        price_id: 'price_1Rax2LRWDp0Sz2pAkHFvLJ9K', // Pro plan
+        current_period_start: Math.floor(Date.now() / 1000),
+        current_period_end: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days from now
+        cancel_at_period_end: false,
+        payment_method_brand: 'visa',
+        payment_method_last4: '4242'
+      };
 
-      if (fetchError) {
-        console.error('Error fetching subscription:', fetchError);
-        setError('Failed to fetch subscription data');
-        return;
+      // Check if user has a stored subscription preference
+      const storedSub = localStorage.getItem(`subscription-${user?.id}`);
+      if (storedSub) {
+        setSubscription(JSON.parse(storedSub));
+      } else {
+        // Default to free plan
+        setSubscription(null);
       }
-
-      setSubscription(data);
     } catch (err) {
       console.error('Error in fetchSubscription:', err);
       setError('An unexpected error occurred');
