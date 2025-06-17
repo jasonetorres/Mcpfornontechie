@@ -97,20 +97,20 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-white/10 rounded-xl max-w-md w-full p-6 relative">
+    <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-card border border-border rounded-xl max-w-md w-full p-6 relative shadow-lg">
         <button
           onClick={() => onClose()}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors duration-200"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             {mode === 'signin' ? 'Welcome Back' : 'Join MCP Academy'}
           </h2>
-          <p className="text-gray-300">
+          <p className="text-muted-foreground">
             {mode === 'signin' 
               ? 'Sign in to continue your learning journey' 
               : 'Create your account to track progress and access exclusive content'
@@ -119,24 +119,24 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
         </div>
 
         {error && (
-          <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-4">
-            <p className="text-red-300 text-sm">{error}</p>
+          <div className="bg-destructive/20 border border-destructive/30 rounded-lg p-3 mb-4">
+            <p className="text-destructive text-sm">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
             <div>
-              <label className="block text-white font-medium mb-2">Full Name</label>
+              <label className="block text-foreground font-medium mb-2">Full Name</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
-                  className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
                   placeholder="Your full name"
                 />
               </div>
@@ -144,25 +144,25 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           )}
 
           <div>
-            <label className="block text-white font-medium mb-2">Email</label>
+            <label className="block text-foreground font-medium mb-2">Email</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
                 placeholder="your@email.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-white font-medium mb-2">Password</label>
+            <label className="block text-foreground font-medium mb-2">Password</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="password"
                 name="password"
@@ -170,7 +170,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
                 onChange={handleInputChange}
                 required
                 minLength={6}
-                className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
                 placeholder="••••••••"
               />
             </div>
@@ -179,9 +179,9 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           {mode === 'signup' && (
             <>
               <div>
-                <label className="block text-white font-medium mb-2">Confirm Password</label>
+                <label className="block text-foreground font-medium mb-2">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="password"
                     name="confirmPassword"
@@ -189,7 +189,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
                     onChange={handleInputChange}
                     required
                     minLength={6}
-                    className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
                     placeholder="••••••••"
                   />
                 </div>
@@ -197,26 +197,26 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white font-medium mb-2">Role</label>
+                  <label className="block text-foreground font-medium mb-2">Role</label>
                   <input
                     type="text"
                     name="role"
                     value={formData.role}
                     onChange={handleInputChange}
-                    className="w-full bg-slate-800 border border-white/20 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                    className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
                     placeholder="Your role"
                   />
                 </div>
                 <div>
-                  <label className="block text-white font-medium mb-2">Company</label>
+                  <label className="block text-foreground font-medium mb-2">Company</label>
                   <div className="relative">
-                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       type="text"
                       name="company"
                       value={formData.company}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-800 border border-white/20 rounded-lg pl-9 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                      className="w-full bg-input border border-border rounded-lg pl-9 pr-4 py-2 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
                       placeholder="Company"
                     />
                   </div>
@@ -228,18 +228,18 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 rounded-lg font-semibold transition-all duration-200"
+            className="w-full bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground py-2 rounded-lg font-semibold transition-all duration-200"
           >
             {loading ? 'Please wait...' : mode === 'signin' ? 'Sign In' : 'Create Account'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             {mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}
             <button
               onClick={switchMode}
-              className="text-blue-400 hover:text-blue-300 ml-1 transition-colors duration-200"
+              className="text-matrix-primary hover:text-matrix-secondary ml-1 transition-colors duration-200"
             >
               {mode === 'signin' ? 'Sign up' : 'Sign in'}
             </button>

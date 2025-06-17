@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import UserMenu from './UserMenu';
 import AuthModal from './AuthModal';
@@ -15,6 +15,7 @@ function Layout({ children }: LayoutProps) {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const location = useLocation();
   const { user, profile } = useAuth();
 
@@ -31,6 +32,20 @@ function Layout({ children }: LayoutProps) {
     setAuthMode(mode);
     setIsAuthModalOpen(true);
   };
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
+  // Initialize dark mode
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
 
   // Show notification when user signs in
   useEffect(() => {
@@ -62,17 +77,17 @@ function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Success Notification */}
       {showNotification && (
         <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-right duration-300">
-          <div className="bg-green-600/90 backdrop-blur-md border border-green-500/30 rounded-lg p-4 shadow-lg max-w-sm">
+          <div className="bg-matrix-primary/90 backdrop-blur-md border border-matrix-primary/30 rounded-lg p-4 shadow-lg max-w-sm">
             <div className="flex items-center space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-200 flex-shrink-0" />
-              <p className="text-green-100 font-medium">{notificationMessage}</p>
+              <CheckCircle className="w-5 h-5 text-matrix-secondary flex-shrink-0" />
+              <p className="text-primary-foreground font-medium">{notificationMessage}</p>
               <button
                 onClick={() => setShowNotification(false)}
-                className="text-green-200 hover:text-white transition-colors duration-200"
+                className="text-primary-foreground/80 hover:text-primary-foreground transition-colors duration-200"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -82,15 +97,15 @@ function Layout({ children }: LayoutProps) {
       )}
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/20 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Usb className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
+                <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-white">MCP Academy</span>
-              <span className="text-sm text-blue-300 bg-blue-500/20 px-2 py-1 rounded-full">For Non-Developers</span>
+              <span className="text-xl font-bold text-foreground">MCP Academy</span>
+              <span className="text-sm text-matrix-primary bg-matrix-primary/20 px-2 py-1 rounded-full">For Non-Developers</span>
             </Link>
             
             <div className="hidden md:block">
@@ -101,8 +116,8 @@ function Layout({ children }: LayoutProps) {
                     to={item.href}
                     className={`flex items-center space-x-1 transition-colors duration-200 ${
                       isActive(item.href)
-                        ? 'text-blue-400'
-                        : 'text-gray-300 hover:text-white'
+                        ? 'text-matrix-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     <item.icon className="w-4 h-4" />
@@ -113,32 +128,44 @@ function Layout({ children }: LayoutProps) {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-muted hover:bg-accent transition-colors duration-200"
+              >
+                {isDarkMode ? (
+                  <Sun className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <Moon className="w-4 h-4 text-muted-foreground" />
+                )}
+              </button>
+
               {/* Auth Status */}
               {user ? (
                 <div className="flex items-center space-x-3">
                   {/* User Status Indicator - Only show on larger screens */}
-                  <div className="hidden lg:flex items-center space-x-2 text-green-300 text-sm bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="hidden lg:flex items-center space-x-2 text-matrix-primary text-sm bg-matrix-primary/10 px-3 py-1 rounded-full border border-matrix-primary/20">
+                    <div className="w-2 h-2 bg-matrix-primary rounded-full animate-pulse"></div>
                     <span>Signed in</span>
                   </div>
                   <UserMenu />
                 </div>
               ) : (
                 <div className="hidden md:flex items-center space-x-3">
-                  <div className="flex items-center space-x-2 text-gray-400 text-sm bg-gray-500/10 px-3 py-1 rounded-full border border-gray-500/20">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                  <div className="flex items-center space-x-2 text-muted-foreground text-sm bg-muted/50 px-3 py-1 rounded-full border border-border">
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
                     <span>Not signed in</span>
                   </div>
                   <button
                     onClick={() => openAuthModal('signin')}
-                    className="text-gray-300 hover:text-white transition-colors duration-200 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-white/10"
+                    className="text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center space-x-1 px-3 py-2 rounded-lg hover:bg-muted"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>Sign In</span>
                   </button>
                   <button
                     onClick={() => openAuthModal('signup')}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                    className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200"
                   >
                     Sign Up
                   </button>
@@ -147,7 +174,7 @@ function Layout({ children }: LayoutProps) {
 
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden text-white"
+                className="md:hidden text-foreground"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -157,18 +184,18 @@ function Layout({ children }: LayoutProps) {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-black/40 backdrop-blur-md border-t border-white/10">
+          <div className="md:hidden bg-background/40 backdrop-blur-md border-t border-border">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {/* Mobile Auth Status */}
-              <div className="px-3 py-2 border-b border-white/10 mb-2">
+              <div className="px-3 py-2 border-b border-border mb-2">
                 {user ? (
-                  <div className="flex items-center space-x-2 text-green-300">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="flex items-center space-x-2 text-matrix-primary">
+                    <div className="w-2 h-2 bg-matrix-primary rounded-full animate-pulse"></div>
                     <span className="text-sm">Signed in as {profile?.full_name || user.email}</span>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                  <div className="flex items-center space-x-2 text-muted-foreground">
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
                     <span className="text-sm">Not signed in</span>
                   </div>
                 )}
@@ -180,8 +207,8 @@ function Layout({ children }: LayoutProps) {
                   to={item.href}
                   className={`flex items-center space-x-2 px-3 py-2 transition-colors duration-200 ${
                     isActive(item.href)
-                      ? 'text-blue-400'
-                      : 'text-gray-300 hover:text-white'
+                      ? 'text-matrix-primary'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -191,13 +218,13 @@ function Layout({ children }: LayoutProps) {
               ))}
               
               {!user && (
-                <div className="border-t border-white/10 pt-2 mt-2">
+                <div className="border-t border-border pt-2 mt-2">
                   <button
                     onClick={() => {
                       openAuthModal('signin');
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200 w-full"
+                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200 w-full"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>Sign In</span>
@@ -207,7 +234,7 @@ function Layout({ children }: LayoutProps) {
                       openAuthModal('signup');
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200 w-full"
+                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200 w-full"
                   >
                     <Users className="w-4 h-4" />
                     <span>Sign Up</span>
@@ -216,11 +243,11 @@ function Layout({ children }: LayoutProps) {
               )}
 
               {user && (
-                <div className="border-t border-white/10 pt-2 mt-2">
+                <div className="border-t border-border pt-2 mt-2">
                   <Link
                     to="/profile"
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200"
+                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
                     <Users className="w-4 h-4" />
                     <span>Profile</span>
@@ -228,7 +255,7 @@ function Layout({ children }: LayoutProps) {
                   <Link
                     to="/dashboard"
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center space-x-2 px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200"
+                    className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
                     <Book className="w-4 h-4" />
                     <span>Dashboard</span>
@@ -246,29 +273,29 @@ function Layout({ children }: LayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <Link to="/" className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Usb className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
+                <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-white">MCP Academy</span>
-              <span className="text-sm text-blue-300">For Non-Developers</span>
+              <span className="text-xl font-bold text-foreground">MCP Academy</span>
+              <span className="text-sm text-matrix-primary">For Non-Developers</span>
             </Link>
             
-            <div className="flex space-x-6 text-gray-300">
-              <Link to="/talk-resources" className="hover:text-white transition-colors duration-200">Talk Resources</Link>
-              <Link to="/templates" className="hover:text-white transition-colors duration-200">Templates</Link>
-              <Link to="/community" className="hover:text-white transition-colors duration-200">Community</Link>
-              <Link to="/guides" className="hover:text-white transition-colors duration-200">Guides</Link>
+            <div className="flex space-x-6 text-muted-foreground">
+              <Link to="/talk-resources" className="hover:text-foreground transition-colors duration-200">Talk Resources</Link>
+              <Link to="/templates" className="hover:text-foreground transition-colors duration-200">Templates</Link>
+              <Link to="/community" className="hover:text-foreground transition-colors duration-200">Community</Link>
+              <Link to="/guides" className="hover:text-foreground transition-colors duration-200">Guides</Link>
             </div>
           </div>
           
-          <div className="mt-8 pt-8 border-t border-white/10 text-center">
-            <p className="text-gray-400">
+          <div className="mt-8 pt-8 border-t border-border text-center">
+            <p className="text-muted-foreground">
               © 2025 MCP Academy. Empowering non-developers to build with AI. 
-              <span className="text-blue-400 ml-2">Supporting "The Missing Link" talk</span>
+              <span className="text-matrix-primary ml-2">Supporting "The Missing Link" talk</span>
             </p>
           </div>
         </div>
