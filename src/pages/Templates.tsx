@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink } from 'lucide-react';
+import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink, FileDown, Code } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAchievements } from '../hooks/useAchievements';
 
@@ -8,6 +8,7 @@ function Templates() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [copiedTemplate, setCopiedTemplate] = useState('');
+  const [downloadingTemplate, setDownloadingTemplate] = useState('');
   const { user } = useAuth();
   const { markTemplateUsed } = useAchievements();
 
@@ -59,7 +60,70 @@ function Templates() {
     "What's Sarah's email?"
   ]
 }`,
-      tags: ['community', 'q&a', 'automation']
+      tags: ['community', 'q&a', 'automation'],
+      files: [
+        {
+          name: 'community-members.csv',
+          content: `Name,Role,Contributions,Email,Join_Date
+Sarah Chen,Community Manager,45,sarah@example.com,2024-01-15
+Mike Rodriguez,Developer,38,mike@example.com,2024-02-01
+Lisa Park,Designer,42,lisa@example.com,2024-01-20
+David Kim,Marketing,29,david@example.com,2024-02-10`
+        },
+        {
+          name: 'zapier-config.json',
+          content: `{
+  "trigger": {
+    "type": "webhook",
+    "name": "Community Question"
+  },
+  "action": {
+    "type": "google_sheets_lookup",
+    "spreadsheet": "community-members",
+    "ai_integration": {
+      "model": "gpt-3.5-turbo",
+      "prompt": "Answer questions about community members using the provided data"
+    }
+  }
+}`
+        },
+        {
+          name: 'setup-instructions.md',
+          content: `# Community Q&A Bot Setup
+
+## Prerequisites
+- Google Sheets account
+- Zapier account (free tier works)
+- ChatGPT API access
+
+## Step 1: Prepare Your Data
+1. Create a new Google Sheet
+2. Import the community-members.csv file
+3. Make sure columns are: Name, Role, Contributions, Email, Join_Date
+
+## Step 2: Set Up Zapier
+1. Create a new Zap
+2. Set trigger as "Webhooks by Zapier"
+3. Choose "Catch Hook"
+4. Copy the webhook URL
+
+## Step 3: Configure AI Integration
+1. Add "OpenAI (ChatGPT)" action
+2. Use the provided prompt template
+3. Connect your Google Sheet as data source
+
+## Step 4: Test Your Bot
+Try these sample questions:
+- "Who is our top contributor?"
+- "Find all marketing team members"
+- "What's Sarah's email address?"
+
+## Troubleshooting
+- Ensure your Google Sheet is shared with Zapier
+- Check API key permissions
+- Verify webhook URL is correct`
+        }
+      ]
     },
     {
       id: 2,
@@ -91,7 +155,39 @@ function Templates() {
     "smb": "emphasize_cost_effectiveness"
   }
 }`,
-      tags: ['marketing', 'segmentation', 'personalization']
+      tags: ['marketing', 'segmentation', 'personalization'],
+      files: [
+        {
+          name: 'customer-data-template.csv',
+          content: `Company,Industry,Revenue,Employees,Founded_Date,Contact_Email
+Acme Corp,Technology,50000,25,2020-01-15,contact@acme.com
+Beta Inc,Healthcare,150000,100,2018-05-20,hello@beta.com
+Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
+        },
+        {
+          name: 'airtable-base-config.json',
+          content: `{
+  "base_name": "Customer Segmentation",
+  "tables": {
+    "customers": {
+      "fields": [
+        {"name": "Company", "type": "singleLineText"},
+        {"name": "Industry", "type": "singleSelect"},
+        {"name": "Revenue", "type": "currency"},
+        {"name": "Employees", "type": "number"},
+        {"name": "Segment", "type": "formula"}
+      ]
+    }
+  },
+  "automations": {
+    "segment_customers": {
+      "trigger": "record_created",
+      "action": "run_script"
+    }
+  }
+}`
+        }
+      ]
     },
     {
       id: 3,
@@ -121,7 +217,23 @@ function Templates() {
   ],
   "metrics": ["completion_rate", "budget_usage", "team_velocity"]
 }`,
-      tags: ['project-management', 'reporting', 'automation']
+      tags: ['project-management', 'reporting', 'automation'],
+      files: [
+        {
+          name: 'notion-database-template.json',
+          content: `{
+  "database_name": "Project Tracker",
+  "properties": {
+    "Task": {"type": "title"},
+    "Status": {"type": "select", "options": ["Not Started", "In Progress", "Completed", "Blocked"]},
+    "Assignee": {"type": "person"},
+    "Due Date": {"type": "date"},
+    "Priority": {"type": "select", "options": ["Low", "Medium", "High", "Critical"]},
+    "Project": {"type": "relation"}
+  }
+}`
+        }
+      ]
     },
     {
       id: 4,
@@ -155,7 +267,36 @@ function Templates() {
     "cold": 40
   }
 }`,
-      tags: ['sales', 'lead-scoring', 'crm']
+      tags: ['sales', 'lead-scoring', 'crm'],
+      files: [
+        {
+          name: 'power-automate-flow.json',
+          content: `{
+  "definition": {
+    "triggers": {
+      "when_lead_created": {
+        "type": "CommonDataServiceV2",
+        "inputs": {
+          "entityName": "leads"
+        }
+      }
+    },
+    "actions": {
+      "score_lead": {
+        "type": "Http",
+        "inputs": {
+          "method": "POST",
+          "uri": "https://api.openai.com/v1/completions",
+          "headers": {
+            "Authorization": "Bearer @{parameters('openai_api_key')}"
+          }
+        }
+      }
+    }
+  }
+}`
+        }
+      ]
     },
     {
       id: 5,
@@ -184,7 +325,28 @@ function Templates() {
     "popularity_weight": 0.2
   }
 }`,
-      tags: ['content', 'recommendations', 'personalization']
+      tags: ['content', 'recommendations', 'personalization'],
+      files: [
+        {
+          name: 'bubble-workflow.json',
+          content: `{
+  "workflow_name": "Content Recommendation",
+  "trigger": "Page is loaded",
+  "actions": [
+    {
+      "step": 1,
+      "action": "Get user preferences",
+      "data_source": "User table"
+    },
+    {
+      "step": 2,
+      "action": "Call API",
+      "endpoint": "OpenAI recommendations"
+    }
+  ]
+}`
+        }
+      ]
     },
     {
       id: 6,
@@ -213,7 +375,31 @@ function Templates() {
     "Who is my IT contact?"
   ]
 }`,
-      tags: ['hr', 'onboarding', 'knowledge-base']
+      tags: ['hr', 'onboarding', 'knowledge-base'],
+      files: [
+        {
+          name: 'sharepoint-setup.md',
+          content: `# SharePoint Knowledge Base Setup
+
+## Document Structure
+- Policies/
+  - Vacation Policy.pdf
+  - Remote Work Policy.pdf
+  - Expense Policy.pdf
+- Processes/
+  - Onboarding Checklist.pdf
+  - IT Setup Guide.pdf
+- Contacts/
+  - Team Directory.xlsx
+  - Emergency Contacts.pdf
+
+## Power Platform Configuration
+1. Create Power Virtual Agent
+2. Connect to SharePoint document library
+3. Configure AI to search documents
+4. Set up common Q&A topics`
+        }
+      ]
     }
   ];
 
@@ -229,13 +415,69 @@ function Templates() {
     setTimeout(() => setCopiedTemplate(''), 2000);
   };
 
-  const handleTemplateDownload = (templateId: number) => {
-    if (user) {
-      markTemplateUsed(templateId.toString());
-      console.log(`Template ${templateId} downloaded by user ${user.id}`);
+  const downloadTemplate = async (template: any) => {
+    setDownloadingTemplate(template.id.toString());
+    
+    try {
+      // Track template usage for achievements
+      if (user) {
+        markTemplateUsed(template.id.toString());
+        console.log(`Template ${template.id} downloaded by user ${user.id}`);
+      }
+
+      // Create a zip-like structure by downloading individual files
+      if (template.files && template.files.length > 0) {
+        // For demo purposes, we'll download the first file or create a combined file
+        const mainFile = template.files[0];
+        const blob = new Blob([mainFile.content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${template.title.replace(/\s+/g, '-').toLowerCase()}-${mainFile.name}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        // If there are multiple files, download them sequentially
+        if (template.files.length > 1) {
+          for (let i = 1; i < template.files.length; i++) {
+            setTimeout(() => {
+              const file = template.files[i];
+              const blob = new Blob([file.content], { type: 'text/plain' });
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `${template.title.replace(/\s+/g, '-').toLowerCase()}-${file.name}`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(url);
+            }, i * 500); // Stagger downloads by 500ms
+          }
+        }
+      } else {
+        // Fallback: download the preview code as a file
+        const blob = new Blob([template.preview], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${template.title.replace(/\s+/g, '-').toLowerCase()}-config.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+
+      // Update download count (in a real app, this would be sent to the server)
+      console.log(`Template "${template.title}" downloaded. New download count: ${template.downloads + 1}`);
+      
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      alert('Error downloading template. Please try again.');
+    } finally {
+      setDownloadingTemplate('');
     }
-    // Here you would typically trigger the actual download
-    console.log('Downloading template:', templateId);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -406,14 +648,41 @@ function Templates() {
                   </pre>
                 </div>
 
+                {/* Template Files Info */}
+                {template.files && template.files.length > 0 && (
+                  <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <FileDown className="w-4 h-4 text-blue-400" />
+                      <span className="text-blue-300 font-medium text-sm">Includes {template.files.length} files:</span>
+                    </div>
+                    <div className="space-y-1">
+                      {template.files.map((file, index) => (
+                        <div key={index} className="text-blue-200 text-xs">
+                          • {file.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Actions */}
                 <div className="flex space-x-3">
                   <button 
-                    onClick={() => handleTemplateDownload(template.id)}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                    onClick={() => downloadTemplate(template)}
+                    disabled={downloadingTemplate === template.id.toString()}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
                   >
-                    <Download className="w-4 h-4" />
-                    <span>Use Template</span>
+                    {downloadingTemplate === template.id.toString() ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>Downloading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        <span>Download Template</span>
+                      </>
+                    )}
                   </button>
                   <Link
                     to="/demo"
