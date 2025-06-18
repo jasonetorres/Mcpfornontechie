@@ -122,12 +122,11 @@ function Layout({ children }: LayoutProps) {
         <div className="container-responsive">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
                 <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">MCP4 Everyone</span>
-              <span className="hidden sm:inline text-sm text-matrix-primary">No Coding Required</span>
+              <span className="text-xl font-bold text-foreground ml-2">MCP4 Everyone</span>
             </Link>
             
             {/* Desktop Navigation */}
@@ -345,12 +344,11 @@ function Layout({ children }: LayoutProps) {
       <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
         <div className="container-responsive">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <Link to="/" className="flex items-center space-x-2 mb-4 md:mb-0">
+            <Link to="/" className="flex items-center mb-4 md:mb-0">
               <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
                 <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">MCP4 Everyone</span>
-              <span className="text-sm text-matrix-primary">No Coding Required</span>
+              <span className="text-xl font-bold text-foreground ml-2">MCP4 Everyone</span>
             </Link>
             
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-muted-foreground">

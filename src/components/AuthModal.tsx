@@ -352,7 +352,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-primary w-full"
+                  className="btn-primary w-full py-2"
                 >
                   {loading ? (
                     <>
