@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Code, Play, BookOpen, Users, Lightbulb, ArrowRight } from 'lucide-react'
+import { Code, Play, BookOpen, Users, Lightbulb, ArrowRight, Zap, Target, CheckCircle } from 'lucide-react'
 import MCPSandbox from '../components/MCPSandbox'
 import InteractiveQuiz from '../components/InteractiveQuiz'
 
@@ -47,6 +47,7 @@ const sandboxQuestions = [
 
 export default function Sandbox() {
   const [activeTab, setActiveTab] = useState('practice')
+  const [quizCompleted, setQuizCompleted] = useState(false)
 
   const practiceScenarios = [
     {
@@ -85,26 +86,31 @@ export default function Sandbox() {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-green-500/20 text-green-400'
-      case 'Intermediate': return 'bg-yellow-500/20 text-yellow-400'
-      case 'Advanced': return 'bg-red-500/20 text-red-400'
-      default: return 'bg-gray-500/20 text-gray-400'
+      case 'Beginner': return 'badge-success'
+      case 'Intermediate': return 'badge-warning'
+      case 'Advanced': return 'badge-error'
+      default: return 'badge-secondary'
     }
   }
 
+  const handleQuizComplete = (score: number) => {
+    setQuizCompleted(true)
+    console.log(`Quiz completed with score: ${score}/${sandboxQuestions.length}`)
+  }
+
   return (
-    <div className="py-20 px-4 sm:px-6 lg:px-8">
+    <div className="container-responsive section-padding">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">MCP Practice Sandbox</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+        <div className="text-center mb-12 sm:mb-16">
+          <h1 className="heading-lg mb-4">MCP Practice Sandbox</h1>
+          <p className="text-body-sm text-muted-foreground max-w-2xl mx-auto">
             Practice your MCP skills in a safe environment with interactive exercises and real-world scenarios
           </p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 mb-12 justify-center">
+        <div className="flex flex-wrap justify-center gap-2 mb-8 sm:mb-12">
           {[
             { id: 'practice', name: 'Interactive Practice', icon: Play },
             { id: 'quiz', name: 'Knowledge Check', icon: Lightbulb },
@@ -113,14 +119,15 @@ export default function Sandbox() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+              className={`flex items-center space-x-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 activeTab === tab.id
                   ? 'bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground'
-                  : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                  : 'glass text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
-              <tab.icon className="w-5 h-5" />
-              <span>{tab.name}</span>
+              <tab.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">{tab.name}</span>
+              <span className="sm:hidden">{tab.name.split(' ')[0]}</span>
             </button>
           ))}
         </div>
@@ -131,25 +138,49 @@ export default function Sandbox() {
             <MCPSandbox />
             
             {/* Practice Tips */}
-            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-4">Practice Tips</h3>
+            <div className="glass-strong bg-gradient-to-r from-blue-600/10 to-purple-600/10 p-6 sm:p-8 rounded-xl">
+              <h3 className="heading-sm mb-4">Practice Tips</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-white font-semibold mb-3">Getting Started:</h4>
-                  <ul className="space-y-2 text-blue-200">
-                    <li>• Start with simple queries to understand the data</li>
-                    <li>• Try different question formats (specific vs. general)</li>
-                    <li>• Notice how AI uses context from your data</li>
-                    <li>• Experiment with follow-up questions</li>
+                  <h4 className="text-foreground font-semibold mb-3">Getting Started:</h4>
+                  <ul className="space-y-2 text-matrix-secondary">
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Start with simple queries to understand the data</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Try different question formats (specific vs. general)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Notice how AI uses context from your data</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Experiment with follow-up questions</span>
+                    </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 className="text-white font-semibold mb-3">Advanced Practice:</h4>
-                  <ul className="space-y-2 text-purple-200">
-                    <li>• Ask for data analysis and insights</li>
-                    <li>• Request specific formatting (lists, tables)</li>
-                    <li>• Try conditional queries ("if X then Y")</li>
-                    <li>• Practice with edge cases and error handling</li>
+                  <h4 className="text-foreground font-semibold mb-3">Advanced Practice:</h4>
+                  <ul className="space-y-2 text-blue-300">
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Ask for data analysis and insights</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Request specific formatting (lists, tables)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Try conditional queries ("if X then Y")</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span>Practice with edge cases and error handling</span>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -158,47 +189,62 @@ export default function Sandbox() {
         )}
 
         {activeTab === 'quiz' && (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <InteractiveQuiz 
               questions={sandboxQuestions}
               title="MCP Knowledge Check"
-              onComplete={(score) => {
-                console.log(`Quiz completed with score: ${score}/${sandboxQuestions.length}`)
-              }}
+              onComplete={handleQuizComplete}
             />
+            
+            {quizCompleted && (
+              <div className="mt-8 glass-strong bg-gradient-to-r from-green-600/10 to-teal-600/10 p-6 rounded-xl text-center animate-fade-in">
+                <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                <h3 className="heading-sm mb-2">Ready for the Next Challenge?</h3>
+                <p className="text-muted-foreground mb-4">
+                  Now that you've tested your knowledge, try applying it in the interactive practice sandbox!
+                </p>
+                <button 
+                  onClick={() => setActiveTab('practice')}
+                  className="btn-primary"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  <span>Try Interactive Practice</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === 'scenarios' && (
           <div className="space-y-8">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">Real-World Practice Scenarios</h2>
-              <p className="text-gray-300 max-w-2xl mx-auto">
+              <h2 className="heading-md mb-4">Real-World Practice Scenarios</h2>
+              <p className="text-body-sm text-muted-foreground max-w-2xl mx-auto">
                 Apply your MCP knowledge to realistic business scenarios. Each scenario includes sample data and guided exercises.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid-responsive-2">
               {practiceScenarios.map((scenario) => (
-                <div key={scenario.id} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+                <div key={scenario.id} className="card-interactive">
                   <div className="flex items-start space-x-4 mb-4">
                     <div className="text-4xl">{scenario.icon}</div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-white">{scenario.title}</h3>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(scenario.difficulty)}`}>
+                        <h3 className="text-lg font-semibold text-foreground">{scenario.title}</h3>
+                        <span className={`${getDifficultyColor(scenario.difficulty)}`}>
                           {scenario.difficulty}
                         </span>
                       </div>
-                      <p className="text-gray-300 mb-3">{scenario.description}</p>
-                      <div className="text-blue-300 text-sm">
+                      <p className="text-muted-foreground mb-3 text-sm">{scenario.description}</p>
+                      <div className="text-matrix-primary text-sm">
                         Estimated time: {scenario.estimatedTime}
                       </div>
                     </div>
                   </div>
                   
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
-                    <Play className="w-4 h-4" />
+                  <button className="btn-primary w-full">
+                    <Play className="w-4 h-4 mr-2" />
                     <span>Start Scenario</span>
                   </button>
                 </div>
@@ -206,22 +252,22 @@ export default function Sandbox() {
             </div>
 
             {/* Scenario Benefits */}
-            <div className="bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-8 text-center">
-              <h3 className="text-2xl font-bold text-white mb-4">Why Practice with Scenarios?</h3>
+            <div className="glass-strong bg-gradient-to-r from-green-600/10 to-teal-600/10 p-6 sm:p-8 rounded-xl text-center">
+              <h3 className="heading-sm mb-6">Why Practice with Scenarios?</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <BookOpen className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                  <h4 className="text-white font-semibold mb-2">Real Context</h4>
+                  <h4 className="text-foreground font-semibold mb-2">Real Context</h4>
                   <p className="text-green-200 text-sm">Practice with actual business problems you might encounter</p>
                 </div>
                 <div>
                   <Users className="w-8 h-8 text-teal-400 mx-auto mb-3" />
-                  <h4 className="text-white font-semibold mb-2">Guided Learning</h4>
+                  <h4 className="text-foreground font-semibold mb-2">Guided Learning</h4>
                   <p className="text-teal-200 text-sm">Step-by-step guidance with hints and best practices</p>
                 </div>
                 <div>
-                  <Lightbulb className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
-                  <h4 className="text-white font-semibold mb-2">Build Confidence</h4>
+                  <Target className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
+                  <h4 className="text-foreground font-semibold mb-2">Build Confidence</h4>
                   <p className="text-yellow-200 text-sm">Gain confidence before implementing in your real work</p>
                 </div>
               </div>
@@ -230,18 +276,19 @@ export default function Sandbox() {
         )}
 
         {/* Call to Action */}
-        <div className="mt-16 bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-4">Ready to Apply Your Skills?</h3>
-          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+        <div className="mt-12 sm:mt-16 glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 p-6 sm:p-8 rounded-xl text-center">
+          <h3 className="heading-sm mb-4">Ready to Apply Your Skills?</h3>
+          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
             Once you're comfortable with the sandbox, try building your first real MCP connection with our templates and guides.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2">
+            <button className="btn-primary">
+              <Zap className="w-4 h-4 mr-2" />
               <span>Browse Templates</span>
-              <ArrowRight className="w-4 h-4" />
             </button>
-            <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
-              Join Community
+            <button className="btn-secondary">
+              <Users className="w-4 h-4 mr-2" />
+              <span>Join Community</span>
             </button>
           </div>
         </div>

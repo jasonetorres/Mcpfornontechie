@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { TrendingUp, Clock, Target, Zap, BookOpen, Users, Trophy, ArrowRight, Calendar, Bell } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import ProgressTracker from './ProgressTracker'
+import { Link } from 'react-router-dom'
 
 interface Recommendation {
   id: string
@@ -153,9 +154,9 @@ export default function PersonalizedDashboard() {
 
   if (!user) {
     return (
-      <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-8 text-center">
+      <div className="glass p-8 text-center">
         <div className="text-muted-foreground mb-4">Sign in to access your personalized dashboard</div>
-        <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground px-6 py-3 rounded-lg font-medium">
+        <button className="btn-primary">
           Sign In
         </button>
       </div>
@@ -165,10 +166,10 @@ export default function PersonalizedDashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-6">
-        <div className="flex items-center justify-between">
+      <div className="glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 border-matrix-primary/30 rounded-xl p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
+            <h2 className="heading-md mb-2">
               Welcome back, {profile?.full_name || 'there'}! 👋
             </h2>
             <p className="text-matrix-secondary">
@@ -184,25 +185,25 @@ export default function PersonalizedDashboard() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-4 text-center">
+        <div className="glass p-4 text-center">
           <Clock className="w-6 h-6 text-blue-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">{userStats.totalTime}</div>
           <div className="text-muted-foreground text-sm">Time Spent</div>
         </div>
         
-        <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-4 text-center">
+        <div className="glass p-4 text-center">
           <BookOpen className="w-6 h-6 text-green-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">{userStats.completedModules}</div>
           <div className="text-muted-foreground text-sm">Modules Done</div>
         </div>
         
-        <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-4 text-center">
+        <div className="glass p-4 text-center">
           <Zap className="w-6 h-6 text-orange-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">{userStats.currentStreak}</div>
           <div className="text-muted-foreground text-sm">Day Streak</div>
         </div>
         
-        <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-4 text-center">
+        <div className="glass p-4 text-center">
           <Trophy className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">12</div>
           <div className="text-muted-foreground text-sm">Achievements</div>
@@ -213,7 +214,7 @@ export default function PersonalizedDashboard() {
         {/* Personalized Recommendations */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-foreground">Recommended for You</h3>
+            <h3 className="heading-sm">Recommended for You</h3>
             <div className="flex items-center space-x-1 text-matrix-primary">
               <TrendingUp className="w-4 h-4" />
               <span className="text-sm">AI-powered</span>
@@ -222,9 +223,9 @@ export default function PersonalizedDashboard() {
           
           <div className="space-y-4">
             {recommendations.map((rec) => (
-              <div key={rec.id} className={`border rounded-xl p-4 ${getPriorityColor(rec.priority)}`}>
+              <div key={rec.id} className={`glass border rounded-xl p-4 ${getPriorityColor(rec.priority)}`}>
                 <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-start space-x-3">
                     {getTypeIcon(rec.type)}
                     <div>
                       <h4 className="font-semibold text-foreground">{rec.title}</h4>
@@ -243,15 +244,15 @@ export default function PersonalizedDashboard() {
                   </div>
                 </div>
                 
-                <div className="bg-muted/50 rounded-lg p-3 mb-3">
+                <div className="glass p-3 mb-3">
                   <div className="text-xs text-muted-foreground mb-1">Why this is recommended:</div>
                   <div className="text-sm text-foreground">{rec.reason}</div>
                 </div>
                 
-                <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground px-4 py-2 rounded-lg font-medium text-sm flex items-center space-x-2 hover:from-matrix-accent hover:to-matrix-primary transition-all duration-200">
+                <Link to={rec.url} className="btn-primary inline-flex text-sm py-2">
                   <span>{rec.action}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
               </div>
             ))}
           </div>
@@ -269,11 +270,11 @@ export default function PersonalizedDashboard() {
           />
 
           {/* Recent Activity */}
-          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
-            <h3 className="text-lg font-bold text-foreground mb-4">Recent Activity</h3>
+          <div className="glass p-6">
+            <h3 className="heading-sm mb-4">Recent Activity</h3>
             <div className="space-y-3">
               {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
+                <div key={activity.id} className="flex items-start space-x-3 p-3 glass rounded-lg">
                   <div className="text-xl">{activity.icon}</div>
                   <div className="flex-1">
                     <div className="font-medium text-foreground text-sm">{activity.title}</div>
@@ -286,20 +287,20 @@ export default function PersonalizedDashboard() {
           </div>
 
           {/* Upcoming Events */}
-          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
+          <div className="glass p-6">
             <div className="flex items-center space-x-2 mb-4">
               <Calendar className="w-5 h-5 text-matrix-primary" />
-              <h3 className="text-lg font-bold text-foreground">Upcoming</h3>
+              <h3 className="heading-sm">Upcoming</h3>
             </div>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 bg-matrix-primary/10 border border-matrix-primary/20 rounded-lg">
+              <div className="flex items-center space-x-3 p-3 badge-primary rounded-lg">
                 <Bell className="w-4 h-4 text-matrix-primary" />
                 <div>
                   <div className="font-medium text-foreground text-sm">Office Hours</div>
                   <div className="text-matrix-primary text-xs">Tomorrow at 2:00 PM</div>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
+              <div className="flex items-center space-x-3 p-3 glass rounded-lg">
                 <Users className="w-4 h-4 text-blue-400" />
                 <div>
                   <div className="font-medium text-foreground text-sm">Community Showcase</div>

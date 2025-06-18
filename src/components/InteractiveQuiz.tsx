@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { CheckCircle, X, RotateCcw, ArrowRight, Lightbulb } from 'lucide-react'
+import { CheckCircle, X, RotateCcw, ArrowRight, Lightbulb, ChevronRight } from 'lucide-react'
 
 interface QuizQuestion {
   id: string
@@ -24,8 +24,11 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
   const [answers, setAnswers] = useState<number[]>([])
   const [showHint, setShowHint] = useState(false)
   const [quizCompleted, setQuizCompleted] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
 
   const handleAnswerSelect = (answerIndex: number) => {
+    if (showResult) return; // Prevent selecting after showing result
+    
     setSelectedAnswer(answerIndex)
     setShowResult(true)
     
@@ -40,10 +43,14 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
-      setSelectedAnswer(null)
-      setShowResult(false)
-      setShowHint(false)
+      setIsAnimating(true)
+      setTimeout(() => {
+        setCurrentQuestion(currentQuestion + 1)
+        setSelectedAnswer(null)
+        setShowResult(false)
+        setShowHint(false)
+        setIsAnimating(false)
+      }, 300)
     } else {
       setQuizCompleted(true)
       onComplete?.(score)
@@ -51,13 +58,17 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
   }
 
   const resetQuiz = () => {
-    setCurrentQuestion(0)
-    setSelectedAnswer(null)
-    setShowResult(false)
-    setScore(0)
-    setAnswers([])
-    setShowHint(false)
-    setQuizCompleted(false)
+    setIsAnimating(true)
+    setTimeout(() => {
+      setCurrentQuestion(0)
+      setSelectedAnswer(null)
+      setShowResult(false)
+      setScore(0)
+      setAnswers([])
+      setShowHint(false)
+      setQuizCompleted(false)
+      setIsAnimating(false)
+    }, 300)
   }
 
   const currentQ = questions[currentQuestion]
@@ -68,7 +79,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
     const passed = percentage >= 70
 
     return (
-      <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-8 text-center">
+      <div className="glass p-6 sm:p-8 text-center animate-fade-in">
         <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${
           passed ? 'bg-green-500' : 'bg-orange-500'
         }`}>
@@ -79,7 +90,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
           )}
         </div>
         
-        <h3 className="text-2xl font-bold text-foreground mb-2">
+        <h3 className="heading-md mb-2">
           {passed ? 'Congratulations!' : 'Keep Learning!'}
         </h3>
         
@@ -87,7 +98,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
           You scored {score} out of {questions.length} ({percentage}%)
         </p>
 
-        <div className="bg-muted/50 rounded-lg p-4 mb-6">
+        <div className="glass-strong p-4 mb-6">
           <div className="text-foreground font-medium mb-2">Your Results:</div>
           <div className="space-y-2">
             {questions.map((q, index) => (
@@ -105,15 +116,15 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
           </div>
         </div>
 
-        <div className="flex space-x-4 justify-center">
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center">
           <button
             onClick={resetQuiz}
-            className="border border-border text-foreground px-6 py-2 rounded-lg font-medium hover:bg-muted transition-colors duration-200"
+            className="btn-secondary"
           >
             Try Again
           </button>
           {passed && (
-            <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground px-6 py-2 rounded-lg font-medium">
+            <button className="btn-primary">
               Continue Learning
             </button>
           )}
@@ -123,24 +134,24 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
   }
 
   return (
-    <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-8">
+    <div className="glass p-6 sm:p-8">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-foreground">{title}</h3>
+        <h3 className="heading-sm">{title}</h3>
         <div className="text-muted-foreground text-sm">
           {currentQuestion + 1} of {questions.length}
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-muted rounded-full h-2 mb-8">
+      <div className="progress-bar mb-8">
         <div 
-          className="bg-gradient-to-r from-matrix-primary to-matrix-secondary h-2 rounded-full transition-all duration-300"
+          className="progress-fill"
           style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
         ></div>
       </div>
 
       {/* Question */}
-      <div className="mb-8">
+      <div className={`mb-8 transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
         <h4 className="text-lg font-semibold text-foreground mb-6">{currentQ?.question}</h4>
         
         <div className="space-y-3">
@@ -187,10 +198,11 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
           >
             <Lightbulb className="w-4 h-4" />
             <span className="text-sm">Need a hint?</span>
+            <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${showHint ? 'rotate-90' : ''}`} />
           </button>
           
           {showHint && (
-            <div className="mt-3 bg-matrix-primary/20 border border-matrix-primary/30 rounded-lg p-3">
+            <div className="mt-3 badge-primary p-3 animate-fade-in">
               <p className="text-matrix-primary text-sm">{currentQ.hint}</p>
             </div>
           )}
@@ -199,7 +211,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
 
       {/* Explanation */}
       {showResult && (
-        <div className={`mb-6 p-4 rounded-lg border ${
+        <div className={`mb-6 p-4 rounded-lg border animate-fade-in ${
           isCorrect 
             ? 'bg-green-500/20 border-green-500/30' 
             : 'bg-red-500/20 border-red-500/30'
@@ -221,7 +233,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
       )}
 
       {/* Navigation */}
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <div className="text-muted-foreground text-sm">
           Score: {score}/{questions.length}
         </div>
@@ -229,10 +241,10 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
         {showResult && (
           <button
             onClick={handleNext}
-            className="bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground px-6 py-2 rounded-lg font-medium flex items-center space-x-2 transition-all duration-200"
+            className="btn-primary"
           >
             <span>{currentQuestion < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         )}
       </div>

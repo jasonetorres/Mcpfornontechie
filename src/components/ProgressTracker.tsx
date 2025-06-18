@@ -42,9 +42,9 @@ export default function ProgressTracker({
 
   if (!user && !showDetailed) {
     return (
-      <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6 text-center">
+      <div className="glass p-6 text-center">
         <div className="text-muted-foreground mb-4">Sign in to track your progress</div>
-        <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground px-6 py-2 rounded-lg font-medium">
+        <button className="btn-primary">
           Sign In
         </button>
       </div>
@@ -52,11 +52,11 @@ export default function ProgressTracker({
   }
 
   return (
-    <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
+    <div className="glass p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-foreground">Your Progress</h3>
+        <h3 className="heading-sm">Your Progress</h3>
         {user && (
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-end sm:items-center sm:space-x-4">
             <div className="flex items-center space-x-1">
               <Zap className="w-4 h-4 text-orange-400" />
               <span className="text-orange-300 text-sm">{streak} day streak</span>
@@ -75,9 +75,9 @@ export default function ProgressTracker({
           <span className="text-foreground font-medium">Overall Progress</span>
           <span className="text-matrix-primary">{Math.round(progressPercentage)}%</span>
         </div>
-        <div className="w-full bg-muted rounded-full h-3">
+        <div className="progress-bar">
           <div 
-            className="bg-gradient-to-r from-matrix-primary to-matrix-secondary h-3 rounded-full transition-all duration-500"
+            className="progress-fill"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
@@ -114,7 +114,7 @@ export default function ProgressTracker({
             <Trophy className="w-5 h-5 text-yellow-400" />
             <span className="text-foreground font-medium">Recent Achievement</span>
           </div>
-          <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3">
+          <div className="badge-warning p-3">
             <div className="flex items-center space-x-2">
               <Star className="w-4 h-4 text-yellow-400" />
               <span className="text-yellow-300 text-sm">

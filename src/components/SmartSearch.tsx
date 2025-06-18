@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Search, Filter, Clock, BookOpen, Users, Zap, ArrowRight, X } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Search, Filter, Clock, BookOpen, Users, Zap, ArrowRight, X, ChevronDown, Tag } from 'lucide-react'
 
 interface SearchResult {
   id: string
@@ -72,12 +72,24 @@ export default function SmartSearch() {
   const [isSearching, setIsSearching] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [recentSearches, setRecentSearches] = useState<string[]>([
     'MCP basics',
     'Zapier integration',
     'community templates',
     'security best practices'
   ])
+  const [allTags, setAllTags] = useState<string[]>([])
+  const searchRef = useRef<HTMLDivElement>(null)
+
+  // Extract all unique tags from search results
+  useEffect(() => {
+    const tags = new Set<string>()
+    mockSearchResults.forEach(result => {
+      result.tags.forEach(tag => tags.add(tag))
+    })
+    setAllTags(Array.from(tags).sort())
+  }, [])
 
   useEffect(() => {
     if (query.length > 2) {
@@ -85,7 +97,21 @@ export default function SmartSearch() {
     } else {
       setResults([])
     }
-  }, [query, selectedTypes])
+  }, [query, selectedTypes, selectedTags])
+
+  // Close filters when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowFilters(false)
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const performSearch = async (searchQuery: string) => {
     setIsSearching(true)
@@ -101,7 +127,10 @@ export default function SmartSearch() {
       
       const matchesType = selectedTypes.length === 0 || selectedTypes.includes(result.type)
       
-      return matchesQuery && matchesType
+      const matchesTags = selectedTags.length === 0 || 
+                          result.tags.some(tag => selectedTags.includes(tag))
+      
+      return matchesQuery && matchesType && matchesTags
     })
 
     // Sort by relevance
@@ -126,10 +155,17 @@ export default function SmartSearch() {
     )
   }
 
+  const toggleTagFilter = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    )
+  }
+
   const clearFilters = () => {
     setSelectedTypes([])
-    setQuery('')
-    setResults([])
+    setSelectedTags([])
   }
 
   const getTypeIcon = (type: string) => {
@@ -145,20 +181,20 @@ export default function SmartSearch() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'course': return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-      case 'template': return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-      case 'guide': return 'bg-green-500/20 text-green-400 border-green-500/30'
-      case 'community': return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-      case 'video': return 'bg-red-500/20 text-red-400 border-red-500/30'
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+      case 'course': return 'badge-primary bg-blue-500/20 text-blue-400 border-blue-500/30'
+      case 'template': return 'badge-primary bg-purple-500/20 text-purple-400 border-purple-500/30'
+      case 'guide': return 'badge-primary bg-green-500/20 text-green-400 border-green-500/30'
+      case 'community': return 'badge-primary bg-orange-500/20 text-orange-400 border-orange-500/30'
+      case 'video': return 'badge-primary bg-red-500/20 text-red-400 border-red-500/30'
+      default: return 'badge-secondary'
     }
   }
 
   return (
-    <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl overflow-hidden">
+    <div className="glass rounded-xl overflow-hidden" ref={searchRef}>
       {/* Search Header */}
-      <div className="p-6 border-b border-border">
-        <div className="flex items-center space-x-4">
+      <div className="p-4 sm:p-6 border-b border-border">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
@@ -166,7 +202,7 @@ export default function SmartSearch() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search courses, templates, guides, and more..."
-              className="w-full bg-muted border border-border rounded-lg pl-10 pr-4 py-3 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
+              className="form-input pl-10"
             />
             {query && (
               <button
@@ -181,16 +217,16 @@ export default function SmartSearch() {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center space-x-2 px-4 py-3 rounded-lg border transition-all duration-200 ${
-              showFilters || selectedTypes.length > 0
+              showFilters || selectedTypes.length > 0 || selectedTags.length > 0
                 ? 'bg-matrix-primary/20 border-matrix-primary text-matrix-primary'
                 : 'bg-muted border-border text-muted-foreground hover:text-foreground'
             }`}
           >
             <Filter className="w-4 h-4" />
-            <span>Filters</span>
-            {selectedTypes.length > 0 && (
-              <span className="bg-matrix-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                {selectedTypes.length}
+            <span className="hidden sm:inline">Filters</span>
+            {(selectedTypes.length > 0 || selectedTags.length > 0) && (
+              <span className="badge-primary">
+                {selectedTypes.length + selectedTags.length}
               </span>
             )}
           </button>
@@ -216,33 +252,65 @@ export default function SmartSearch() {
 
         {/* Filters */}
         {showFilters && (
-          <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-foreground font-medium">Content Type</span>
-              {selectedTypes.length > 0 && (
-                <button
-                  onClick={clearFilters}
-                  className="text-matrix-primary hover:text-matrix-secondary text-sm"
-                >
-                  Clear all
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {['course', 'template', 'guide', 'community', 'video'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => toggleTypeFilter(type)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
-                    selectedTypes.includes(type)
-                      ? getTypeColor(type)
-                      : 'bg-muted border-border text-muted-foreground hover:bg-accent'
-                  }`}
-                >
-                  {getTypeIcon(type)}
-                  <span className="capitalize">{type}</span>
-                </button>
-              ))}
+          <div className="mt-4 p-4 glass rounded-lg animate-fade-in">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-foreground font-medium">Content Type</span>
+                {(selectedTypes.length > 0 || selectedTags.length > 0) && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-matrix-primary hover:text-matrix-secondary text-sm"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                {['course', 'template', 'guide', 'community', 'video'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => toggleTypeFilter(type)}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+                      selectedTypes.includes(type)
+                        ? getTypeColor(type)
+                        : 'bg-muted border-border text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    {getTypeIcon(type)}
+                    <span className="capitalize">{type}</span>
+                  </button>
+                ))}
+              </div>
+              
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-foreground font-medium">Popular Tags</span>
+                  <button 
+                    className="text-muted-foreground hover:text-foreground text-sm flex items-center"
+                    onClick={() => setShowFilters(prev => !prev)}
+                  >
+                    <span>Show {showFilters ? 'less' : 'more'}</span>
+                    <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {allTags.slice(0, 8).map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTagFilter(tag)}
+                      className={`flex items-center space-x-1 px-2 py-1 rounded-lg text-xs transition-all duration-200 ${
+                        selectedTags.includes(tag)
+                          ? 'bg-matrix-primary/20 text-matrix-primary border border-matrix-primary/30'
+                          : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      }`}
+                    >
+                      <Tag className="w-3 h-3" />
+                      <span>{tag}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -252,13 +320,13 @@ export default function SmartSearch() {
       <div className="max-h-96 overflow-y-auto">
         {isSearching ? (
           <div className="p-8 text-center">
-            <div className="w-8 h-8 border-2 border-matrix-primary/30 border-t-matrix-primary rounded-full animate-spin mx-auto mb-4"></div>
-            <div className="text-muted-foreground">Searching...</div>
+            <div className="loading-spinner mx-auto mb-4"></div>
+            <div className="text-muted-foreground">Searching<span className="loading-dots"></span></div>
           </div>
         ) : results.length > 0 ? (
           <div className="p-4 space-y-3">
             {results.map((result) => (
-              <div key={result.id} className="p-4 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-200 cursor-pointer group">
+              <div key={result.id} className="p-4 glass hover:bg-muted/50 rounded-lg transition-colors duration-200 cursor-pointer group">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
@@ -266,19 +334,19 @@ export default function SmartSearch() {
                       <h3 className="font-semibold text-foreground group-hover:text-matrix-primary transition-colors duration-200">
                         {result.title}
                       </h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getTypeColor(result.type)}`}>
+                      <span className={`${getTypeColor(result.type)}`}>
                         {result.type}
                       </span>
                     </div>
                     
                     <p className="text-muted-foreground text-sm mb-3">{result.description}</p>
                     
-                    <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                      <div className="flex items-center space-x-1">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                      <div className="flex items-center">
                         <span>Relevance: {result.relevance}%</span>
                       </div>
                       {result.author && (
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center">
                           <span>by {result.author}</span>
                         </div>
                       )}
@@ -299,7 +367,7 @@ export default function SmartSearch() {
                     </div>
                   </div>
                   
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-matrix-primary transition-colors duration-200 ml-4" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-matrix-primary transition-colors duration-200 ml-4 flex-shrink-0" />
                 </div>
               </div>
             ))}
