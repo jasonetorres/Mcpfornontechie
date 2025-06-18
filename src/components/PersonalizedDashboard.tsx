@@ -293,7 +293,7 @@ export default function PersonalizedDashboard() {
               <h3 className="heading-sm">Upcoming</h3>
             </div>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 badge-primary rounded-lg">
+              <div className="flex items-center space-x-3 p-3 text-matrix-primary rounded-lg">
                 <Bell className="w-4 h-4 text-matrix-primary" />
                 <div>
                   <div className="font-medium text-foreground text-sm">Office Hours</div>

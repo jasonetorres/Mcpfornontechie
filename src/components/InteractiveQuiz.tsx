@@ -202,8 +202,8 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
           </button>
           
           {showHint && (
-            <div className="mt-3 badge-primary p-3 animate-fade-in">
-              <p className="text-matrix-primary text-sm">{currentQ.hint}</p>
+            <div className="mt-3 text-matrix-primary text-sm p-3 animate-fade-in">
+              <p>{currentQ.hint}</p>
             </div>
           )}
         </div>

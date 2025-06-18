@@ -217,7 +217,7 @@ export default function MCPSandbox() {
         )}
 
         {/* Tips */}
-        <div className="bg-matrix-primary/10 border border-matrix-primary/20 rounded-lg p-4">
+        <div className="bg-matrix-primary/10 border-matrix-primary/20 rounded-lg p-4">
           <div className="flex items-start space-x-2">
             <AlertCircle className="w-5 h-5 text-matrix-primary mt-0.5 flex-shrink-0" />
             <div>

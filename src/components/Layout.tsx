@@ -127,7 +127,7 @@ function Layout({ children }: LayoutProps) {
                 <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">MCP4 Everyone</span>
-              <span className="hidden sm:inline badge-primary">No Coding Required</span>
+              <span className="hidden sm:inline text-sm text-matrix-primary">No Coding Required</span>
             </Link>
             
             {/* Desktop Navigation */}
@@ -186,7 +186,7 @@ function Layout({ children }: LayoutProps) {
               {user ? (
                 <div className="flex items-center space-x-3">
                   {/* Plan Status - Desktop Only */}
-                  <div className="hidden lg:flex items-center space-x-2 badge-primary">
+                  <div className="hidden lg:flex items-center space-x-2 text-matrix-primary text-sm">
                     <div className="status-online"></div>
                     <span>
                       {currentPlan && hasActiveSub ? `${currentPlan}` : 'Free'}
@@ -350,7 +350,7 @@ function Layout({ children }: LayoutProps) {
                 <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-foreground">MCP4 Everyone</span>
-              <span className="badge-primary">No Coding Required</span>
+              <span className="text-sm text-matrix-primary">No Coding Required</span>
             </Link>
             
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-muted-foreground">

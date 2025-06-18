@@ -142,9 +142,9 @@ function Home() {
 
         <div className="container-responsive text-center">
           <div className="mb-8">
-            <div className="inline-flex items-center space-x-2 badge-primary mb-6">
+            <div className="inline-flex items-center space-x-2 text-matrix-primary text-sm font-medium mb-6">
               <Play className="w-4 h-4" />
-              <span className="text-sm font-medium">Learn MCP - No Coding Required</span>
+              <span>Learn MCP - No Coding Required</span>
             </div>
             <h1 className="heading-xl mb-6 leading-tight">
               The{' '}
@@ -206,7 +206,7 @@ function Home() {
               <p className="text-muted-foreground mb-4">
                 AI is amazing, but it doesn't know about YOUR specific data. Without context, AI can only give generic answers.
               </p>
-              <div className="badge-error p-4">
+              <div className="bg-destructive/20 p-4 rounded-lg">
                 <p className="text-destructive text-sm">
                   <strong>Before MCP:</strong> Each AI integration required custom development from scratch. 
                   No standard way to connect AI to your systems like Google Drive, Asana, or Slack.
@@ -220,7 +220,7 @@ function Home() {
                 MCP is like <strong>USB-C for AI</strong> - a universal connector that lets AI access your data 
                 without coding. Created by Anthropic as an open standard.
               </p>
-              <div className="badge-primary p-4">
+              <div className="bg-matrix-primary/20 p-4 rounded-lg">
                 <p className="text-matrix-primary text-sm">
                   <strong>With MCP:</strong> You don't need to be a developer! Connect AI to any tool 
                   using standardized MCP servers. Over 3,000 servers available.
@@ -238,8 +238,8 @@ function Home() {
                   <div className="text-4xl mb-3">{server.icon}</div>
                   <h4 className="text-foreground font-semibold mb-2">{server.name}</h4>
                   <p className="text-muted-foreground text-sm mb-3">{server.description}</p>
-                  <div className="badge-primary p-2">
-                    <p className="text-matrix-primary text-xs">{server.useCase}</p>
+                  <div className="text-matrix-primary text-xs">
+                    <p>{server.useCase}</p>
                   </div>
                 </div>
               ))}
@@ -250,7 +250,7 @@ function Home() {
                 className="inline-flex items-center space-x-2 text-matrix-primary hover:text-matrix-secondary transition-colors duration-200"
               >
                 <span>Explore all MCP servers</span>
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-4 h-4 ml-1" />
               </button>
             </div>
           </div>
@@ -335,7 +335,7 @@ function Home() {
                     <span className="text-matrix-primary font-medium">MCP Solution: </span>
                     <span className="text-muted-foreground">{useCase.solution}</span>
                   </div>
-                  <div className="badge-primary p-3">
+                  <div className="bg-matrix-primary/20 p-3 rounded-lg">
                     <span className="text-matrix-primary font-medium">Example Query: </span>
                     <span className="text-matrix-secondary italic">{useCase.example}</span>
                   </div>

@@ -148,7 +148,7 @@ export default function CommunityFeed() {
   return (
     <div className="space-y-6">
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap justify-center gap-2">
         {[
           { id: 'all', name: 'All Posts', icon: Users },
           { id: 'success_story', name: 'Success Stories', icon: Trophy },
@@ -213,8 +213,8 @@ export default function CommunityFeed() {
                   <span className="font-semibold text-foreground">{post.project.title}</span>
                 </div>
                 <p className="text-muted-foreground text-sm mb-2">{post.project.description}</p>
-                <div className="badge-primary p-2">
-                  <span className="text-matrix-primary text-sm font-medium">{post.project.metrics}</span>
+                <div className="text-matrix-primary text-sm font-medium">
+                  <p>{post.project.metrics}</p>
                 </div>
               </div>
             )}
