@@ -1,0 +1,251 @@
+import React, { useState } from 'react'
+import { Code, Play, BookOpen, Users, Lightbulb, ArrowRight } from 'lucide-react'
+import MCPSandbox from '../components/MCPSandbox'
+import InteractiveQuiz from '../components/InteractiveQuiz'
+
+const sandboxQuestions = [
+  {
+    id: '1',
+    question: 'What is the primary purpose of MCP (Model Context Protocol)?',
+    options: [
+      'To replace all existing APIs',
+      'To provide a standardized way for AI to access external data sources',
+      'To make AI models faster',
+      'To encrypt data communications'
+    ],
+    correctAnswer: 1,
+    explanation: 'MCP acts as a universal connector that allows AI models to access and interact with external data sources in a standardized way, similar to how USB-C works for devices.',
+    hint: 'Think about the USB-C analogy we discussed earlier.'
+  },
+  {
+    id: '2',
+    question: 'Which of these is NOT a benefit of using MCP?',
+    options: [
+      'Standardized integration approach',
+      'Improved data security and control',
+      'Automatic code generation',
+      'Context-aware AI responses'
+    ],
+    correctAnswer: 2,
+    explanation: 'MCP provides standardization, security, and context-awareness, but it doesn\'t automatically generate code. You still need to set up the connections and configurations.',
+    hint: 'MCP is about connecting and accessing data, not creating code automatically.'
+  },
+  {
+    id: '3',
+    question: 'What should you do FIRST when setting up an MCP connection?',
+    options: [
+      'Choose your AI model',
+      'Write complex prompts',
+      'Prepare and organize your data source',
+      'Set up authentication'
+    ],
+    correctAnswer: 2,
+    explanation: 'Before connecting anything, you need to ensure your data is properly organized and structured. Clean, well-organized data leads to better AI responses.',
+    hint: 'Good data in, good responses out. What comes before the connection?'
+  }
+]
+
+export default function Sandbox() {
+  const [activeTab, setActiveTab] = useState('practice')
+
+  const practiceScenarios = [
+    {
+      id: 'community',
+      title: 'Community Management',
+      description: 'Practice managing community member data and queries',
+      difficulty: 'Beginner',
+      estimatedTime: '15 min',
+      icon: '👥'
+    },
+    {
+      id: 'marketing',
+      title: 'Customer Segmentation',
+      description: 'Learn to segment customers for targeted campaigns',
+      difficulty: 'Intermediate',
+      estimatedTime: '25 min',
+      icon: '📊'
+    },
+    {
+      id: 'projects',
+      title: 'Project Tracking',
+      description: 'Generate automated project status reports',
+      difficulty: 'Beginner',
+      estimatedTime: '20 min',
+      icon: '📋'
+    },
+    {
+      id: 'sales',
+      title: 'Lead Scoring',
+      description: 'Implement AI-powered lead qualification',
+      difficulty: 'Advanced',
+      estimatedTime: '35 min',
+      icon: '💼'
+    }
+  ]
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Beginner': return 'bg-green-500/20 text-green-400'
+      case 'Intermediate': return 'bg-yellow-500/20 text-yellow-400'
+      case 'Advanced': return 'bg-red-500/20 text-red-400'
+      default: return 'bg-gray-500/20 text-gray-400'
+    }
+  }
+
+  return (
+    <div className="py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-bold text-white mb-4">MCP Practice Sandbox</h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Practice your MCP skills in a safe environment with interactive exercises and real-world scenarios
+          </p>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex flex-wrap gap-2 mb-12 justify-center">
+          {[
+            { id: 'practice', name: 'Interactive Practice', icon: Play },
+            { id: 'quiz', name: 'Knowledge Check', icon: Lightbulb },
+            { id: 'scenarios', name: 'Real Scenarios', icon: Users }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground'
+                  : 'bg-white/5 text-gray-300 hover:bg-white/10'
+              }`}
+            >
+              <tab.icon className="w-5 h-5" />
+              <span>{tab.name}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'practice' && (
+          <div className="space-y-8">
+            <MCPSandbox />
+            
+            {/* Practice Tips */}
+            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-white mb-4">Practice Tips</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-white font-semibold mb-3">Getting Started:</h4>
+                  <ul className="space-y-2 text-blue-200">
+                    <li>• Start with simple queries to understand the data</li>
+                    <li>• Try different question formats (specific vs. general)</li>
+                    <li>• Notice how AI uses context from your data</li>
+                    <li>• Experiment with follow-up questions</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold mb-3">Advanced Practice:</h4>
+                  <ul className="space-y-2 text-purple-200">
+                    <li>• Ask for data analysis and insights</li>
+                    <li>• Request specific formatting (lists, tables)</li>
+                    <li>• Try conditional queries ("if X then Y")</li>
+                    <li>• Practice with edge cases and error handling</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'quiz' && (
+          <div className="max-w-4xl mx-auto">
+            <InteractiveQuiz 
+              questions={sandboxQuestions}
+              title="MCP Knowledge Check"
+              onComplete={(score) => {
+                console.log(`Quiz completed with score: ${score}/${sandboxQuestions.length}`)
+              }}
+            />
+          </div>
+        )}
+
+        {activeTab === 'scenarios' && (
+          <div className="space-y-8">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-white mb-4">Real-World Practice Scenarios</h2>
+              <p className="text-gray-300 max-w-2xl mx-auto">
+                Apply your MCP knowledge to realistic business scenarios. Each scenario includes sample data and guided exercises.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {practiceScenarios.map((scenario) => (
+                <div key={scenario.id} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+                  <div className="flex items-start space-x-4 mb-4">
+                    <div className="text-4xl">{scenario.icon}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-white">{scenario.title}</h3>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(scenario.difficulty)}`}>
+                          {scenario.difficulty}
+                        </span>
+                      </div>
+                      <p className="text-gray-300 mb-3">{scenario.description}</p>
+                      <div className="text-blue-300 text-sm">
+                        Estimated time: {scenario.estimatedTime}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                    <Play className="w-4 h-4" />
+                    <span>Start Scenario</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Scenario Benefits */}
+            <div className="bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-8 text-center">
+              <h3 className="text-2xl font-bold text-white mb-4">Why Practice with Scenarios?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <BookOpen className="w-8 h-8 text-green-400 mx-auto mb-3" />
+                  <h4 className="text-white font-semibold mb-2">Real Context</h4>
+                  <p className="text-green-200 text-sm">Practice with actual business problems you might encounter</p>
+                </div>
+                <div>
+                  <Users className="w-8 h-8 text-teal-400 mx-auto mb-3" />
+                  <h4 className="text-white font-semibold mb-2">Guided Learning</h4>
+                  <p className="text-teal-200 text-sm">Step-by-step guidance with hints and best practices</p>
+                </div>
+                <div>
+                  <Lightbulb className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
+                  <h4 className="text-white font-semibold mb-2">Build Confidence</h4>
+                  <p className="text-yellow-200 text-sm">Gain confidence before implementing in your real work</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Call to Action */}
+        <div className="mt-16 bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-white mb-4">Ready to Apply Your Skills?</h3>
+          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+            Once you're comfortable with the sandbox, try building your first real MCP connection with our templates and guides.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2">
+              <span>Browse Templates</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
+              Join Community
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

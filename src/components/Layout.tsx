@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard, Loader2 } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard, Loader2, Search, Code } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../hooks/useSubscription';
 import UserMenu from './UserMenu';
@@ -26,6 +26,7 @@ function Layout({ children }: LayoutProps) {
     { name: 'Demo', href: '/demo', icon: Play },
     { name: 'Examples', href: '/examples', icon: Zap },
     { name: 'Resources', href: '/resources', icon: Users },
+    { name: 'Sandbox', href: '/sandbox', icon: Code },
   ];
 
   const isCurrentPathActive = (path: string) => location.pathname === path;
@@ -308,7 +309,7 @@ function Layout({ children }: LayoutProps) {
                     <span>Profile</span>
                   </Link>
                   <Link
-                    to="/dashboard"
+                    to="/enhanced-dashboard"
                     onClick={() => setIsMenuOpen(false)}
                     className="flex items-center space-x-2 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
