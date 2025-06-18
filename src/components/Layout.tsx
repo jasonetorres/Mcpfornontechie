@@ -75,7 +75,7 @@ function Layout({ children }: LayoutProps) {
     setIsAuthModalOpen(false);
     
     if (wasSuccessfulSignup) {
-      setNotificationMessage('Account created successfully! Welcome to MCP Academy!');
+      setNotificationMessage('Account created successfully! Welcome to MCP4 Everyone!');
       setShowNotification(true);
       
       setTimeout(() => {
@@ -126,8 +126,8 @@ function Layout({ children }: LayoutProps) {
               <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
                 <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">MCP Academy</span>
-              <span className="hidden sm:inline badge-primary">For Non-Developers</span>
+              <span className="text-xl font-bold text-foreground">MCP4 Everyone</span>
+              <span className="hidden sm:inline badge-primary">No Coding Required</span>
             </Link>
             
             {/* Desktop Navigation */}
@@ -349,8 +349,8 @@ function Layout({ children }: LayoutProps) {
               <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
                 <Usb className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-foreground">MCP Academy</span>
-              <span className="badge-primary">For Non-Developers</span>
+              <span className="text-xl font-bold text-foreground">MCP4 Everyone</span>
+              <span className="badge-primary">No Coding Required</span>
             </Link>
             
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-muted-foreground">
@@ -364,7 +364,7 @@ function Layout({ children }: LayoutProps) {
           
           <div className="mt-8 pt-8 border-t border-border text-center">
             <p className="text-muted-foreground">
-              © 2025 MCP Academy. Empowering non-developers to build with AI.
+              © 2025 MCP4 Everyone. Empowering everyone to build with AI.
             </p>
           </div>
         </div>

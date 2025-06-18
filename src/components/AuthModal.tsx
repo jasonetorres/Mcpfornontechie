@@ -93,7 +93,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           setError(error.message)
           setStep('form')
         } else {
-          setSuccess('Account created successfully! Welcome to MCP Academy!')
+          setSuccess('Account created successfully! Welcome to MCP4 Everyone!')
           setStep('success')
           
           // Close modal after showing success - reduced delay for better UX
@@ -175,7 +175,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
         <div className="p-6">
           <div className="text-center mb-6">
             <h2 className="heading-md mb-2">
-              {mode === 'signin' ? 'Welcome Back' : 'Join MCP Academy'}
+              {mode === 'signin' ? 'Welcome Back' : 'Join MCP4 Everyone'}
             </h2>
             <p className="text-muted-foreground">
               {mode === 'signin' 
