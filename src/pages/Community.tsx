@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, MessageSquare, Calendar, Trophy, Star, ArrowRight, ExternalLink, Heart, Zap, BookOpen } from 'lucide-react';
+import { Users, MessageSquare, Calendar, Trophy, Star, ArrowRight, ExternalLink, Heart, Zap, BookOpen, Search, Filter, X, Send, Edit, Trash2, MoreHorizontal, ChevronDown, Tag } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import CommunityFeed from '../components/CommunityFeed';
 
 function Community() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const [showNewDiscussionForm, setShowNewDiscussionForm] = useState(false);
+  const [discussionFormData, setDiscussionFormData] = useState({
+    title: '',
+    content: '',
+    tags: [] as string[],
+    currentTag: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const formRef = useRef<HTMLDivElement>(null);
 
   const communityStats = [
     { label: 'Active Members', value: '2,847', icon: Users },
@@ -42,40 +56,112 @@ function Community() {
     }
   ];
 
-  const recentDiscussions = [
+  const discussionCategories = [
+    { id: 'all', name: 'All Discussions' },
+    { id: 'questions', name: 'Questions' },
+    { id: 'help', name: 'Help Requests' },
+    { id: 'showcase', name: 'Project Showcase' },
+    { id: 'success', name: 'Success Stories' },
+    { id: 'tips', name: 'Tips & Tricks' }
+  ];
+
+  const popularTags = [
+    'zapier', 'power-platform', 'airtable', 'notion', 'beginner', 
+    'security', 'marketing', 'community', 'project-management', 'sales'
+  ];
+
+  const [recentDiscussions, setRecentDiscussions] = useState([
     {
+      id: '1',
       title: 'Best practices for connecting Salesforce to AI?',
       author: 'David Kim',
+      authorAvatar: '👨‍💼',
       replies: 12,
       lastActivity: '2 hours ago',
       tags: ['salesforce', 'crm', 'beginner'],
-      solved: false
+      solved: false,
+      content: 'I\'m trying to connect our Salesforce instance to an AI assistant using MCP. Has anyone done this before? What\'s the best approach for a non-developer? I\'ve tried using Zapier but I\'m running into some issues with the data structure.',
+      category: 'questions',
+      likes: 8,
+      views: 124,
+      isLiked: false
     },
     {
+      id: '2',
       title: 'How to handle sensitive data in MCP connections?',
       author: 'Emma Wilson',
+      authorAvatar: '👩‍💻',
       replies: 8,
       lastActivity: '4 hours ago',
       tags: ['security', 'privacy', 'best-practices'],
-      solved: true
+      solved: true,
+      content: 'I need to connect our customer database to AI, but I\'m concerned about privacy and security. What are the best practices for handling sensitive data in MCP connections? Are there specific settings or approaches I should be using?',
+      category: 'help',
+      likes: 15,
+      views: 203,
+      isLiked: false
     },
     {
+      id: '3',
       title: 'Zapier vs Power Platform for MCP - which is better?',
       author: 'Alex Thompson',
+      authorAvatar: '👨‍🔧',
       replies: 15,
       lastActivity: '6 hours ago',
       tags: ['zapier', 'power-platform', 'comparison'],
-      solved: false
+      solved: false,
+      content: 'I\'m trying to decide between Zapier and Power Platform for our MCP implementation. We\'re a small marketing team with basic technical skills. Which platform would you recommend and why? Cost is a factor but ease of use is more important.',
+      category: 'questions',
+      likes: 22,
+      views: 315,
+      isLiked: false
     },
     {
+      id: '4',
       title: 'Success Story: Automated our entire onboarding process!',
       author: 'Rachel Green',
+      authorAvatar: '👩‍🦰',
       replies: 23,
       lastActivity: '1 day ago',
       tags: ['success-story', 'onboarding', 'automation'],
-      solved: false
+      solved: false,
+      content: 'Just wanted to share our success! We automated our entire employee onboarding process using MCP to connect our HR system, IT ticketing system, and Slack. New employees now get personalized welcome messages, automatic account creation, and a customized onboarding checklist. Reduced manual work by 85%!',
+      category: 'success',
+      likes: 47,
+      views: 512,
+      isLiked: false
+    },
+    {
+      id: '5',
+      title: 'Quick tip: Use "confidence scores" in your MCP setup',
+      author: 'Michael Scott',
+      authorAvatar: '👨‍💼',
+      replies: 7,
+      lastActivity: '2 days ago',
+      tags: ['tips', 'best-practices', 'intermediate'],
+      solved: false,
+      content: 'Here\'s a quick tip that improved our MCP implementation: Add a "confidence score" field to your AI responses. This helps users understand how certain the AI is about each answer. We use a simple 1-5 scale, and it\'s been a game-changer for user trust!',
+      category: 'tips',
+      likes: 31,
+      views: 278,
+      isLiked: false
+    },
+    {
+      id: '6',
+      title: 'Project Showcase: AI-powered customer support triage',
+      author: 'Jennifer Liu',
+      authorAvatar: '👩‍💼',
+      replies: 19,
+      lastActivity: '3 days ago',
+      tags: ['showcase', 'customer-support', 'airtable'],
+      solved: false,
+      content: 'Excited to share our latest project! We built an AI-powered customer support triage system using Airtable and Claude. The system automatically categorizes incoming tickets, suggests solutions from our knowledge base, and routes complex issues to the right specialist. Reduced response time by 62%!',
+      category: 'showcase',
+      likes: 38,
+      views: 421,
+      isLiked: false
     }
-  ];
+  ]);
 
   const upcomingEvents = [
     {
@@ -131,32 +217,139 @@ function Community() {
     }
   ];
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setDiscussionFormData({
+      ...discussionFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && discussionFormData.currentTag.trim()) {
+      e.preventDefault();
+      if (!discussionFormData.tags.includes(discussionFormData.currentTag.trim())) {
+        setDiscussionFormData({
+          ...discussionFormData,
+          tags: [...discussionFormData.tags, discussionFormData.currentTag.trim()],
+          currentTag: ''
+        });
+      } else {
+        setDiscussionFormData({
+          ...discussionFormData,
+          currentTag: ''
+        });
+      }
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setDiscussionFormData({
+      ...discussionFormData,
+      tags: discussionFormData.tags.filter(tag => tag !== tagToRemove)
+    });
+  };
+
+  const handleQuickTag = (tag: string) => {
+    if (!discussionFormData.tags.includes(tag)) {
+      setDiscussionFormData({
+        ...discussionFormData,
+        tags: [...discussionFormData.tags, tag]
+      });
+    }
+  };
+
+  const handleSubmitDiscussion = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      const newDiscussion = {
+        id: (recentDiscussions.length + 1).toString(),
+        title: discussionFormData.title,
+        author: user?.email?.split('@')[0] || 'Anonymous',
+        authorAvatar: '👤',
+        replies: 0,
+        lastActivity: 'Just now',
+        tags: discussionFormData.tags.length > 0 ? discussionFormData.tags : ['general'],
+        solved: false,
+        content: discussionFormData.content,
+        category: 'questions',
+        likes: 0,
+        views: 1,
+        isLiked: false
+      };
+
+      setRecentDiscussions([newDiscussion, ...recentDiscussions]);
+      setDiscussionFormData({
+        title: '',
+        content: '',
+        tags: [],
+        currentTag: ''
+      });
+      setShowNewDiscussionForm(false);
+      setIsSubmitting(false);
+    }, 1500);
+  };
+
+  const handleLikeDiscussion = (discussionId: string) => {
+    setRecentDiscussions(recentDiscussions.map(discussion => {
+      if (discussion.id === discussionId) {
+        return {
+          ...discussion,
+          likes: discussion.isLiked ? discussion.likes - 1 : discussion.likes + 1,
+          isLiked: !discussion.isLiked
+        };
+      }
+      return discussion;
+    }));
+  };
+
+  // Filter discussions based on search query and category
+  const filteredDiscussions = recentDiscussions.filter(discussion => {
+    const matchesSearch = searchQuery === '' || 
+      discussion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      discussion.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      discussion.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesCategory = selectedCategory === 'all' || discussion.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
+
+  // Scroll to form when "Start New Discussion" is clicked
+  useEffect(() => {
+    if (showNewDiscussionForm && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [showNewDiscussionForm]);
+
   return (
-    <div className="py-20 px-4 sm:px-6 lg:px-8">
+    <div className="container-responsive section-padding">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">MCP Community</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Join thousands of non-developers building amazing AI-powered solutions with MCP
+        <div className="text-center mb-12 sm:mb-16">
+          <h1 className="heading-lg mb-4">MCP4 Everyone Community</h1>
+          <p className="text-body text-muted-foreground max-w-2xl mx-auto">
+            Join thousands of people building amazing AI-powered solutions with MCP
           </p>
         </div>
 
         {/* Community Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {communityStats.map((stat, index) => (
-            <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <stat.icon className="w-6 h-6 text-white" />
+            <div key={index} className="glass p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <stat.icon className="w-6 h-6 text-primary-foreground" />
               </div>
-              <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-gray-300 text-sm">{stat.label}</div>
+              <div className="text-2xl font-bold text-foreground mb-1">{stat.value}</div>
+              <div className="text-muted-foreground text-sm">{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 mb-12">
+        <div className="flex flex-wrap justify-center gap-2 mb-8 sm:mb-12">
           {[
             { id: 'overview', name: 'Overview', icon: Users },
             { id: 'discussions', name: 'Discussions', icon: MessageSquare },
@@ -168,12 +361,13 @@ function Community() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                  ? 'bg-matrix-primary text-primary-foreground'
+                  : 'glass text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <tab.icon className="w-4 h-4" />
-              <span>{tab.name}</span>
+              <span className="hidden sm:inline">{tab.name}</span>
+              <span className="sm:hidden">{tab.id === 'overview' ? 'Home' : tab.icon}</span>
             </button>
           ))}
         </div>
@@ -183,16 +377,16 @@ function Community() {
           <div className="space-y-12">
             {/* Featured Members */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-8">Featured Community Members</h2>
+              <h2 className="heading-md mb-8">Featured Community Members</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {featuredMembers.map((member, index) => (
-                  <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                  <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="text-3xl">{member.avatar}</div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white">{member.name}</h3>
-                        <p className="text-blue-300">{member.role}</p>
-                        <p className="text-gray-400 text-sm">{member.company}</p>
+                        <h3 className="text-lg font-semibold text-foreground">{member.name}</h3>
+                        <p className="text-matrix-primary">{member.role}</p>
+                        <p className="text-muted-foreground text-sm">{member.company}</p>
                       </div>
                     </div>
                     
@@ -208,19 +402,19 @@ function Community() {
                     </div>
                     
                     <div className="mb-4">
-                      <h4 className="text-white font-medium mb-2">Specialties:</h4>
+                      <h4 className="text-foreground font-medium mb-2">Specialties:</h4>
                       <div className="flex flex-wrap gap-2">
                         {member.specialties.map((specialty, specIndex) => (
-                          <span key={specIndex} className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">
+                          <span key={specIndex} className="badge-primary bg-purple-500/20 text-purple-300 border-purple-500/30">
                             {specialty}
                           </span>
                         ))}
                       </div>
                     </div>
                     
-                    <div className="bg-slate-800/50 rounded-lg p-3">
+                    <div className="glass bg-muted/20 rounded-lg p-3">
                       <h4 className="text-green-300 font-medium text-sm mb-1">Recent Project:</h4>
-                      <p className="text-gray-300 text-sm">{member.recentProject}</p>
+                      <p className="text-muted-foreground text-sm">{member.recentProject}</p>
                     </div>
                   </div>
                 ))}
@@ -228,20 +422,78 @@ function Community() {
             </div>
 
             {/* Join Community CTA */}
-            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8 text-center">
-              <h3 className="text-2xl font-bold text-white mb-4">Ready to Join Our Community?</h3>
-              <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+            <div className="glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 border-matrix-primary/30 rounded-xl p-8 text-center">
+              <h3 className="heading-md mb-4">Ready to Join Our Community?</h3>
+              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
                 Connect with like-minded professionals, share your projects, get help, and learn from others building with MCP.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/join-community"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+                  className="btn-primary"
                 >
                   Join Discord Community
                 </Link>
-                <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
+                <button className="btn-secondary">
                   Browse Forum
+                </button>
+              </div>
+            </div>
+
+            {/* Recent Discussions Preview */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="heading-md">Recent Discussions</h2>
+                <Link to="#" onClick={() => setActiveTab('discussions')} className="text-matrix-primary hover:text-matrix-secondary flex items-center">
+                  <span>View all</span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+              
+              <div className="space-y-4">
+                {recentDiscussions.slice(0, 3).map((discussion) => (
+                  <div key={discussion.id} className="glass p-6 hover:bg-card/70 transition-all duration-300">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="text-lg font-semibold text-foreground">{discussion.title}</h3>
+                          {discussion.solved && (
+                            <span className="badge-success">
+                              Solved
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                          <span>by {discussion.author}</span>
+                          <span>{discussion.replies} replies</span>
+                          <span>{discussion.lastActivity}</span>
+                        </div>
+                      </div>
+                      <button className="text-muted-foreground hover:text-foreground transition-colors duration-200">
+                        <ExternalLink className="w-5 h-5" />
+                      </button>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      {discussion.tags.map((tag, tagIndex) => (
+                        <span key={tagIndex} className="badge-secondary">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-6 text-center">
+                <button 
+                  onClick={() => {
+                    setActiveTab('discussions');
+                    setShowNewDiscussionForm(true);
+                  }}
+                  className="btn-primary"
+                >
+                  Start New Discussion
                 </button>
               </div>
             </div>
@@ -250,139 +502,392 @@ function Community() {
 
         {activeTab === 'discussions' && (
           <div>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-white">Recent Discussions</h2>
-              <button className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
-                Start New Discussion
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-8">
+              <h2 className="heading-md">Community Discussions</h2>
+              <button 
+                onClick={() => setShowNewDiscussionForm(!showNewDiscussionForm)}
+                className="btn-primary"
+              >
+                {showNewDiscussionForm ? 'Cancel' : 'Start New Discussion'}
               </button>
             </div>
             
-            <div className="space-y-4">
-              {recentDiscussions.map((discussion, index) => (
-                <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="text-lg font-semibold text-white">{discussion.title}</h3>
-                        {discussion.solved && (
-                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-medium">
-                            Solved
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-4 text-sm text-gray-300">
-                        <span>by {discussion.author}</span>
-                        <span>{discussion.replies} replies</span>
-                        <span>{discussion.lastActivity}</span>
-                      </div>
-                    </div>
-                    <button className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
-                      <ExternalLink className="w-5 h-5" />
-                    </button>
+            {/* New Discussion Form */}
+            {showNewDiscussionForm && (
+              <div ref={formRef} className="glass-strong p-6 mb-8 animate-fade-in">
+                <h3 className="heading-sm mb-4">Create New Discussion</h3>
+                <form onSubmit={handleSubmitDiscussion} className="space-y-4">
+                  <div>
+                    <label className="form-label">Title</label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={discussionFormData.title}
+                      onChange={handleInputChange}
+                      required
+                      className="form-input"
+                      placeholder="What's your question or topic?"
+                    />
                   </div>
                   
-                  <div className="flex flex-wrap gap-2">
-                    {discussion.tags.map((tag, tagIndex) => (
-                      <span key={tagIndex} className="px-2 py-1 bg-gray-700/50 text-gray-300 rounded text-xs">
-                        #{tag}
-                      </span>
-                    ))}
+                  <div>
+                    <label className="form-label">Content</label>
+                    <textarea
+                      name="content"
+                      value={discussionFormData.content}
+                      onChange={handleInputChange}
+                      required
+                      rows={5}
+                      className="form-input resize-none"
+                      placeholder="Describe your question, share your experience, or tell your story..."
+                    />
                   </div>
+                  
+                  <div>
+                    <label className="form-label">Tags</label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {discussionFormData.tags.map((tag) => (
+                        <div key={tag} className="badge-primary flex items-center space-x-1">
+                          <span>#{tag}</span>
+                          <button 
+                            type="button"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="hover:text-foreground"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="relative">
+                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        name="currentTag"
+                        value={discussionFormData.currentTag}
+                        onChange={handleInputChange}
+                        onKeyDown={handleAddTag}
+                        className="form-input pl-9"
+                        placeholder="Add tags (press Enter to add)"
+                      />
+                    </div>
+                    <div className="mt-2">
+                      <p className="text-sm text-muted-foreground mb-1">Popular tags:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {popularTags.slice(0, 6).map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => handleQuickTag(tag)}
+                            className="badge-secondary hover:bg-muted"
+                          >
+                            #{tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowNewDiscussionForm(false)}
+                      className="btn-secondary"
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="loading-spinner mr-2"></div>
+                          <span>Posting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          <span>Post Discussion</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+            
+            {/* Search and Filters */}
+            <div className="glass p-4 mb-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search discussions..."
+                    className="form-input pl-10"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
-              ))}
+                
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="form-input py-2"
+                  >
+                    {discussionCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              
+              <div className="mt-3 flex flex-wrap gap-2">
+                {popularTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setSearchQuery(tag)}
+                    className={`badge-secondary hover:bg-muted ${
+                      searchQuery === tag ? 'bg-matrix-primary/20 text-matrix-primary border-matrix-primary/30' : ''
+                    }`}
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
             </div>
+            
+            {/* Discussions List */}
+            <div className="space-y-4">
+              {filteredDiscussions.length > 0 ? (
+                filteredDiscussions.map((discussion) => (
+                  <div key={discussion.id} className="glass p-6 hover:bg-card/70 transition-all duration-300">
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className="text-2xl flex-shrink-0">{discussion.authorAvatar}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="text-lg font-semibold text-foreground mb-1">{discussion.title}</h3>
+                            <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
+                              <span>{discussion.author}</span>
+                              <span>•</span>
+                              <span>{discussion.lastActivity}</span>
+                              {discussion.solved && (
+                                <>
+                                  <span>•</span>
+                                  <span className="badge-success">Solved</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button className="text-muted-foreground hover:text-foreground p-1 rounded-full hover:bg-muted">
+                              <MoreHorizontal className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="text-muted-foreground mb-4 line-clamp-3">
+                          {discussion.content}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {discussion.tags.map((tag, tagIndex) => (
+                            <span key={tagIndex} className="badge-secondary">
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <button 
+                              onClick={() => handleLikeDiscussion(discussion.id)}
+                              className={`flex items-center space-x-1 hover:text-red-400 transition-colors duration-200 ${
+                                discussion.isLiked ? 'text-red-400' : 'text-muted-foreground'
+                              }`}
+                            >
+                              <Heart className={`w-4 h-4 ${discussion.isLiked ? 'fill-current' : ''}`} />
+                              <span>{discussion.likes}</span>
+                            </button>
+                            
+                            <div className="flex items-center space-x-1 text-muted-foreground">
+                              <MessageSquare className="w-4 h-4" />
+                              <span>{discussion.replies}</span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-1 text-muted-foreground">
+                              <Users className="w-4 h-4" />
+                              <span>{discussion.views}</span>
+                            </div>
+                          </div>
+                          
+                          <button className="text-matrix-primary hover:text-matrix-secondary flex items-center space-x-1">
+                            <span>Read more</span>
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="glass p-8 text-center">
+                  <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="heading-sm mb-2">No discussions found</h3>
+                  <p className="text-muted-foreground mb-6">
+                    {searchQuery 
+                      ? `No discussions match "${searchQuery}". Try a different search term.` 
+                      : 'No discussions in this category yet. Be the first to start one!'}
+                  </p>
+                  <button 
+                    onClick={() => {
+                      setShowNewDiscussionForm(true);
+                      setSearchQuery('');
+                      setSelectedCategory('all');
+                    }}
+                    className="btn-primary"
+                  >
+                    Start New Discussion
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            {filteredDiscussions.length > 0 && (
+              <div className="mt-8 text-center">
+                <button className="btn-primary">
+                  Load More Discussions
+                </button>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === 'events' && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-8">Upcoming Events</h2>
+            <h2 className="heading-md mb-8">Upcoming Events</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {upcomingEvents.map((event, index) => (
-                <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      event.type === 'Weekly' ? 'bg-blue-500/20 text-blue-400' :
-                      event.type === 'Workshop' ? 'bg-green-500/20 text-green-400' :
-                      'bg-purple-500/20 text-purple-400'
+                    <span className={`badge-primary ${
+                      event.type === 'Weekly' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                      event.type === 'Workshop' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                      'bg-purple-500/20 text-purple-400 border-purple-500/30'
                     }`}>
                       {event.type}
                     </span>
-                    <div className="flex items-center space-x-1 text-gray-400">
+                    <div className="flex items-center space-x-1 text-muted-foreground">
                       <Users className="w-4 h-4" />
                       <span className="text-sm">{event.attendees}</span>
                     </div>
                   </div>
                   
-                  <h3 className="text-lg font-semibold text-white mb-2">{event.title}</h3>
-                  <p className="text-gray-300 mb-4">{event.description}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{event.title}</h3>
+                  <p className="text-muted-foreground mb-4">{event.description}</p>
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-blue-400" />
-                      <span className="text-blue-300 text-sm">{event.date}</span>
+                      <Calendar className="w-4 h-4 text-matrix-primary" />
+                      <span className="text-matrix-secondary text-sm">{event.date}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="w-4 h-4 flex items-center justify-center">🕐</span>
-                      <span className="text-gray-300 text-sm">{event.time}</span>
+                      <span className="text-muted-foreground text-sm">{event.time}</span>
                     </div>
                   </div>
                   
                   <Link
                     to="/office-hours"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 block text-center"
+                    className="btn-primary w-full inline-flex justify-center"
                   >
                     Register
                   </Link>
                 </div>
               ))}
             </div>
+            
+            <div className="mt-8 glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 border-matrix-primary/30 p-6 rounded-xl text-center">
+              <h3 className="heading-sm mb-4">Want to Host an Event?</h3>
+              <p className="text-muted-foreground mb-6">
+                Share your knowledge with the community by hosting a workshop, Q&A session, or showcase.
+              </p>
+              <button className="btn-primary">
+                Propose an Event
+              </button>
+            </div>
           </div>
         )}
 
         {activeTab === 'learning' && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-8">Community Learning Paths</h2>
+            <h2 className="heading-md mb-8">Community Learning Paths</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {learningPaths.map((path, index) => (
-                <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white">{path.title}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      path.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' :
-                      path.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                      'bg-red-500/20 text-red-400'
+                    <h3 className="text-lg font-semibold text-foreground">{path.title}</h3>
+                    <span className={`badge-primary ${
+                      path.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                      path.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                      'bg-red-500/20 text-red-400 border-red-500/30'
                     }`}>
                       {path.difficulty}
                     </span>
                   </div>
                   
-                  <p className="text-gray-300 mb-4">{path.description}</p>
+                  <p className="text-muted-foreground mb-4">{path.description}</p>
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Modules:</span>
-                      <span className="text-blue-300">{path.modules}</span>
+                      <span className="text-muted-foreground">Modules:</span>
+                      <span className="text-matrix-primary">{path.modules}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Duration:</span>
+                      <span className="text-muted-foreground">Duration:</span>
                       <span className="text-green-300">{path.duration}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Enrolled:</span>
+                      <span className="text-muted-foreground">Enrolled:</span>
                       <span className="text-purple-300">{path.enrolled.toLocaleString()}</span>
                     </div>
                   </div>
                   
                   <Link
                     to="/learn"
-                    className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                    className="btn-primary w-full inline-flex justify-center items-center"
                   >
                     <span>Start Learning</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </div>
               ))}
+            </div>
+            
+            <div className="mt-8 glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 border-matrix-primary/30 p-6 rounded-xl text-center">
+              <h3 className="heading-sm mb-4">Want to Contribute?</h3>
+              <p className="text-muted-foreground mb-6">
+                Share your knowledge by creating tutorials, guides, or learning paths for the community.
+              </p>
+              <button className="btn-primary">
+                Become a Contributor
+              </button>
             </div>
           </div>
         )}

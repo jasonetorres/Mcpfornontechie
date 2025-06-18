@@ -1,21 +1,31 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, MessageSquare, Calendar, Trophy, Star, ArrowRight, ExternalLink, Heart, Zap, BookOpen } from 'lucide-react';
+import { Users, MessageSquare, Calendar, Trophy, Star, ArrowRight, ExternalLink, Heart, Zap, BookOpen, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAchievements } from '../hooks/useAchievements';
 
 function JoinCommunity() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [joinedDiscord, setJoinedDiscord] = useState(false);
+  const [joinedForum, setJoinedForum] = useState(false);
   const { user } = useAuth();
   const { markCommunityJoined } = useAchievements();
 
-  const handleJoinCommunity = () => {
+  const handleJoinCommunity = (platform: 'discord' | 'forum') => {
     if (user) {
       markCommunityJoined();
       console.log('User joined community - achievement tracking updated');
     }
-    // Here you would typically redirect to Discord or open the community platform
-    window.open('https://discord.gg/mcp-academy', '_blank');
+    
+    if (platform === 'discord') {
+      // Here you would typically redirect to Discord or open the community platform
+      window.open('https://discord.gg/mcp4everyone', '_blank');
+      setJoinedDiscord(true);
+    } else {
+      // Open forum in new tab
+      window.open('https://forum.mcp4everyone.com', '_blank');
+      setJoinedForum(true);
+    }
   };
 
   const communityStats = [
@@ -144,37 +154,201 @@ function JoinCommunity() {
     }
   ];
 
+  const communityBenefits = [
+    {
+      title: 'Get Help When You Need It',
+      description: 'Stuck on a problem? Our community members and experts are ready to help.',
+      icon: '🤝'
+    },
+    {
+      title: 'Share Your Success',
+      description: 'Celebrate your wins and inspire others with your MCP projects.',
+      icon: '🏆'
+    },
+    {
+      title: 'Learn From Others',
+      description: 'See how others are using MCP and learn from their experiences.',
+      icon: '📚'
+    },
+    {
+      title: 'Network With Peers',
+      description: 'Connect with other non-technical professionals using AI.',
+      icon: '🌐'
+    },
+    {
+      title: 'Stay Up-to-Date',
+      description: 'Be the first to know about new MCP features and best practices.',
+      icon: '📣'
+    },
+    {
+      title: 'Advance Your Career',
+      description: 'Build your reputation as an MCP expert and open new opportunities.',
+      icon: '📈'
+    }
+  ];
+
   return (
-    <div className="py-20 px-4 sm:px-6 lg:px-8">
+    <div className="container-responsive section-padding">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">MCP Community</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Join thousands of non-developers building amazing AI-powered solutions with MCP
+        <div className="text-center mb-12 sm:mb-16">
+          <h1 className="heading-lg mb-4">Join the MCP4 Everyone Community</h1>
+          <p className="text-body text-muted-foreground max-w-2xl mx-auto">
+            Connect with thousands of people building amazing AI-powered solutions with MCP
           </p>
           {user && (
-            <div className="mt-4 text-green-300">
+            <div className="mt-4 text-matrix-primary">
               ✅ Signed in - Joining the community will unlock achievements!
             </div>
           )}
         </div>
 
         {/* Community Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {communityStats.map((stat, index) => (
-            <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <stat.icon className="w-6 h-6 text-white" />
+            <div key={index} className="glass p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <stat.icon className="w-6 h-6 text-primary-foreground" />
               </div>
-              <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-gray-300 text-sm">{stat.label}</div>
+              <div className="text-2xl font-bold text-foreground mb-1">{stat.value}</div>
+              <div className="text-muted-foreground text-sm">{stat.label}</div>
             </div>
           ))}
         </div>
 
+        {/* Community Benefits */}
+        <div className="mb-12 sm:mb-16">
+          <h2 className="heading-md text-center mb-8">Why Join Our Community?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {communityBenefits.map((benefit, index) => (
+              <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="text-3xl">{benefit.icon}</div>
+                  <h3 className="text-lg font-semibold text-foreground">{benefit.title}</h3>
+                </div>
+                <p className="text-muted-foreground">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Join Options */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 sm:mb-16">
+          <div className="glass-strong bg-gradient-to-r from-blue-600/10 to-purple-600/10 border-blue-500/30 rounded-xl p-6 sm:p-8">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="text-4xl">💬</div>
+              <div>
+                <h3 className="heading-sm">Join Our Discord</h3>
+                <p className="text-muted-foreground">Real-time chat, help, and collaboration</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <Check className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-foreground font-medium">Live Chat Support</div>
+                  <div className="text-muted-foreground text-sm">Get help in real-time from community members</div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <Check className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-foreground font-medium">Dedicated Channels</div>
+                  <div className="text-muted-foreground text-sm">Specific spaces for different topics and platforms</div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <Check className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-foreground font-medium">Weekly Events</div>
+                  <div className="text-muted-foreground text-sm">Office hours, workshops, and community calls</div>
+                </div>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => handleJoinCommunity('discord')}
+              className="btn-primary w-full"
+              disabled={joinedDiscord}
+            >
+              {joinedDiscord ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  <span>Discord Joined</span>
+                </>
+              ) : (
+                <>
+                  <Users className="w-4 h-4 mr-2" />
+                  <span>Join Discord Community</span>
+                </>
+              )}
+            </button>
+            
+            <div className="text-center mt-3 text-sm text-muted-foreground">
+              Already a member? <a href="https://discord.gg/mcp4everyone" target="_blank" rel="noopener noreferrer" className="text-matrix-primary hover:text-matrix-secondary">Open Discord</a>
+            </div>
+          </div>
+          
+          <div className="glass-strong bg-gradient-to-r from-green-600/10 to-teal-600/10 border-green-500/30 rounded-xl p-6 sm:p-8">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="text-4xl">📝</div>
+              <div>
+                <h3 className="heading-sm">Join Our Forum</h3>
+                <p className="text-muted-foreground">Structured discussions and knowledge base</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <Check className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-foreground font-medium">Searchable Knowledge</div>
+                  <div className="text-muted-foreground text-sm">Find solutions to common problems</div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <Check className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-foreground font-medium">Detailed Discussions</div>
+                  <div className="text-muted-foreground text-sm">In-depth conversations about MCP topics</div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <Check className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-foreground font-medium">Build Your Reputation</div>
+                  <div className="text-muted-foreground text-sm">Earn badges and recognition for your contributions</div>
+                </div>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => handleJoinCommunity('forum')}
+              className="btn-primary w-full"
+              disabled={joinedForum}
+            >
+              {joinedForum ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  <span>Forum Joined</span>
+                </>
+              ) : (
+                <>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  <span>Join Community Forum</span>
+                </>
+              )}
+            </button>
+            
+            <div className="text-center mt-3 text-sm text-muted-foreground">
+              Already a member? <a href="https://forum.mcp4everyone.com" target="_blank" rel="noopener noreferrer" className="text-matrix-primary hover:text-matrix-secondary">Open Forum</a>
+            </div>
+          </div>
+        </div>
+
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 mb-12">
+        <div className="flex flex-wrap justify-center gap-2 mb-8 sm:mb-12">
           {[
             { id: 'overview', name: 'Overview', icon: Users },
             { id: 'discussions', name: 'Discussions', icon: MessageSquare },
@@ -186,12 +360,13 @@ function JoinCommunity() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                  ? 'bg-matrix-primary text-primary-foreground'
+                  : 'glass text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <tab.icon className="w-4 h-4" />
-              <span>{tab.name}</span>
+              <span className="hidden sm:inline">{tab.name}</span>
+              <span className="sm:hidden">{tab.id === 'overview' ? 'Home' : tab.icon}</span>
             </button>
           ))}
         </div>
@@ -201,16 +376,16 @@ function JoinCommunity() {
           <div className="space-y-12">
             {/* Featured Members */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-8">Featured Community Members</h2>
+              <h2 className="heading-md mb-8">Featured Community Members</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {featuredMembers.map((member, index) => (
-                  <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                  <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="text-3xl">{member.avatar}</div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white">{member.name}</h3>
-                        <p className="text-blue-300">{member.role}</p>
-                        <p className="text-gray-400 text-sm">{member.company}</p>
+                        <h3 className="text-lg font-semibold text-foreground">{member.name}</h3>
+                        <p className="text-matrix-primary">{member.role}</p>
+                        <p className="text-muted-foreground text-sm">{member.company}</p>
                       </div>
                     </div>
                     
@@ -226,41 +401,75 @@ function JoinCommunity() {
                     </div>
                     
                     <div className="mb-4">
-                      <h4 className="text-white font-medium mb-2">Specialties:</h4>
+                      <h4 className="text-foreground font-medium mb-2">Specialties:</h4>
                       <div className="flex flex-wrap gap-2">
                         {member.specialties.map((specialty, specIndex) => (
-                          <span key={specIndex} className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">
+                          <span key={specIndex} className="badge-primary bg-purple-500/20 text-purple-300 border-purple-500/30">
                             {specialty}
                           </span>
                         ))}
                       </div>
                     </div>
                     
-                    <div className="bg-slate-800/50 rounded-lg p-3">
+                    <div className="glass bg-muted/20 rounded-lg p-3">
                       <h4 className="text-green-300 font-medium text-sm mb-1">Recent Project:</h4>
-                      <p className="text-gray-300 text-sm">{member.recentProject}</p>
+                      <p className="text-muted-foreground text-sm">{member.recentProject}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Join Community CTA */}
-            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8 text-center">
-              <h3 className="text-2xl font-bold text-white mb-4">Ready to Join Our Community?</h3>
-              <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                Connect with like-minded professionals, share your projects, get help, and learn from others building with MCP.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={handleJoinCommunity}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
-                >
-                  Join Discord Community
-                </button>
-                <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
-                  Browse Forum
-                </button>
+            {/* Community Guidelines */}
+            <div className="glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 border-matrix-primary/30 rounded-xl p-6 sm:p-8">
+              <h3 className="heading-md mb-6 text-center">Community Guidelines</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="text-2xl">🤝</div>
+                    <div>
+                      <h4 className="text-foreground font-semibold">Be Respectful</h4>
+                      <p className="text-muted-foreground text-sm">Treat others with kindness and respect. We're all here to learn and grow together.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="text-2xl">🔍</div>
+                    <div>
+                      <h4 className="text-foreground font-semibold">Search First</h4>
+                      <p className="text-muted-foreground text-sm">Before asking a question, search to see if it's been answered already.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="text-2xl">🙋‍♀️</div>
+                    <div>
+                      <h4 className="text-foreground font-semibold">Help Others</h4>
+                      <p className="text-muted-foreground text-sm">Share your knowledge and experience to help fellow community members.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="text-2xl">📝</div>
+                    <div>
+                      <h4 className="text-foreground font-semibold">Be Specific</h4>
+                      <p className="text-muted-foreground text-sm">When asking questions, provide details and context to help others help you.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="text-2xl">🏆</div>
+                    <div>
+                      <h4 className="text-foreground font-semibold">Share Successes</h4>
+                      <p className="text-muted-foreground text-sm">Celebrate your wins and inspire others with your MCP projects.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="text-2xl">🔒</div>
+                    <div>
+                      <h4 className="text-foreground font-semibold">Respect Privacy</h4>
+                      <p className="text-muted-foreground text-sm">Don't share sensitive data or personal information in public channels.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -269,39 +478,42 @@ function JoinCommunity() {
         {activeTab === 'discussions' && (
           <div>
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-white">Recent Discussions</h2>
-              <button className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200">
-                Start New Discussion
-              </button>
+              <h2 className="heading-md">Recent Discussions</h2>
+              <Link
+                to="/community"
+                className="btn-primary"
+              >
+                View Full Community
+              </Link>
             </div>
             
             <div className="space-y-4">
               {recentDiscussions.map((discussion, index) => (
-                <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+                <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="text-lg font-semibold text-white">{discussion.title}</h3>
+                        <h3 className="text-lg font-semibold text-foreground">{discussion.title}</h3>
                         {discussion.solved && (
-                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-medium">
+                          <span className="badge-success">
                             Solved
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center space-x-4 text-sm text-gray-300">
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                         <span>by {discussion.author}</span>
                         <span>{discussion.replies} replies</span>
                         <span>{discussion.lastActivity}</span>
                       </div>
                     </div>
-                    <button className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
+                    <button className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                       <ExternalLink className="w-5 h-5" />
                     </button>
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
                     {discussion.tags.map((tag, tagIndex) => (
-                      <span key={tagIndex} className="px-2 py-1 bg-gray-700/50 text-gray-300 rounded text-xs">
+                      <span key={tagIndex} className="badge-secondary">
                         #{tag}
                       </span>
                     ))}
@@ -309,95 +521,113 @@ function JoinCommunity() {
                 </div>
               ))}
             </div>
+            
+            <div className="mt-6 text-center">
+              <Link
+                to="/community"
+                className="btn-primary"
+              >
+                Browse All Discussions
+              </Link>
+            </div>
           </div>
         )}
 
         {activeTab === 'events' && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-8">Upcoming Events</h2>
+            <h2 className="heading-md mb-8">Upcoming Events</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {upcomingEvents.map((event, index) => (
-                <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      event.type === 'Weekly' ? 'bg-blue-500/20 text-blue-400' :
-                      event.type === 'Workshop' ? 'bg-green-500/20 text-green-400' :
-                      'bg-purple-500/20 text-purple-400'
+                    <span className={`badge-primary ${
+                      event.type === 'Weekly' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                      event.type === 'Workshop' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                      'bg-purple-500/20 text-purple-400 border-purple-500/30'
                     }`}>
                       {event.type}
                     </span>
-                    <div className="flex items-center space-x-1 text-gray-400">
+                    <div className="flex items-center space-x-1 text-muted-foreground">
                       <Users className="w-4 h-4" />
                       <span className="text-sm">{event.attendees}</span>
                     </div>
                   </div>
                   
-                  <h3 className="text-lg font-semibold text-white mb-2">{event.title}</h3>
-                  <p className="text-gray-300 mb-4">{event.description}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{event.title}</h3>
+                  <p className="text-muted-foreground mb-4">{event.description}</p>
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-blue-400" />
-                      <span className="text-blue-300 text-sm">{event.date}</span>
+                      <Calendar className="w-4 h-4 text-matrix-primary" />
+                      <span className="text-matrix-secondary text-sm">{event.date}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="w-4 h-4 flex items-center justify-center">🕐</span>
-                      <span className="text-gray-300 text-sm">{event.time}</span>
+                      <span className="text-muted-foreground text-sm">{event.time}</span>
                     </div>
                   </div>
                   
                   <Link
                     to="/office-hours"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 block text-center"
+                    className="btn-primary w-full inline-flex justify-center"
                   >
                     Register
                   </Link>
                 </div>
               ))}
             </div>
+            
+            <div className="mt-8 text-center">
+              <Link
+                to="/office-hours"
+                className="btn-primary"
+              >
+                View All Events
+              </Link>
+            </div>
           </div>
         )}
 
         {activeTab === 'learning' && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-8">Community Learning Paths</h2>
+            <h2 className="heading-md mb-8">Community Learning Paths</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {learningPaths.map((path, index) => (
-                <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+                <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white">{path.title}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      path.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' :
-                      path.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                      'bg-red-500/20 text-red-400'
+                    <h3 className="text-lg font-semibold text-foreground">{path.title}</h3>
+                    <span className={`badge-primary ${
+                      path.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                      path.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                      'bg-red-500/20 text-red-400 border-red-500/30'
                     }`}>
                       {path.difficulty}
                     </span>
                   </div>
                   
-                  <p className="text-gray-300 mb-4">{path.description}</p>
+                  <p className="text-muted-foreground mb-4">{path.description}</p>
                   
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Modules:</span>
-                      <span className="text-blue-300">{path.modules}</span>
+                      <span className="text-muted-foreground">Modules:</span>
+                      <span className="text-matrix-primary">{path.modules}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Duration:</span>
+                      <span className="text-muted-foreground">Duration:</span>
                       <span className="text-green-300">{path.duration}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Enrolled:</span>
+                      <span className="text-muted-foreground">Enrolled:</span>
                       <span className="text-purple-300">{path.enrolled.toLocaleString()}</span>
                     </div>
                   </div>
                   
                   <Link
                     to="/learn"
-                    className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                    className="btn-primary w-full inline-flex justify-center items-center"
                   >
                     <span>Start Learning</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </div>
               ))}

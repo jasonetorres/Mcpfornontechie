@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Heart, MessageSquare, Share2, Bookmark, MoreHorizontal, Trophy, Star, Users, Zap } from 'lucide-react'
+import { Heart, MessageSquare, Share2, Bookmark, MoreHorizontal, Trophy, Star, Users, Zap, X, Send } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import { Link } from 'react-router-dom'
 
 interface CommunityPost {
   id: string
@@ -101,6 +102,9 @@ const samplePosts: CommunityPost[] = [
 export default function CommunityFeed() {
   const [posts, setPosts] = useState(samplePosts)
   const [filter, setFilter] = useState('all')
+  const [newPostContent, setNewPostContent] = useState('')
+  const [isPostingContent, setIsPostingContent] = useState(false)
+  const [showNewPostForm, setShowNewPostForm] = useState(false)
   const { user } = useAuth()
 
   const handleLike = (postId: string) => {
@@ -121,6 +125,38 @@ export default function CommunityFeed() {
         ? { ...post, isBookmarked: !post.isBookmarked }
         : post
     ))
+  }
+
+  const handlePostContent = () => {
+    if (!newPostContent.trim()) return;
+    
+    setIsPostingContent(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const newPost: CommunityPost = {
+        id: `new-${Date.now()}`,
+        author: {
+          name: user?.email?.split('@')[0] || 'Anonymous',
+          avatar: '👤',
+          role: 'Community Member',
+          level: 'MCP Learner'
+        },
+        content: newPostContent,
+        type: 'question',
+        timestamp: 'Just now',
+        likes: 0,
+        comments: 0,
+        tags: ['community'],
+        isLiked: false,
+        isBookmarked: false
+      };
+      
+      setPosts([newPost, ...posts]);
+      setNewPostContent('');
+      setIsPostingContent(false);
+      setShowNewPostForm(false);
+    }, 1500);
   }
 
   const getPostIcon = (type: string) => {
@@ -148,7 +184,7 @@ export default function CommunityFeed() {
   return (
     <div className="space-y-6">
       {/* Filter Tabs */}
-      <div className="flex flex-wrap justify-center gap-2">
+      <div className="flex flex-wrap justify-center gap-2 mb-6">
         {[
           { id: 'all', name: 'All Posts', icon: Users },
           { id: 'success_story', name: 'Success Stories', icon: Trophy },
@@ -172,105 +208,187 @@ export default function CommunityFeed() {
         ))}
       </div>
 
+      {/* New Post Form */}
+      {user && (
+        <div className="mb-6">
+          {!showNewPostForm ? (
+            <button 
+              onClick={() => setShowNewPostForm(true)}
+              className="glass w-full p-4 rounded-xl text-left text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 flex items-center space-x-3"
+            >
+              <div className="w-10 h-10 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center">
+                <Users className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <span>Share something with the community...</span>
+            </button>
+          ) : (
+            <div className="glass p-4 rounded-xl animate-fade-in">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div className="text-sm font-medium text-foreground">
+                  {user.email?.split('@')[0] || 'You'}
+                </div>
+              </div>
+              <textarea
+                value={newPostContent}
+                onChange={(e) => setNewPostContent(e.target.value)}
+                placeholder="What would you like to share or ask?"
+                rows={4}
+                className="form-input resize-none mb-3"
+              />
+              <div className="flex justify-between">
+                <button
+                  onClick={() => setShowNewPostForm(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePostContent}
+                  disabled={!newPostContent.trim() || isPostingContent}
+                  className="btn-primary py-2"
+                >
+                  {isPostingContent ? (
+                    <>
+                      <div className="loading-spinner mr-2"></div>
+                      <span>Posting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      <span>Post</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Posts */}
       <div className="space-y-6">
-        {filteredPosts.map((post) => (
-          <div key={post.id} className="glass rounded-xl p-6 hover:bg-card/70 transition-all duration-300">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="text-3xl">{post.author.avatar}</div>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-foreground">{post.author.name}</span>
-                    <span className={`${getPostTypeColor(post.type)}`}>
-                      {post.author.level}
-                    </span>
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post) => (
+            <div key={post.id} className="glass rounded-xl p-6 hover:bg-card/70 transition-all duration-300">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="text-3xl">{post.author.avatar}</div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-semibold text-foreground">{post.author.name}</span>
+                      <span className={`${getPostTypeColor(post.type)}`}>
+                        {post.author.level}
+                      </span>
+                    </div>
+                    <div className="text-muted-foreground text-sm">{post.author.role}</div>
+                    <div className="text-muted-foreground text-xs">{post.timestamp}</div>
                   </div>
-                  <div className="text-muted-foreground text-sm">{post.author.role}</div>
-                  <div className="text-muted-foreground text-xs">{post.timestamp}</div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  {getPostIcon(post.type)}
+                  <button className="text-muted-foreground hover:text-foreground transition-colors duration-200">
+                    <MoreHorizontal className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
-              
-              <div className="flex items-center space-x-2">
-                {getPostIcon(post.type)}
-                <button className="text-muted-foreground hover:text-foreground transition-colors duration-200">
-                  <MoreHorizontal className="w-5 h-5" />
-                </button>
+
+              {/* Content */}
+              <div className="mb-4">
+                <p className="text-foreground leading-relaxed">{post.content}</p>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="mb-4">
-              <p className="text-foreground leading-relaxed">{post.content}</p>
-            </div>
+              {/* Project Showcase */}
+              {post.project && (
+                <div className="glass bg-muted/20 rounded-lg p-4 mb-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Star className="w-4 h-4 text-matrix-primary" />
+                    <span className="font-semibold text-foreground">{post.project.title}</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm mb-2">{post.project.description}</p>
+                  <div className="text-matrix-primary text-sm font-medium">
+                    <p>{post.project.metrics}</p>
+                  </div>
+                </div>
+              )}
 
-            {/* Project Showcase */}
-            {post.project && (
-              <div className="glass bg-muted/20 rounded-lg p-4 mb-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Star className="w-4 h-4 text-matrix-primary" />
-                  <span className="font-semibold text-foreground">{post.project.title}</span>
-                </div>
-                <p className="text-muted-foreground text-sm mb-2">{post.project.description}</p>
-                <div className="text-matrix-primary text-sm font-medium">
-                  <p>{post.project.metrics}</p>
-                </div>
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {post.tags.map((tag, index) => (
+                  <span key={index} className="badge-secondary">
+                    #{tag}
+                  </span>
+                ))}
               </div>
-            )}
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {post.tags.map((tag, index) => (
-                <span key={index} className="px-2 py-1 bg-muted text-muted-foreground rounded text-xs">
-                  #{tag}
-                </span>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-between pt-4 border-t border-border">
-              <div className="flex items-center space-x-6">
+              {/* Actions */}
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <div className="flex items-center space-x-6">
+                  <button
+                    onClick={() => handleLike(post.id)}
+                    className={`flex items-center space-x-2 transition-colors duration-200 ${
+                      post.isLiked ? 'text-red-400' : 'text-muted-foreground hover:text-red-400'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
+                    <span className="text-sm">{post.likes}</span>
+                  </button>
+                  
+                  <button className="flex items-center space-x-2 text-muted-foreground hover:text-blue-400 transition-colors duration-200">
+                    <MessageSquare className="w-5 h-5" />
+                    <span className="text-sm">{post.comments}</span>
+                  </button>
+                  
+                  <button className="flex items-center space-x-2 text-muted-foreground hover:text-green-400 transition-colors duration-200">
+                    <Share2 className="w-5 h-5" />
+                    <span className="text-sm">Share</span>
+                  </button>
+                </div>
+                
                 <button
-                  onClick={() => handleLike(post.id)}
-                  className={`flex items-center space-x-2 transition-colors duration-200 ${
-                    post.isLiked ? 'text-red-400' : 'text-muted-foreground hover:text-red-400'
+                  onClick={() => handleBookmark(post.id)}
+                  className={`transition-colors duration-200 ${
+                    post.isBookmarked ? 'text-matrix-primary' : 'text-muted-foreground hover:text-matrix-primary'
                   }`}
                 >
-                  <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
-                  <span className="text-sm">{post.likes}</span>
-                </button>
-                
-                <button className="flex items-center space-x-2 text-muted-foreground hover:text-blue-400 transition-colors duration-200">
-                  <MessageSquare className="w-5 h-5" />
-                  <span className="text-sm">{post.comments}</span>
-                </button>
-                
-                <button className="flex items-center space-x-2 text-muted-foreground hover:text-green-400 transition-colors duration-200">
-                  <Share2 className="w-5 h-5" />
-                  <span className="text-sm">Share</span>
+                  <Bookmark className={`w-5 h-5 ${post.isBookmarked ? 'fill-current' : ''}`} />
                 </button>
               </div>
-              
-              <button
-                onClick={() => handleBookmark(post.id)}
-                className={`transition-colors duration-200 ${
-                  post.isBookmarked ? 'text-matrix-primary' : 'text-muted-foreground hover:text-matrix-primary'
-                }`}
-              >
-                <Bookmark className={`w-5 h-5 ${post.isBookmarked ? 'fill-current' : ''}`} />
-              </button>
             </div>
+          ))
+        ) : (
+          <div className="glass p-8 text-center">
+            <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="heading-sm mb-2">No posts found</h3>
+            <p className="text-muted-foreground mb-4">
+              {filter !== 'all' 
+                ? `No ${filter.replace('_', ' ')} posts found. Try a different filter.`
+                : 'No posts found. Be the first to share something!'}
+            </p>
+            {user && (
+              <button 
+                onClick={() => setShowNewPostForm(true)}
+                className="btn-primary"
+              >
+                Create First Post
+              </button>
+            )}
           </div>
-        ))}
+        )}
       </div>
 
       {/* Load More */}
-      <div className="text-center">
-        <button className="btn-primary">
-          Load More Posts
-        </button>
-      </div>
+      {filteredPosts.length > 0 && (
+        <div className="text-center">
+          <button className="btn-primary">
+            Load More Posts
+          </button>
+        </div>
+      )}
     </div>
   )
 }
