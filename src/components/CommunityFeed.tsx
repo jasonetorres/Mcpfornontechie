@@ -135,11 +135,11 @@ export default function CommunityFeed() {
 
   const getPostTypeColor = (type: string) => {
     switch (type) {
-      case 'success_story': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-      case 'question': return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-      case 'showcase': return 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-      case 'tip': return 'bg-green-500/20 text-green-400 border-green-500/30'
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+      case 'success_story': return 'badge-warning'
+      case 'question': return 'badge-primary'
+      case 'showcase': return 'badge-success'
+      case 'tip': return 'badge-success'
+      default: return 'badge-secondary'
     }
   }
 
@@ -162,11 +162,12 @@ export default function CommunityFeed() {
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
               filter === tab.id
                 ? 'bg-matrix-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                : 'glass text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
             <tab.icon className="w-4 h-4" />
-            <span>{tab.name}</span>
+            <span className="hidden sm:inline">{tab.name}</span>
+            <span className="sm:hidden">{tab.id === 'all' ? 'All' : tab.icon}</span>
           </button>
         ))}
       </div>
@@ -174,7 +175,7 @@ export default function CommunityFeed() {
       {/* Posts */}
       <div className="space-y-6">
         {filteredPosts.map((post) => (
-          <div key={post.id} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6 hover:bg-card transition-all duration-300">
+          <div key={post.id} className="glass rounded-xl p-6 hover:bg-card/70 transition-all duration-300">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -182,7 +183,7 @@ export default function CommunityFeed() {
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="font-semibold text-foreground">{post.author.name}</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPostTypeColor(post.type)}`}>
+                    <span className={`${getPostTypeColor(post.type)}`}>
                       {post.author.level}
                     </span>
                   </div>
@@ -206,13 +207,13 @@ export default function CommunityFeed() {
 
             {/* Project Showcase */}
             {post.project && (
-              <div className="bg-muted/50 border border-border rounded-lg p-4 mb-4">
+              <div className="glass bg-muted/20 rounded-lg p-4 mb-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <Star className="w-4 h-4 text-matrix-primary" />
                   <span className="font-semibold text-foreground">{post.project.title}</span>
                 </div>
                 <p className="text-muted-foreground text-sm mb-2">{post.project.description}</p>
-                <div className="bg-matrix-primary/20 border border-matrix-primary/30 rounded-lg p-2">
+                <div className="badge-primary p-2">
                   <span className="text-matrix-primary text-sm font-medium">{post.project.metrics}</span>
                 </div>
               </div>
@@ -266,7 +267,7 @@ export default function CommunityFeed() {
 
       {/* Load More */}
       <div className="text-center">
-        <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:from-matrix-accent hover:to-matrix-primary transition-all duration-200">
+        <button className="btn-primary">
           Load More Posts
         </button>
       </div>

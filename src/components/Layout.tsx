@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard, Loader2, Code } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard, Loader2, Code, Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../hooks/useSubscription';
 import UserMenu from './UserMenu';
@@ -118,7 +118,7 @@ function Layout({ children }: LayoutProps) {
       )}
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/20 backdrop-blur-md border-b border-border">
+      <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
         <div className="container-responsive">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -131,7 +131,7 @@ function Layout({ children }: LayoutProps) {
             </Link>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
+            <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
@@ -157,14 +157,14 @@ function Layout({ children }: LayoutProps) {
                 <CreditCard className="w-4 h-4" />
                 <span>Pricing</span>
               </Link>
-            </div>
+            </nav>
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-2 sm:space-x-3">
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg bg-muted hover:bg-accent transition-colors duration-200"
+                className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors duration-200"
                 aria-label="Toggle theme"
               >
                 {isDarkMode ? (
@@ -173,6 +173,14 @@ function Layout({ children }: LayoutProps) {
                   <Moon className="w-4 h-4 text-muted-foreground" />
                 )}
               </button>
+
+              {/* Notifications - Only show when logged in */}
+              {user && (
+                <button className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors duration-200 relative">
+                  <Bell className="w-4 h-4 text-muted-foreground" />
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-matrix-primary rounded-full"></span>
+                </button>
+              )}
 
               {/* User Section */}
               {user ? (
@@ -326,7 +334,7 @@ function Layout({ children }: LayoutProps) {
             </div>
           </div>
         )}
-      </nav>
+      </header>
 
       {/* Main Content */}
       <main className="pt-16">
