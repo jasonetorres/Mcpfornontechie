@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, MessageSquare, Calendar, Trophy, Star, ArrowRight, ExternalLink, Heart, Zap, BookOpen, Search, Filter, X, Send, Edit, Trash2, MoreHorizontal, ChevronDown, Tag } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
