@@ -135,26 +135,26 @@ export default function PersonalizedDashboard() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'border-red-200 bg-red-50'
-      case 'medium': return 'border-yellow-200 bg-yellow-50'
-      case 'low': return 'border-green-200 bg-green-50'
-      default: return 'border-gray-200 bg-gray-50'
+      case 'high': return 'border-red-500/30 bg-red-500/10'
+      case 'medium': return 'border-yellow-500/30 bg-yellow-500/10'
+      case 'low': return 'border-green-500/30 bg-green-500/10'
+      default: return 'border-border bg-muted/50'
     }
   }
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'course': return <BookOpen className="w-5 h-5 text-blue-500" />
-      case 'template': return <Zap className="w-5 h-5 text-purple-500" />
-      case 'community': return <Users className="w-5 h-5 text-green-500" />
-      case 'practice': return <Target className="w-5 h-5 text-orange-500" />
-      default: return <BookOpen className="w-5 h-5 text-gray-500" />
+      case 'course': return <BookOpen className="w-5 h-5 text-blue-400" />
+      case 'template': return <Zap className="w-5 h-5 text-purple-400" />
+      case 'community': return <Users className="w-5 h-5 text-green-400" />
+      case 'practice': return <Target className="w-5 h-5 text-orange-400" />
+      default: return <BookOpen className="w-5 h-5 text-gray-400" />
     }
   }
 
   if (!user) {
     return (
-      <div className="bg-white p-8 rounded-lg shadow-sm border border-border text-center">
+      <div className="glass p-8 text-center">
         <div className="text-muted-foreground mb-4">Sign in to access your personalized dashboard</div>
         <button className="btn-primary">
           Sign In
@@ -166,45 +166,45 @@ export default function PersonalizedDashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="bg-blue-50 border-blue-100 rounded-xl p-6">
+      <div className="glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 border-matrix-primary/30 rounded-xl p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
+            <h2 className="heading-md mb-2">
               Welcome back, {profile?.full_name || 'there'}! 👋
             </h2>
-            <p className="text-blue-500">
+            <p className="text-matrix-secondary">
               You're on a {userStats.currentStreak} day learning streak! Keep it up!
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-blue-500">{userStats.progressToNext}%</div>
-            <div className="text-blue-600 text-sm">to {userStats.nextMilestone}</div>
+            <div className="text-3xl font-bold text-matrix-primary">{userStats.progressToNext}%</div>
+            <div className="text-matrix-secondary text-sm">to {userStats.nextMilestone}</div>
           </div>
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-border text-center">
-          <Clock className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+        <div className="glass p-4 text-center">
+          <Clock className="w-6 h-6 text-blue-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">{userStats.totalTime}</div>
           <div className="text-muted-foreground text-sm">Time Spent</div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-border text-center">
-          <BookOpen className="w-6 h-6 text-green-500 mx-auto mb-2" />
+        <div className="glass p-4 text-center">
+          <BookOpen className="w-6 h-6 text-green-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">{userStats.completedModules}</div>
           <div className="text-muted-foreground text-sm">Modules Done</div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-border text-center">
-          <Zap className="w-6 h-6 text-orange-500 mx-auto mb-2" />
+        <div className="glass p-4 text-center">
+          <Zap className="w-6 h-6 text-orange-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">{userStats.currentStreak}</div>
           <div className="text-muted-foreground text-sm">Day Streak</div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-border text-center">
-          <Trophy className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
+        <div className="glass p-4 text-center">
+          <Trophy className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
           <div className="text-xl font-bold text-foreground">12</div>
           <div className="text-muted-foreground text-sm">Achievements</div>
         </div>
@@ -214,8 +214,8 @@ export default function PersonalizedDashboard() {
         {/* Personalized Recommendations */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-foreground">Recommended for You</h3>
-            <div className="flex items-center space-x-1 text-blue-500">
+            <h3 className="heading-sm">Recommended for You</h3>
+            <div className="flex items-center space-x-1 text-matrix-primary">
               <TrendingUp className="w-4 h-4" />
               <span className="text-sm">AI-powered</span>
             </div>
@@ -223,7 +223,7 @@ export default function PersonalizedDashboard() {
           
           <div className="space-y-4">
             {recommendations.map((rec) => (
-              <div key={rec.id} className={`bg-white border rounded-xl p-4 shadow-sm ${getPriorityColor(rec.priority)}`}>
+              <div key={rec.id} className={`glass border rounded-xl p-4 ${getPriorityColor(rec.priority)}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start space-x-3">
                     {getTypeIcon(rec.type)}
@@ -235,16 +235,16 @@ export default function PersonalizedDashboard() {
                   <div className="text-right">
                     <div className="text-xs text-muted-foreground">{rec.estimatedTime}</div>
                     <div className={`text-xs font-medium ${
-                      rec.priority === 'high' ? 'text-red-500' :
-                      rec.priority === 'medium' ? 'text-yellow-500' :
-                      'text-green-500'
+                      rec.priority === 'high' ? 'text-red-400' :
+                      rec.priority === 'medium' ? 'text-yellow-400' :
+                      'text-green-400'
                     }`}>
                       {rec.priority} priority
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-white p-3 rounded-lg border border-gray-100 mb-3">
+                <div className="glass p-3 mb-3">
                   <div className="text-xs text-muted-foreground mb-1">Why this is recommended:</div>
                   <div className="text-sm text-foreground">{rec.reason}</div>
                 </div>
@@ -270,11 +270,11 @@ export default function PersonalizedDashboard() {
           />
 
           {/* Recent Activity */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-border">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
+          <div className="glass p-6">
+            <h3 className="heading-sm mb-4">Recent Activity</h3>
             <div className="space-y-3">
               {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div key={activity.id} className="flex items-start space-x-3 p-3 glass rounded-lg">
                   <div className="text-xl">{activity.icon}</div>
                   <div className="flex-1">
                     <div className="font-medium text-foreground text-sm">{activity.title}</div>
@@ -287,21 +287,21 @@ export default function PersonalizedDashboard() {
           </div>
 
           {/* Upcoming Events */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-border">
+          <div className="glass p-6">
             <div className="flex items-center space-x-2 mb-4">
-              <Calendar className="w-5 h-5 text-blue-500" />
-              <h3 className="text-lg font-semibold text-foreground">Upcoming</h3>
+              <Calendar className="w-5 h-5 text-matrix-primary" />
+              <h3 className="heading-sm">Upcoming</h3>
             </div>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 text-blue-500 rounded-lg bg-blue-50 border border-blue-100">
-                <Bell className="w-4 h-4 text-blue-500" />
+              <div className="flex items-center space-x-3 p-3 text-matrix-primary rounded-lg">
+                <Bell className="w-4 h-4 text-matrix-primary" />
                 <div>
                   <div className="font-medium text-foreground text-sm">Office Hours</div>
-                  <div className="text-blue-600 text-xs">Tomorrow at 2:00 PM</div>
+                  <div className="text-matrix-primary text-xs">Tomorrow at 2:00 PM</div>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                <Users className="w-4 h-4 text-blue-500" />
+              <div className="flex items-center space-x-3 p-3 glass rounded-lg">
+                <Users className="w-4 h-4 text-blue-400" />
                 <div>
                   <div className="font-medium text-foreground text-sm">Community Showcase</div>
                   <div className="text-muted-foreground text-xs">Friday at 3:00 PM</div>

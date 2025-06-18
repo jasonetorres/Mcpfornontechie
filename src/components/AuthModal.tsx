@@ -188,8 +188,8 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           {/* Processing State */}
           {step === 'processing' && (
             <div className="text-center py-8 animate-fade-in">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+              <div className="w-16 h-16 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                <Loader2 className="w-8 h-8 text-primary-foreground animate-spin" />
               </div>
               <h3 className="heading-sm mb-2">
                 {mode === 'signup' ? 'Creating Your Account' : 'Signing You In'}
@@ -200,8 +200,8 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
                   : 'Verifying your credentials and loading your dashboard...'
                 }
               </p>
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <p className="text-blue-500 text-sm">
+              <div className="badge-primary p-3">
+                <p className="text-matrix-primary text-sm">
                   {success || (mode === 'signup' ? 'This may take a few moments...' : 'Almost there...')}
                 </p>
               </div>
@@ -211,14 +211,14 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           {/* Success State */}
           {step === 'success' && (
             <div className="text-center py-8 animate-fade-in">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-500" />
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-white" />
               </div>
               <h3 className="heading-sm mb-2">
                 {mode === 'signup' ? 'Account Created!' : 'Welcome Back!'}
               </h3>
-              <div className="bg-green-50 p-3 rounded-lg">
-                <p className="text-green-600 text-sm">{success}</p>
+              <div className="badge-success p-3">
+                <p className="text-green-400 text-sm">{success}</p>
               </div>
             </div>
           )}
@@ -228,17 +228,17 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
             <>
               {/* Error Display */}
               {error && (
-                <div className="bg-red-50 p-3 mb-4 rounded-lg flex items-start space-x-2">
-                  <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-red-600 text-sm">{error}</p>
+                <div className="badge-error p-3 mb-4 flex items-start space-x-2">
+                  <AlertCircle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+                  <p className="text-destructive text-sm">{error}</p>
                 </div>
               )}
 
               {/* Success Display */}
               {success && (
-                <div className="bg-blue-50 p-3 mb-4 rounded-lg flex items-start space-x-2">
-                  <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-blue-600 text-sm">{success}</p>
+                <div className="badge-primary p-3 mb-4 flex items-start space-x-2">
+                  <CheckCircle className="w-4 h-4 text-matrix-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-matrix-primary text-sm">{success}</p>
                 </div>
               )}
 
@@ -371,7 +371,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
                   <button
                     onClick={switchMode}
                     disabled={loading}
-                    className="text-blue-500 hover:text-blue-600 ml-1 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-matrix-primary hover:text-matrix-secondary ml-1 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {mode === 'signin' ? 'Sign up' : 'Sign in'}
                   </button>

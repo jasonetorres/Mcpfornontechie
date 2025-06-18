@@ -32,17 +32,17 @@ export default function ProgressTracker({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-blue-500 text-white'
+      case 'completed': return 'bg-green-500 text-white'
       case 'current': return 'bg-blue-500 text-white animate-pulse'
-      case 'available': return 'bg-gray-200 text-gray-700'
-      case 'locked': return 'bg-gray-100 text-gray-400'
-      default: return 'bg-gray-200 text-gray-700'
+      case 'available': return 'bg-gray-600 text-gray-300'
+      case 'locked': return 'bg-gray-800 text-gray-500'
+      default: return 'bg-gray-600 text-gray-300'
     }
   }
 
   if (!user && !showDetailed) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-sm text-center border border-border">
+      <div className="glass p-6 text-center">
         <div className="text-muted-foreground mb-4">Sign in to track your progress</div>
         <button className="btn-primary">
           Sign In
@@ -52,18 +52,18 @@ export default function ProgressTracker({
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-border">
+    <div className="glass p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-foreground">Your Progress</h3>
+        <h3 className="heading-sm">Your Progress</h3>
         {user && (
           <div className="flex flex-col sm:flex-row items-end sm:items-center sm:space-x-4">
             <div className="flex items-center space-x-1">
-              <Zap className="w-4 h-4 text-orange-500" />
-              <span className="text-orange-500 text-sm">{streak} day streak</span>
+              <Zap className="w-4 h-4 text-orange-400" />
+              <span className="text-orange-300 text-sm">{streak} day streak</span>
             </div>
             <div className="flex items-center space-x-1">
-              <Clock className="w-4 h-4 text-blue-500" />
-              <span className="text-blue-500 text-sm">{timeSpent}</span>
+              <Clock className="w-4 h-4 text-blue-400" />
+              <span className="text-blue-300 text-sm">{timeSpent}</span>
             </div>
           </div>
         )}
@@ -73,11 +73,11 @@ export default function ProgressTracker({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-foreground font-medium">Overall Progress</span>
-          <span className="text-blue-500">{Math.round(progressPercentage)}%</span>
+          <span className="text-matrix-primary">{Math.round(progressPercentage)}%</span>
         </div>
-        <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
+        <div className="progress-bar">
           <div 
-            className="bg-blue-500 h-full transition-all duration-500 ease-out"
+            className="progress-fill"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
@@ -111,13 +111,13 @@ export default function ProgressTracker({
       {user && completedModules.length > 0 && (
         <div className="mt-6 pt-6 border-t border-border">
           <div className="flex items-center space-x-2 mb-3">
-            <Trophy className="w-5 h-5 text-yellow-500" />
+            <Trophy className="w-5 h-5 text-yellow-400" />
             <span className="text-foreground font-medium">Recent Achievement</span>
           </div>
-          <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+          <div className="badge-warning p-3">
             <div className="flex items-center space-x-2">
-              <Star className="w-4 h-4 text-yellow-500" />
-              <span className="text-yellow-700 text-sm">
+              <Star className="w-4 h-4 text-yellow-400" />
+              <span className="text-yellow-300 text-sm">
                 {completedModules.length === 1 ? 'First Steps' : 
                  completedModules.length === 3 ? 'Getting Momentum' :
                  completedModules.length === 5 ? 'Halfway Hero' :
