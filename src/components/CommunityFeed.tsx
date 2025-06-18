@@ -203,7 +203,7 @@ export default function CommunityFeed() {
           >
             <tab.icon className="w-4 h-4" />
             <span className="hidden sm:inline">{tab.name}</span>
-            <span className="sm:hidden">{tab.id === 'all' ? 'All' : tab.icon}</span>
+            <span className="sm:hidden">{tab.id === 'all' ? 'All' : <tab.icon className="w-4 h-4" />}</span>
           </button>
         ))}
       </div>
