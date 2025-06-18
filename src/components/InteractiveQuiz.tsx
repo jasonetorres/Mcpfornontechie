@@ -79,18 +79,18 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
     const passed = percentage >= 70
 
     return (
-      <div className="glass p-6 sm:p-8 text-center animate-fade-in">
+      <div className="bg-white p-6 sm:p-8 text-center animate-fade-in rounded-lg shadow-sm border border-border">
         <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${
-          passed ? 'bg-green-500' : 'bg-orange-500'
+          passed ? 'bg-green-100' : 'bg-orange-100'
         }`}>
           {passed ? (
-            <CheckCircle className="w-8 h-8 text-white" />
+            <CheckCircle className="w-8 h-8 text-green-500" />
           ) : (
-            <RotateCcw className="w-8 h-8 text-white" />
+            <RotateCcw className="w-8 h-8 text-orange-500" />
           )}
         </div>
         
-        <h3 className="heading-md mb-2">
+        <h3 className="text-xl font-bold text-foreground mb-2">
           {passed ? 'Congratulations!' : 'Keep Learning!'}
         </h3>
         
@@ -98,7 +98,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
           You scored {score} out of {questions.length} ({percentage}%)
         </p>
 
-        <div className="glass-strong p-4 mb-6">
+        <div className="bg-gray-50 p-4 mb-6 rounded-lg border border-gray-100">
           <div className="text-foreground font-medium mb-2">Your Results:</div>
           <div className="space-y-2">
             {questions.map((q, index) => (
@@ -106,9 +106,9 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
                 <span className="text-muted-foreground">Question {index + 1}</span>
                 <div className="flex items-center space-x-1">
                   {answers[index] === q.correctAnswer ? (
-                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    <CheckCircle className="w-4 h-4 text-green-500" />
                   ) : (
-                    <X className="w-4 h-4 text-red-400" />
+                    <X className="w-4 h-4 text-red-500" />
                   )}
                 </div>
               </div>
@@ -134,18 +134,18 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
   }
 
   return (
-    <div className="glass p-6 sm:p-8">
+    <div className="bg-white p-6 sm:p-8 rounded-lg shadow-sm border border-border">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="heading-sm">{title}</h3>
+        <h3 className="text-xl font-semibold text-foreground">{title}</h3>
         <div className="text-muted-foreground text-sm">
           {currentQuestion + 1} of {questions.length}
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="progress-bar mb-8">
+      <div className="bg-gray-100 rounded-full h-2 mb-8 overflow-hidden">
         <div 
-          className="progress-fill"
+          className="bg-blue-500 h-full transition-all duration-300"
           style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
         ></div>
       </div>
@@ -163,13 +163,13 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
               className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
                 showResult
                   ? index === currentQ.correctAnswer
-                    ? 'bg-green-500/20 border-green-500 text-green-300'
+                    ? 'bg-green-50 border-green-200 text-green-700'
                     : index === selectedAnswer && index !== currentQ.correctAnswer
-                    ? 'bg-red-500/20 border-red-500 text-red-300'
-                    : 'bg-muted/50 border-border text-muted-foreground'
+                    ? 'bg-red-50 border-red-200 text-red-700'
+                    : 'bg-gray-50 border-gray-200 text-muted-foreground'
                   : selectedAnswer === index
-                  ? 'bg-matrix-primary/20 border-matrix-primary text-matrix-primary'
-                  : 'bg-muted/50 border-border text-foreground hover:bg-muted hover:border-matrix-primary/50'
+                  ? 'bg-blue-50 border-blue-200 text-blue-700'
+                  : 'bg-white border-border text-foreground hover:bg-gray-50 hover:border-blue-200'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -194,7 +194,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
         <div className="mb-6">
           <button
             onClick={() => setShowHint(!showHint)}
-            className="flex items-center space-x-2 text-matrix-primary hover:text-matrix-secondary transition-colors duration-200"
+            className="flex items-center space-x-2 text-blue-500 hover:text-blue-600 transition-colors duration-200"
           >
             <Lightbulb className="w-4 h-4" />
             <span className="text-sm">Need a hint?</span>
@@ -202,7 +202,7 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
           </button>
           
           {showHint && (
-            <div className="mt-3 text-matrix-primary text-sm p-3 animate-fade-in">
+            <div className="mt-3 text-blue-600 text-sm p-3 bg-blue-50 rounded-lg border border-blue-100 animate-fade-in">
               <p>{currentQ.hint}</p>
             </div>
           )}
@@ -213,20 +213,20 @@ export default function InteractiveQuiz({ questions, title, onComplete }: Intera
       {showResult && (
         <div className={`mb-6 p-4 rounded-lg border animate-fade-in ${
           isCorrect 
-            ? 'bg-green-500/20 border-green-500/30' 
-            : 'bg-red-500/20 border-red-500/30'
+            ? 'bg-green-50 border-green-200' 
+            : 'bg-red-50 border-red-200'
         }`}>
           <div className="flex items-center space-x-2 mb-2">
             {isCorrect ? (
-              <CheckCircle className="w-5 h-5 text-green-400" />
+              <CheckCircle className="w-5 h-5 text-green-500" />
             ) : (
-              <X className="w-5 h-5 text-red-400" />
+              <X className="w-5 h-5 text-red-500" />
             )}
-            <span className={`font-medium ${isCorrect ? 'text-green-300' : 'text-red-300'}`}>
+            <span className={`font-medium ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
               {isCorrect ? 'Correct!' : 'Not quite right'}
             </span>
           </div>
-          <p className={`text-sm ${isCorrect ? 'text-green-200' : 'text-red-200'}`}>
+          <p className={`text-sm ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
             {currentQ?.explanation}
           </p>
         </div>

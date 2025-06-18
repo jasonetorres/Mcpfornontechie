@@ -170,28 +170,28 @@ export default function SmartSearch() {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'course': return <BookOpen className="w-4 h-4 text-blue-400" />
-      case 'template': return <Zap className="w-4 h-4 text-purple-400" />
-      case 'guide': return <BookOpen className="w-4 h-4 text-green-400" />
-      case 'community': return <Users className="w-4 h-4 text-orange-400" />
-      case 'video': return <Clock className="w-4 h-4 text-red-400" />
-      default: return <Search className="w-4 h-4 text-gray-400" />
+      case 'course': return <BookOpen className="w-4 h-4 text-blue-500" />
+      case 'template': return <Zap className="w-4 h-4 text-purple-500" />
+      case 'guide': return <BookOpen className="w-4 h-4 text-green-500" />
+      case 'community': return <Users className="w-4 h-4 text-orange-500" />
+      case 'video': return <Clock className="w-4 h-4 text-red-500" />
+      default: return <Search className="w-4 h-4 text-gray-500" />
     }
   }
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'course': return 'badge-primary bg-blue-500/20 text-blue-400 border-blue-500/30'
-      case 'template': return 'badge-primary bg-purple-500/20 text-purple-400 border-purple-500/30'
-      case 'guide': return 'badge-primary bg-green-500/20 text-green-400 border-green-500/30'
-      case 'community': return 'badge-primary bg-orange-500/20 text-orange-400 border-orange-500/30'
-      case 'video': return 'badge-primary bg-red-500/20 text-red-400 border-red-500/30'
-      default: return 'badge-secondary'
+      case 'course': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'template': return 'bg-purple-100 text-purple-800 border-purple-200'
+      case 'guide': return 'bg-green-100 text-green-800 border-green-200'
+      case 'community': return 'bg-orange-100 text-orange-800 border-orange-200'
+      case 'video': return 'bg-red-100 text-red-800 border-red-200'
+      default: return 'bg-gray-100 text-gray-800 border-gray-200'
     }
   }
 
   return (
-    <div className="glass rounded-xl overflow-hidden" ref={searchRef}>
+    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-border" ref={searchRef}>
       {/* Search Header */}
       <div className="p-4 sm:p-6 border-b border-border">
         <div className="flex flex-col sm:flex-row gap-3">
@@ -218,8 +218,8 @@ export default function SmartSearch() {
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center space-x-2 px-4 py-3 rounded-lg border transition-all duration-200 ${
               showFilters || selectedTypes.length > 0 || selectedTags.length > 0
-                ? 'bg-matrix-primary/20 border-matrix-primary text-matrix-primary'
-                : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                ? 'bg-blue-50 border-blue-200 text-blue-500'
+                : 'bg-white border-border text-muted-foreground hover:text-foreground'
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -241,7 +241,7 @@ export default function SmartSearch() {
                 <button
                   key={index}
                   onClick={() => handleSearch(search)}
-                  className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
+                  className="px-3 py-1 bg-gray-100 text-muted-foreground rounded-full text-sm hover:bg-gray-200 hover:text-foreground transition-colors duration-200"
                 >
                   {search}
                 </button>
@@ -252,14 +252,14 @@ export default function SmartSearch() {
 
         {/* Filters */}
         {showFilters && (
-          <div className="mt-4 p-4 glass rounded-lg animate-fade-in">
+          <div className="mt-4 p-4 bg-white rounded-lg animate-fade-in border border-gray-100">
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-foreground font-medium">Content Type</span>
                 {(selectedTypes.length > 0 || selectedTags.length > 0) && (
                   <button
                     onClick={clearFilters}
-                    className="text-matrix-primary hover:text-matrix-secondary text-sm"
+                    className="text-blue-500 hover:text-blue-600 text-sm"
                   >
                     Clear all
                   </button>
@@ -274,7 +274,7 @@ export default function SmartSearch() {
                     className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
                       selectedTypes.includes(type)
                         ? getTypeColor(type)
-                        : 'bg-muted border-border text-muted-foreground hover:bg-accent'
+                        : 'bg-white border-border text-muted-foreground hover:bg-gray-50'
                     }`}
                   >
                     {getTypeIcon(type)}
@@ -301,8 +301,8 @@ export default function SmartSearch() {
                       onClick={() => toggleTagFilter(tag)}
                       className={`flex items-center space-x-1 px-2 py-1 rounded-lg text-xs transition-all duration-200 ${
                         selectedTags.includes(tag)
-                          ? 'bg-matrix-primary/20 text-matrix-primary border border-matrix-primary/30'
-                          : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                          ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                          : 'bg-gray-100 text-muted-foreground hover:bg-gray-200 hover:text-foreground'
                       }`}
                     >
                       <Tag className="w-3 h-3" />
@@ -326,15 +326,15 @@ export default function SmartSearch() {
         ) : results.length > 0 ? (
           <div className="p-4 space-y-3">
             {results.map((result) => (
-              <div key={result.id} className="p-4 glass hover:bg-muted/50 rounded-lg transition-colors duration-200 cursor-pointer group">
+              <div key={result.id} className="p-4 bg-white hover:bg-gray-50 rounded-lg transition-colors duration-200 cursor-pointer group border border-border">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
                       {getTypeIcon(result.type)}
-                      <h3 className="font-semibold text-foreground group-hover:text-matrix-primary transition-colors duration-200">
+                      <h3 className="font-semibold text-foreground group-hover:text-blue-500 transition-colors duration-200">
                         {result.title}
                       </h3>
-                      <span className={`${getTypeColor(result.type)}`}>
+                      <span className={`badge ${getTypeColor(result.type)}`}>
                         {result.type}
                       </span>
                     </div>
@@ -360,14 +360,14 @@ export default function SmartSearch() {
                     
                     <div className="flex flex-wrap gap-1 mt-2">
                       {result.tags.map((tag, index) => (
-                        <span key={index} className="px-2 py-1 bg-background text-muted-foreground rounded text-xs">
+                        <span key={index} className="px-2 py-1 bg-gray-100 text-muted-foreground rounded text-xs">
                           #{tag}
                         </span>
                       ))}
                     </div>
                   </div>
                   
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-matrix-primary transition-colors duration-200 ml-4 flex-shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-blue-500 transition-colors duration-200 ml-4 flex-shrink-0" />
                 </div>
               </div>
             ))}

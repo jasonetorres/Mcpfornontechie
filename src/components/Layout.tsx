@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Book, Play, Zap, Users, Usb, LogIn, CheckCircle, Sun, Moon, CreditCard, Loader2, Code, Bell } from 'lucide-react';
+import { Menu, X, Book, Play, Zap, Users, Code, LogIn, CheckCircle, Sun, Moon, CreditCard, Loader2, Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubscription } from '../hooks/useSubscription';
 import UserMenu from './UserMenu';
@@ -16,7 +16,7 @@ function Layout({ children }: LayoutProps) {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const location = useLocation();
   const { user, profile, loading: authLoading } = useAuth();
   const { getSubscriptionPlan, isActive } = useSubscription();
@@ -88,16 +88,16 @@ function Layout({ children }: LayoutProps) {
   const hasActiveSub = user ? isActive() : false;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+    <div className="min-h-screen bg-background">
       {/* Success Notification */}
       {showNotification && (
         <div className="notification-success animate-slide-in-right">
           <div className="flex items-center space-x-3">
-            <CheckCircle className="w-5 h-5 text-matrix-secondary flex-shrink-0" />
-            <p className="text-matrix-primary font-medium">{notificationMessage}</p>
+            <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
+            <p className="text-foreground font-medium">{notificationMessage}</p>
             <button
               onClick={() => setShowNotification(false)}
-              className="text-matrix-primary/80 hover:text-matrix-primary transition-colors duration-200 ml-auto"
+              className="text-muted-foreground hover:text-foreground transition-colors duration-200 ml-auto"
             >
               <X className="w-4 h-4" />
             </button>
@@ -108,9 +108,9 @@ function Layout({ children }: LayoutProps) {
       {/* Loading Overlay for Auth */}
       {authLoading && (
         <div className="fixed top-20 right-4 z-50">
-          <div className="glass p-4 shadow-lg">
+          <div className="bg-white p-4 shadow-lg rounded-lg">
             <div className="flex items-center space-x-3">
-              <Loader2 className="w-5 h-5 text-matrix-primary animate-spin flex-shrink-0" />
+              <Loader2 className="w-5 h-5 text-blue-500 animate-spin flex-shrink-0" />
               <p className="text-foreground font-medium">Loading your account...</p>
             </div>
           </div>
@@ -118,13 +118,13 @@ function Layout({ children }: LayoutProps) {
       )}
 
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border">
         <div className="container-responsive">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
-                <Usb className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                <Code className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-foreground ml-2">MCP4 Everyone</span>
             </Link>
@@ -137,7 +137,7 @@ function Layout({ children }: LayoutProps) {
                   to={item.href}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors duration-200 ${
                     isCurrentPathActive(item.href)
-                      ? 'text-matrix-primary bg-matrix-primary/10'
+                      ? 'text-blue-500 bg-blue-50'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
                 >
@@ -149,7 +149,7 @@ function Layout({ children }: LayoutProps) {
                 to="/pricing"
                 className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors duration-200 ${
                   isCurrentPathActive('/pricing')
-                    ? 'text-matrix-primary bg-matrix-primary/10'
+                    ? 'text-blue-500 bg-blue-50'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`}
               >
@@ -177,7 +177,7 @@ function Layout({ children }: LayoutProps) {
               {user && (
                 <button className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors duration-200 relative">
                   <Bell className="w-4 h-4 text-muted-foreground" />
-                  <span className="absolute top-0 right-0 w-2 h-2 bg-matrix-primary rounded-full"></span>
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>
                 </button>
               )}
 
@@ -185,7 +185,7 @@ function Layout({ children }: LayoutProps) {
               {user ? (
                 <div className="flex items-center space-x-3">
                   {/* Plan Status - Desktop Only */}
-                  <div className="hidden lg:flex items-center space-x-2 text-matrix-primary text-sm">
+                  <div className="hidden lg:flex items-center space-x-2 text-blue-500 text-sm">
                     <div className="status-online"></div>
                     <span>
                       {currentPlan && hasActiveSub ? `${currentPlan}` : 'Free'}
@@ -231,12 +231,12 @@ function Layout({ children }: LayoutProps) {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden glass border-t border-border">
+          <div className="md:hidden bg-white border-t border-border">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {/* Mobile User Status */}
               <div className="px-3 py-2 border-b border-border mb-2">
                 {user ? (
-                  <div className="flex items-center space-x-2 text-matrix-primary">
+                  <div className="flex items-center space-x-2 text-blue-500">
                     <div className="status-online"></div>
                     <span className="text-sm">
                       {profile?.full_name || user.email} 
@@ -258,7 +258,7 @@ function Layout({ children }: LayoutProps) {
                   to={item.href}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors duration-200 ${
                     isCurrentPathActive(item.href)
-                      ? 'text-matrix-primary bg-matrix-primary/10'
+                      ? 'text-blue-500 bg-blue-50'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
@@ -272,7 +272,7 @@ function Layout({ children }: LayoutProps) {
                 to="/pricing"
                 className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors duration-200 ${
                   isCurrentPathActive('/pricing')
-                    ? 'text-matrix-primary bg-matrix-primary/10'
+                    ? 'text-blue-500 bg-blue-50'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
@@ -341,12 +341,12 @@ function Layout({ children }: LayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border bg-white">
         <div className="container-responsive">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <Link to="/" className="flex items-center mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center">
-                <Usb className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                <Code className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-foreground ml-2">MCP4 Everyone</span>
             </Link>

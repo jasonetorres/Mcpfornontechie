@@ -81,28 +81,28 @@ export default function MCPSandbox() {
   }
 
   return (
-    <div className={`glass rounded-xl overflow-hidden transition-all duration-300 ${
+    <div className={`bg-white rounded-xl overflow-hidden transition-all duration-300 shadow-sm border border-border ${
       isExpanded ? 'fixed inset-4 z-50 max-h-[calc(100vh-2rem)]' : 'relative'
     }`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border-b border-border p-4 sm:p-6">
+      <div className="bg-blue-50 border-b border-border p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Code className="w-5 h-5 sm:w-6 sm:h-6 text-matrix-primary" />
-            <h3 className="heading-sm">MCP4 Everyone Sandbox</h3>
+            <Code className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />
+            <h3 className="text-lg sm:text-xl font-semibold text-foreground">MCP4 Everyone Sandbox</h3>
           </div>
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
-                connectionStatus === 'connected' ? 'status-online' :
-                connectionStatus === 'connecting' ? 'status-warning' :
-                'status-offline'
+                connectionStatus === 'connected' ? 'bg-green-500' :
+                connectionStatus === 'connecting' ? 'bg-yellow-500' :
+                'bg-gray-300'
               }`}></div>
               <span className="text-xs sm:text-sm text-muted-foreground capitalize">{connectionStatus}</span>
             </div>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 hover:bg-muted rounded-lg transition-colors duration-200"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
               aria-label={isExpanded ? 'Minimize sandbox' : 'Expand sandbox'}
             >
               {isExpanded ? (
@@ -123,16 +123,16 @@ export default function MCPSandbox() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="form-label">Data Source</label>
-            <div className="flex items-center space-x-2 bg-muted/50 rounded-lg p-3">
-              <Database className="w-4 h-4 text-matrix-primary flex-shrink-0" />
+            <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <Database className="w-4 h-4 text-blue-500 flex-shrink-0" />
               <span className="text-foreground text-sm sm:text-base truncate">{currentConfig.dataSource}</span>
             </div>
           </div>
           
           <div>
             <label className="form-label">AI Model</label>
-            <div className="flex items-center space-x-2 bg-muted/50 rounded-lg p-3">
-              <MessageSquare className="w-4 h-4 text-matrix-secondary flex-shrink-0" />
+            <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <MessageSquare className="w-4 h-4 text-blue-500 flex-shrink-0" />
               <span className="text-foreground text-sm sm:text-base truncate">{currentConfig.aiModel}</span>
             </div>
           </div>
@@ -200,12 +200,12 @@ export default function MCPSandbox() {
 
         {/* Output */}
         {showOutput && (
-          <div className="glass rounded-lg overflow-hidden mb-6">
-            <div className="bg-muted border-b border-border px-4 py-3 flex items-center justify-between">
+          <div className="bg-white rounded-lg overflow-hidden mb-6 border border-border shadow-sm">
+            <div className="bg-gray-50 border-b border-border px-4 py-3 flex items-center justify-between">
               <span className="text-foreground font-medium">AI Response</span>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                <span className="text-green-400 text-sm">Success</span>
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                <span className="text-green-600 text-sm">Success</span>
               </div>
             </div>
             <div className="p-4">
@@ -217,12 +217,12 @@ export default function MCPSandbox() {
         )}
 
         {/* Tips */}
-        <div className="bg-matrix-primary/10 border-matrix-primary/20 rounded-lg p-4">
+        <div className="bg-blue-50 border-blue-100 rounded-lg p-4">
           <div className="flex items-start space-x-2">
-            <AlertCircle className="w-5 h-5 text-matrix-primary mt-0.5 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
             <div>
-              <div className="text-matrix-primary font-medium mb-1">Sandbox Tips:</div>
-              <ul className="text-matrix-secondary text-sm space-y-1">
+              <div className="text-blue-700 font-medium mb-1">Sandbox Tips:</div>
+              <ul className="space-y-1 text-sm text-blue-600">
                 <li>• Try different query styles to see how AI responds</li>
                 <li>• Experiment with specific vs. general questions</li>
                 <li>• Notice how the AI uses your data to provide context</li>

@@ -161,21 +161,21 @@ export default function CommunityFeed() {
 
   const getPostIcon = (type: string) => {
     switch (type) {
-      case 'success_story': return <Trophy className="w-5 h-5 text-yellow-400" />
-      case 'question': return <MessageSquare className="w-5 h-5 text-blue-400" />
-      case 'showcase': return <Star className="w-5 h-5 text-purple-400" />
-      case 'tip': return <Zap className="w-5 h-5 text-green-400" />
-      default: return <Users className="w-5 h-5 text-gray-400" />
+      case 'success_story': return <Trophy className="w-5 h-5 text-yellow-500" />
+      case 'question': return <MessageSquare className="w-5 h-5 text-blue-500" />
+      case 'showcase': return <Star className="w-5 h-5 text-purple-500" />
+      case 'tip': return <Zap className="w-5 h-5 text-green-500" />
+      default: return <Users className="w-5 h-5 text-gray-500" />
     }
   }
 
   const getPostTypeColor = (type: string) => {
     switch (type) {
-      case 'success_story': return 'badge-warning'
-      case 'question': return 'badge-primary'
-      case 'showcase': return 'badge-success'
-      case 'tip': return 'badge-success'
-      default: return 'badge-secondary'
+      case 'success_story': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'question': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'showcase': return 'bg-purple-100 text-purple-800 border-purple-200'
+      case 'tip': return 'bg-green-100 text-green-800 border-green-200'
+      default: return 'bg-gray-100 text-gray-800 border-gray-200'
     }
   }
 
@@ -197,8 +197,8 @@ export default function CommunityFeed() {
             onClick={() => setFilter(tab.id)}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
               filter === tab.id
-                ? 'bg-matrix-primary text-primary-foreground'
-                : 'glass text-muted-foreground hover:text-foreground hover:bg-muted'
+                ? 'bg-blue-500 text-white'
+                : 'bg-white text-muted-foreground hover:text-foreground hover:bg-gray-50 border border-border'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -214,18 +214,18 @@ export default function CommunityFeed() {
           {!showNewPostForm ? (
             <button 
               onClick={() => setShowNewPostForm(true)}
-              className="glass w-full p-4 rounded-xl text-left text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 flex items-center space-x-3"
+              className="bg-white w-full p-4 rounded-xl text-left text-muted-foreground hover:text-foreground hover:bg-gray-50 transition-all duration-200 flex items-center space-x-3 border border-border shadow-sm"
             >
-              <div className="w-10 h-10 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center">
-                <Users className="w-5 h-5 text-primary-foreground" />
+              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
               </div>
               <span>Share something with the community...</span>
             </button>
           ) : (
-            <div className="glass p-4 rounded-xl animate-fade-in">
+            <div className="bg-white p-4 rounded-xl animate-fade-in border border-border shadow-sm">
               <div className="flex items-center space-x-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center">
-                  <Users className="w-5 h-5 text-primary-foreground" />
+                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
                 <div className="text-sm font-medium text-foreground">
                   {user.email?.split('@')[0] || 'You'}
@@ -272,7 +272,7 @@ export default function CommunityFeed() {
       <div className="space-y-6">
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post) => (
-            <div key={post.id} className="glass rounded-xl p-6 hover:bg-card/70 transition-all duration-300">
+            <div key={post.id} className="bg-white rounded-xl p-6 hover:shadow-md transition-all duration-300 border border-border">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
@@ -280,7 +280,7 @@ export default function CommunityFeed() {
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className="font-semibold text-foreground">{post.author.name}</span>
-                      <span className={`${getPostTypeColor(post.type)}`}>
+                      <span className={`badge ${getPostTypeColor(post.type)}`}>
                         {post.author.level}
                       </span>
                     </div>
@@ -304,13 +304,13 @@ export default function CommunityFeed() {
 
               {/* Project Showcase */}
               {post.project && (
-                <div className="glass bg-muted/20 rounded-lg p-4 mb-4">
+                <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-100">
                   <div className="flex items-center space-x-2 mb-2">
-                    <Star className="w-4 h-4 text-matrix-primary" />
+                    <Star className="w-4 h-4 text-blue-500" />
                     <span className="font-semibold text-foreground">{post.project.title}</span>
                   </div>
                   <p className="text-muted-foreground text-sm mb-2">{post.project.description}</p>
-                  <div className="text-matrix-primary text-sm font-medium">
+                  <div className="text-blue-500 text-sm font-medium">
                     <p>{post.project.metrics}</p>
                   </div>
                 </div>
@@ -331,19 +331,19 @@ export default function CommunityFeed() {
                   <button
                     onClick={() => handleLike(post.id)}
                     className={`flex items-center space-x-2 transition-colors duration-200 ${
-                      post.isLiked ? 'text-red-400' : 'text-muted-foreground hover:text-red-400'
+                      post.isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
                     }`}
                   >
                     <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
                     <span className="text-sm">{post.likes}</span>
                   </button>
                   
-                  <button className="flex items-center space-x-2 text-muted-foreground hover:text-blue-400 transition-colors duration-200">
+                  <button className="flex items-center space-x-2 text-muted-foreground hover:text-blue-500 transition-colors duration-200">
                     <MessageSquare className="w-5 h-5" />
                     <span className="text-sm">{post.comments}</span>
                   </button>
                   
-                  <button className="flex items-center space-x-2 text-muted-foreground hover:text-green-400 transition-colors duration-200">
+                  <button className="flex items-center space-x-2 text-muted-foreground hover:text-green-500 transition-colors duration-200">
                     <Share2 className="w-5 h-5" />
                     <span className="text-sm">Share</span>
                   </button>
@@ -352,7 +352,7 @@ export default function CommunityFeed() {
                 <button
                   onClick={() => handleBookmark(post.id)}
                   className={`transition-colors duration-200 ${
-                    post.isBookmarked ? 'text-matrix-primary' : 'text-muted-foreground hover:text-matrix-primary'
+                    post.isBookmarked ? 'text-blue-500' : 'text-muted-foreground hover:text-blue-500'
                   }`}
                 >
                   <Bookmark className={`w-5 h-5 ${post.isBookmarked ? 'fill-current' : ''}`} />
@@ -361,9 +361,9 @@ export default function CommunityFeed() {
             </div>
           ))
         ) : (
-          <div className="glass p-8 text-center">
+          <div className="bg-white p-8 text-center rounded-lg border border-border shadow-sm">
             <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="heading-sm mb-2">No posts found</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No posts found</h3>
             <p className="text-muted-foreground mb-4">
               {filter !== 'all' 
                 ? `No ${filter.replace('_', ' ')} posts found. Try a different filter.`

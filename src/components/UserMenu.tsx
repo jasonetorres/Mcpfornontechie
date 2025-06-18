@@ -43,15 +43,15 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 text-foreground hover:text-matrix-primary transition-colors duration-200 bg-muted/50 hover:bg-muted rounded-lg px-3 py-2 border border-border"
+        className="flex items-center space-x-2 text-foreground hover:text-blue-500 transition-colors duration-200 bg-muted/50 hover:bg-muted rounded-lg px-3 py-2 border border-border"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <div className="w-8 h-8 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center overflow-hidden">
+        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center overflow-hidden">
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
           ) : (
-            <User className="w-4 h-4 text-primary-foreground" />
+            <User className="w-4 h-4 text-white" />
           )}
         </div>
         <div className="hidden md:block text-left">
@@ -66,15 +66,15 @@ export default function UserMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-64 sm:w-80 glass-strong rounded-xl shadow-lg z-20 animate-scale-in origin-top-right">
+        <div className="absolute right-0 top-full mt-2 w-64 sm:w-80 bg-white rounded-lg shadow-lg z-20 animate-scale-in origin-top-right border border-border">
           {/* User Info Header */}
-          <div className="p-4 border-b border-border bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10">
+          <div className="p-4 border-b border-border bg-blue-50">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
                 ) : (
-                  <User className="w-6 h-6 text-primary-foreground" />
+                  <User className="w-6 h-6 text-white" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -83,7 +83,7 @@ export default function UserMenu() {
                 </div>
                 <div className="text-muted-foreground text-sm truncate">{profile.email}</div>
                 {profile.role && (
-                  <div className="text-matrix-primary text-xs truncate">{profile.role}</div>
+                  <div className="text-blue-500 text-xs truncate">{profile.role}</div>
                 )}
                 {profile.company && (
                   <div className="text-muted-foreground text-xs truncate">{profile.company}</div>
@@ -190,14 +190,14 @@ export default function UserMenu() {
             <button
               onClick={handleSignOut}
               disabled={isSigningOut}
-              className="flex items-center space-x-3 px-3 py-3 text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-lg transition-colors duration-200 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center space-x-3 px-3 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <LogOut className="w-5 h-5" />
               <div>
                 <div className="font-medium">
                   {isSigningOut ? 'Signing Out...' : 'Sign Out'}
                 </div>
-                <div className="text-xs text-destructive/80">
+                <div className="text-xs text-red-400">
                   {isSigningOut ? 'Please wait...' : 'End your current session'}
                 </div>
               </div>
