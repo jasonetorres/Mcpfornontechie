@@ -25,6 +25,12 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
     company: ''
   })
 
+  // Reset form when mode changes
+  React.useEffect(() => {
+    setMode(defaultMode)
+    resetForm()
+  }, [defaultMode])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -34,8 +40,39 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
     setSuccess(null)
   }
 
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      setError('Email and password are required')
+      return false
+    }
+
+    if (mode === 'signup') {
+      if (!formData.fullName) {
+        setError('Full name is required')
+        return false
+      }
+      
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match')
+        return false
+      }
+
+      if (formData.password.length < 6) {
+        setError('Password must be at least 6 characters')
+        return false
+      }
+    }
+
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!validateForm()) {
+      return
+    }
+
     setLoading(true)
     setError(null)
     setSuccess(null)
@@ -43,20 +80,6 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
 
     try {
       if (mode === 'signup') {
-        if (formData.password !== formData.confirmPassword) {
-          setError('Passwords do not match')
-          setStep('form')
-          setLoading(false)
-          return
-        }
-
-        if (formData.password.length < 6) {
-          setError('Password must be at least 6 characters')
-          setStep('form')
-          setLoading(false)
-          return
-        }
-
         // Show processing message
         setSuccess('Creating your account...')
         
@@ -141,6 +164,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           onClick={handleClose}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors duration-200"
           disabled={loading}
+          aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>

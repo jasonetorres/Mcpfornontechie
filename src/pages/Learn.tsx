@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
+import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
 
 function Learn() {
   const [activeTab, setActiveTab] = useState('basics');
@@ -276,93 +276,38 @@ all tasks assigned to me this week and summarize them."`
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">Learn MCP (No Code Required)</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold text-foreground mb-4">Learn MCP (No Code Required)</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Master the concepts that will transform how you work with AI - the "USB-C for AI"
           </p>
         </div>
 
-        {/* Featured Course */}
-        <div className="mb-16">
-          <div className="bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8">
-            <div className="flex items-center space-x-3 mb-4">
-              <GraduationCap className="w-8 h-8 text-matrix-primary" />
-              <span className="text-matrix-primary font-semibold">Featured Course</span>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  MCP Basics: Complete In-Depth Course
-                </h2>
-                <p className="text-matrix-secondary mb-6">
-                  Everything you need to understand and implement MCP, explained in simple terms for non-technical people. Build your first working MCP connection step-by-step.
-                </p>
-                <div className="flex items-center space-x-6 mb-6">
-                  <div className="flex items-center space-x-2">
-                    <BookOpen className="w-4 h-4 text-matrix-primary" />
-                    <span className="text-matrix-secondary">8 comprehensive modules</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Play className="w-4 h-4 text-green-400" />
-                    <span className="text-green-300">2.5 hours total</span>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => handleNavigation('/mcp-basics')}
-                  className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
-                >
-                  <GraduationCap className="w-5 h-5" />
-                  <span>Start Complete Course</span>
-                </button>
-              </div>
-              <div className="bg-muted/50 rounded-lg p-6">
-                <h3 className="text-white font-semibold mb-4">What You'll Learn:</h3>
-                <div className="space-y-3">
-                  {[
-                    'What MCP is using simple analogies (USB-C for AI)',
-                    'How to choose the right no-code platform',
-                    'Build your first working MCP connection step-by-step',
-                    'Security and privacy best practices',
-                    'Real-world use cases and examples',
-                    'Advanced concepts and next steps'
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-start space-x-2">
-                      <div className="w-1.5 h-1.5 bg-matrix-primary rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-gray-300">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* What is MCP Section */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8">What is MCP?</h2>
-          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8">
+          <h2 className="text-2xl font-bold text-foreground mb-8">What is MCP?</h2>
+          <div className="bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-semibold text-white mb-4">The Problem</h3>
-                <p className="text-blue-200 mb-4">
+                <h3 className="text-xl font-semibold text-foreground mb-4">The Problem</h3>
+                <p className="text-muted-foreground mb-4">
                   AI is powerful but doesn't know about YOUR data. Without context, AI can only give generic answers. 
                   There wasn't a standard way to connect AI agents to your systems like Google Drive, Asana, or Slack.
                 </p>
-                <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
-                  <p className="text-red-200 text-sm">
+                <div className="bg-destructive/20 border border-destructive/30 rounded-lg p-4">
+                  <p className="text-destructive text-sm">
                     <strong>Before MCP:</strong> Each AI integration required custom development from scratch. Super tedious!
                   </p>
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-white mb-4">The Solution</h3>
-                <p className="text-green-200 mb-4">
+                <h3 className="text-xl font-semibold text-foreground mb-4">The Solution</h3>
+                <p className="text-muted-foreground mb-4">
                   MCP (Model Context Protocol) is an open standard created by Anthropic. Think of MCP as the 
                   <strong> USB-C of AI integrations</strong> - a universal connector that lets AI agents access 
                   your external systems without coding.
                 </p>
-                <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
-                  <p className="text-green-200 text-sm">
+                <div className="bg-matrix-primary/20 border border-matrix-primary/30 rounded-lg p-4">
+                  <p className="text-matrix-primary text-sm">
                     <strong>With MCP:</strong> You don't need to be a developer to start using them! 
                     Connect AI to any tool with standardized MCP servers.
                   </p>
@@ -374,18 +319,18 @@ all tasks assigned to me this week and summarize them."`
 
         {/* Popular MCP Servers */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8">Popular MCP Servers You Should Try</h2>
-          <p className="text-gray-300 mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-8">Popular MCP Servers You Should Try</h2>
+          <p className="text-muted-foreground mb-8">
             With over 3,000 MCP servers available, here are the most popular ones to get you started:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mcpServers.map((server, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6 hover:bg-card transition-all duration-300">
                 <div className="text-4xl mb-4">{server.icon}</div>
-                <h3 className="text-lg font-semibold text-white mb-2">{server.name}</h3>
-                <p className="text-gray-300 mb-3 text-sm">{server.description}</p>
-                <div className="bg-blue-500/20 rounded-lg p-3 mb-4">
-                  <p className="text-blue-200 text-sm">
+                <h3 className="text-lg font-semibold text-foreground mb-2">{server.name}</h3>
+                <p className="text-muted-foreground mb-3 text-sm">{server.description}</p>
+                <div className="bg-matrix-primary/20 rounded-lg p-3 mb-4">
+                  <p className="text-matrix-primary text-sm">
                     <strong>Use Case:</strong> {server.useCase}
                   </p>
                 </div>
@@ -393,7 +338,7 @@ all tasks assigned to me this week and summarize them."`
                   href={server.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center space-x-1 text-sm"
+                  className="text-matrix-primary hover:text-matrix-secondary transition-colors duration-200 flex items-center space-x-1 text-sm"
                 >
                   <span>View on GitHub</span>
                   <ExternalLink className="w-3 h-3" />
@@ -404,7 +349,7 @@ all tasks assigned to me this week and summarize them."`
           <div className="mt-8 text-center">
             <button
               onClick={() => handleNavigation('/templates')}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
+              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
             >
               <span>Browse Templates</span>
               <ArrowRight className="w-4 h-4" />
@@ -414,18 +359,18 @@ all tasks assigned to me this week and summarize them."`
 
         {/* Core Concepts */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8">Core Concepts</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-8">Core Concepts</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {concepts.map((concept, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <concept.icon className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center flex-shrink-0">
+                    <concept.icon className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{concept.title}</h3>
-                    <p className="text-blue-300 mb-3">{concept.description}</p>
-                    <p className="text-gray-300 text-sm">{concept.details}</p>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{concept.title}</h3>
+                    <p className="text-matrix-primary mb-3">{concept.description}</p>
+                    <p className="text-muted-foreground text-sm">{concept.details}</p>
                   </div>
                 </div>
               </div>
@@ -435,12 +380,12 @@ all tasks assigned to me this week and summarize them."`
 
         {/* Learning Paths */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8">Choose Your Learning Path</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-8">Choose Your Learning Path</h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {learningPaths.map((path, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-white">{path.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground">{path.title}</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     path.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' :
                     path.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
@@ -450,14 +395,14 @@ all tasks assigned to me this week and summarize them."`
                   </span>
                 </div>
                 
-                <p className="text-gray-300 mb-3">{path.description}</p>
-                <p className="text-blue-300 text-sm mb-4">Duration: {path.duration}</p>
+                <p className="text-muted-foreground mb-3">{path.description}</p>
+                <p className="text-matrix-primary text-sm mb-4">Duration: {path.duration}</p>
                 
                 <div className="space-y-2 mb-4">
                   {path.steps.map((step, stepIndex) => (
                     <div key={stepIndex} className="flex items-start space-x-2">
-                      <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-gray-300 text-sm">{step}</span>
+                      <div className="w-1.5 h-1.5 bg-matrix-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-muted-foreground text-sm">{step}</span>
                     </div>
                   ))}
                 </div>
@@ -472,7 +417,7 @@ all tasks assigned to me this week and summarize them."`
                 
                 <Link
                   to={path.route}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 block text-center"
+                  className="w-full bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-4 py-2 rounded-lg font-semibold transition-all duration-200 block text-center"
                 >
                   Start This Path
                 </Link>
@@ -484,8 +429,8 @@ all tasks assigned to me this week and summarize them."`
         {/* Interactive Learning */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Tutorial Navigation */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
-            <h3 className="text-2xl font-bold text-white mb-6">Interactive Concepts</h3>
+          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
+            <h3 className="text-2xl font-bold text-foreground mb-6">Interactive Concepts</h3>
             <div className="space-y-3">
               {[
                 { id: 'basics', title: 'MCP Basics', description: 'What is MCP and why it matters', icon: Lightbulb },
@@ -499,8 +444,8 @@ all tasks assigned to me this week and summarize them."`
                   onClick={() => setActiveTab(topic.id)}
                   className={`w-full text-left p-4 rounded-lg transition-all duration-200 ${
                     activeTab === topic.id
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                      : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                      ? 'bg-gradient-to-r from-matrix-primary to-matrix-secondary text-primary-foreground'
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -516,12 +461,12 @@ all tasks assigned to me this week and summarize them."`
           </div>
 
           {/* Code Example */}
-          <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <span className="text-white font-medium">Concept Explanation</span>
+          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <span className="text-foreground font-medium">Concept Explanation</span>
               <button
                 onClick={() => copyCode(codeExamples[activeTab as keyof typeof codeExamples], activeTab)}
-                className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors duration-200"
+                className="flex items-center space-x-1 text-muted-foreground hover:text-foreground transition-colors duration-200"
               >
                 {codeCopied === activeTab ? (
                   <Check className="w-4 h-4" />
@@ -531,36 +476,30 @@ all tasks assigned to me this week and summarize them."`
                 <span className="text-sm">Copy</span>
               </button>
             </div>
-            <pre className="p-4 text-sm text-gray-300 overflow-x-auto whitespace-pre-wrap">
+            <pre className="p-4 text-sm text-muted-foreground overflow-x-auto whitespace-pre-wrap">
               <code>{codeExamples[activeTab as keyof typeof codeExamples]}</code>
             </pre>
           </div>
         </div>
 
         {/* Call to Action */}
-        <div className="mt-16 bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-4">Ready to Start Building?</h3>
-          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+        <div className="mt-16 bg-gradient-to-r from-matrix-primary/20 to-matrix-secondary/20 border border-matrix-primary/30 rounded-xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-foreground mb-4">Ready to Start Building?</h3>
+          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
             The possibilities are endless! While some MCP servers are developed by official providers, 
             a vast majority are actually developed by community members. Because MCP is an open standard, 
             anyone can build an MCP server for any resource.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => handleNavigation('/mcp-basics')}
-              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200"
-            >
-              Take Complete Course
-            </button>
             <Link
               to="/demo"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200"
             >
               Try Interactive Demo
             </Link>
             <Link
               to="/templates"
-              className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+              className="border border-border text-foreground px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors duration-200"
             >
               Browse Templates
             </Link>
