@@ -448,608 +448,219 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
     },
     {
       id: 7,
-      title: 'Secure Enterprise MCP Bridge',
-      description: 'Connect AI to enterprise systems with enhanced security and compliance',
-      category: 'operations',
-      platform: 'power-platform',
-      difficulty: 'Advanced',
-      rating: 4.7,
-      downloads: 512,
-      dataSource: 'Multiple Enterprise Systems',
-      aiModel: 'Azure OpenAI',
-      features: [
-        'Role-based access control',
-        'Audit logging',
-        'Data encryption',
-        'Compliance reporting'
-      ],
-      setupTime: '5 hours',
-      preview: `// Enterprise Security Configuration
-{
-  "access_control": {
-    "roles": ["viewer", "editor", "admin"],
-    "permissions": {
-      "viewer": ["read"],
-      "editor": ["read", "write"],
-      "admin": ["read", "write", "delete", "configure"]
-    }
-  },
-  "audit": {
-    "log_retention": "90 days",
-    "events_to_log": ["access", "query", "modification"]
-  }
-}`,
-      tags: ['security', 'enterprise', 'compliance'],
-      files: [
-        {
-          name: 'security-setup.md',
-          content: `# Enterprise Security Setup
-
-## Security Configuration
-1. Set up Azure AD integration
-2. Configure role-based access control
-3. Enable audit logging
-4. Set up data encryption
-5. Configure compliance reporting
-
-## Compliance Features
-- GDPR compliance tools
-- HIPAA security features
-- SOC 2 audit support
-- PCI DSS compliance options`
-        }
-      ]
-    },
-    {
-      id: 8,
-      title: 'Web Data Extraction with AgentQL',
-      description: 'Extract structured data from websites using AgentQL MCP Server',
+      title: 'Twilio Customer Messaging',
+      description: 'Send personalized messages to customers based on their data and behavior',
       category: 'marketing',
       platform: 'zapier',
-      difficulty: 'Intermediate',
-      rating: 4.8,
-      downloads: 378,
-      dataSource: 'Web Pages',
+      difficulty: 'Beginner',
+      rating: 4.7,
+      downloads: 856,
+      dataSource: 'CRM Data',
       aiModel: 'Claude',
       features: [
-        'Structured data extraction',
-        'Automated web scraping',
-        'Custom data fields',
-        'Batch processing'
+        'Personalized SMS campaigns',
+        'Automated follow-ups',
+        'Engagement tracking',
+        'Response analysis'
       ],
       setupTime: '1 hour',
-      preview: `// AgentQL Data Extraction Configuration
+      preview: `// Personalized Messaging Flow
 {
-  "extraction_config": {
-    "url": "https://example.com/products",
-    "data_schema": {
-      "products": [
-        {
-          "name": "string",
-          "price": "number",
-          "description": "string",
-          "rating": "number",
-          "in_stock": "boolean"
-        }
-      ]
-    },
-    "output_format": "json"
+  "trigger": "new_customer_event",
+  "data_source": "customer_database",
+  "message_template": "Hi {{customer.first_name}}, {{ai_generated_message}}",
+  "follow_up": {
+    "delay": "3 days",
+    "condition": "no_response"
   }
 }`,
-      tags: ['web-scraping', 'data-extraction', 'automation'],
+      tags: ['messaging', 'customer-engagement', 'automation'],
       files: [
         {
-          name: 'agentql-setup.md',
-          content: `# AgentQL MCP Server Setup
-
-## Installation
-1. Install the package: \`npm install -g agentql-mcp\`
-2. Get an API key from the AgentQL Dev Portal
-3. Configure in your MCP-compatible application
-
-## Configuration for Claude
-\`\`\`json
-{
-  "mcpServers": {
-    "agentql": {
-      "command": "npx",
-      "args": ["-y", "agentql-mcp"],
-      "env": {
-        "AGENTQL_API_KEY": "YOUR_API_KEY"
-      }
-    }
-  }
-}
-\`\`\`
-
-## Configuration for VS Code
-\`\`\`json
-{
-  "mcp": {
-    "inputs": [
-      {
-        "type": "promptString",
-        "id": "apiKey",
-        "description": "AgentQL API Key",
-        "password": true
-      }
-    ],
-    "servers": {
-      "agentql": {
-        "command": "npx",
-        "args": ["-y", "agentql-mcp"],
-        "env": {
-          "AGENTQL_API_KEY": "\${input:apiKey}"
-        }
-      }
-    }
-  }
-}
-\`\`\`
-
-## Example Extraction Task
-"Extract the list of videos from the page https://www.youtube.com/results?search_query=agentql, every video should have a title, an author name, a number of views and a url to the video. Make sure to exclude ads items. Format this as a markdown table."
-
-## Troubleshooting
-- If your agent complains it can't open URLs, try adding "use tools" or "use agentql tool" hint
-- Ensure your API key has the correct permissions
-- Check that the URL is accessible and not behind authentication`
-        },
-        {
-          name: 'zapier-agentql-integration.json',
+          name: 'customer-message-templates.json',
           content: `{
-  "trigger": {
-    "type": "schedule",
-    "frequency": "daily"
-  },
-  "action": {
-    "type": "code",
-    "language": "javascript",
-    "code": "// This code calls the AgentQL API to extract data from a website\\nconst url = 'https://example.com/products';\\nconst prompt = 'Extract all products with their names, prices, and descriptions';\\n\\nconst response = await fetch('https://api.agentql.com/extract', {\\n  method: 'POST',\\n  headers: {\\n    'Content-Type': 'application/json',\\n    'Authorization': 'Bearer ' + process.env.AGENTQL_API_KEY\\n  },\\n  body: JSON.stringify({ url, prompt })\\n});\\n\\nreturn await response.json();"
-  },
-  "output": {
-    "type": "google_sheets",
-    "spreadsheet": "extracted_products",
-    "worksheet": "daily_update"
-  }
+  "welcome": "Welcome to our service! We're excited to have you join us.",
+  "follow_up": "We noticed you haven't completed your profile yet. Need any help?",
+  "re_engagement": "We miss you! Here's what you've been missing...",
+  "special_offer": "As a valued customer, we have a special offer just for you!"
 }`
         }
       ]
     },
     {
-      id: 9,
-      title: 'Google Keep Notes Manager',
-      description: 'Read, create, update and delete Google Keep notes using AI',
+      id: 8,
+      title: 'GitHub PR Reviewer',
+      description: 'Automatically review and summarize pull requests for faster code reviews',
       category: 'operations',
       platform: 'make',
       difficulty: 'Intermediate',
       rating: 4.6,
-      downloads: 289,
-      dataSource: 'Google Keep',
-      aiModel: 'Claude',
+      downloads: 712,
+      dataSource: 'GitHub Repositories',
+      aiModel: 'GPT-4',
       features: [
-        'Note search and retrieval',
-        'Create new notes',
-        'Update existing notes',
-        'Delete notes',
-        'Automatic labeling'
+        'Code change summaries',
+        'Potential issue detection',
+        'Best practice suggestions',
+        'Documentation checks'
       ],
-      setupTime: '45 minutes',
-      preview: `// Google Keep MCP Configuration
+      setupTime: '2 hours',
+      preview: `// PR Review Configuration
 {
-  "server_config": {
-    "name": "keep-mcp",
-    "credentials": {
-      "google_email": "YOUR_EMAIL",
-      "google_master_token": "YOUR_MASTER_TOKEN"
-    },
-    "safety_features": {
-      "restrict_to_labeled_notes": true,
-      "label": "keep-mcp"
-    }
+  "repo_access": {
+    "owner": "{{repo_owner}}",
+    "repo": "{{repo_name}}",
+    "branch": "{{branch_name}}"
   },
-  "operations": ["find", "create_note", "update_note", "delete_note"]
+  "review_focus": [
+    "code_quality",
+    "security_issues",
+    "performance_concerns",
+    "documentation"
+  ]
 }`,
-      tags: ['notes', 'productivity', 'google-workspace'],
+      tags: ['development', 'code-review', 'github'],
       files: [
         {
-          name: 'keep-mcp-setup.md',
-          content: `# Google Keep MCP Server Setup
+          name: 'review-template.md',
+          content: `# PR Review Summary
 
-## Installation
-1. Install the package using pipx:
-   \`pipx run keep-mcp\`
+## Overview
+{{pr_summary}}
 
-2. Configure your MCP server with your Google credentials:
-   \`\`\`json
-   "mcpServers": {
-     "keep-mcp-pipx": {
-       "command": "pipx",
-       "args": [
-         "run",
-         "keep-mcp"
-       ],
-       "env": {
-         "GOOGLE_EMAIL": "Your Google Email",
-         "GOOGLE_MASTER_TOKEN": "Your Google Master Token"
-       }
-     }
-   }
-   \`\`\`
+## Key Changes
+{{key_changes}}
 
-3. Obtain a Google Master Token:
-   - Check https://gkeepapi.readthedocs.io/en/latest/#obtaining-a-master-token
-   - Alternative method: https://github.com/simon-weber/gpsoauth?tab=readme-ov-file#alternative-flow
+## Potential Issues
+{{potential_issues}}
 
-## Features
-- **find**: Search for notes based on a query string
-- **create_note**: Create a new note with title and text (automatically adds keep-mcp label)
-- **update_note**: Update a note's title and text
-- **delete_note**: Mark a note for deletion
+## Recommendations
+{{recommendations}}
 
-## Safety Features
-By default, all destructive and modification operations are restricted to notes that were created by the MCP server (i.e., have the keep-mcp label). Set UNSAFE_MODE to true to bypass this restriction:
-
-\`\`\`json
-"env": {
-  "GOOGLE_EMAIL": "Your Google Email",
-  "GOOGLE_MASTER_TOKEN": "Your Google Master Token",
-  "UNSAFE_MODE": "true"
-}
-\`\`\`
-
-## Troubleshooting
-If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.google.com/ac/devices/settings/general and turn off "Turn off mobile management (Unmanaged)"`
-        },
-        {
-          name: 'make-integration.json',
-          content: `{
-  "scenario": {
-    "name": "AI Note Manager",
-    "trigger": {
-      "type": "webhook",
-      "method": "POST"
+---
+*This review was generated automatically using GitHub PR Reviewer*`
+        }
+      ]
     },
-    "steps": [
-      {
-        "name": "Parse Request",
-        "module": "text-parser",
-        "operation": "parse-json",
-        "input": "{{trigger.body}}"
-      },
-      {
-        "name": "Process with AI",
-        "module": "ai",
-        "operation": "generate",
-        "input": {
-          "prompt": "Based on the user request, determine what action to take with Google Keep notes.",
-          "model": "claude-3-sonnet"
-        }
-      },
-      {
-        "name": "Execute Keep MCP Command",
-        "module": "http",
-        "operation": "make-request",
-        "input": {
-          "url": "http://localhost:8000/keep-mcp",
-          "method": "POST",
-          "body": {
-            "action": "{{2.action}}",
-            "parameters": "{{2.parameters}}"
-          }
-        }
-      }
-    ]
-  }
+    {
+      id: 9,
+      title: 'AgentQL Web Data Extractor',
+      description: 'Extract structured data from websites for analysis and automation',
+      category: 'operations',
+      platform: 'zapier',
+      difficulty: 'Beginner',
+      rating: 4.5,
+      downloads: 678,
+      dataSource: 'Web Pages',
+      aiModel: 'Claude',
+      features: [
+        'Structured data extraction',
+        'Regular monitoring',
+        'Change detection',
+        'Data transformation'
+      ],
+      setupTime: '30 minutes',
+      preview: `// Web Data Extraction Config
+{
+  "url": "https://example.com/data-page",
+  "extraction_targets": [
+    {
+      "name": "product_prices",
+      "selector": "table.products tr",
+      "fields": ["name", "price", "availability"]
+    }
+  ],
+  "schedule": "daily"
+}`,
+      tags: ['web-scraping', 'data-extraction', 'monitoring'],
+      files: [
+        {
+          name: 'extraction-schema.json',
+          content: `{
+  "schemas": [
+    {
+      "name": "product",
+      "fields": [
+        {"name": "name", "type": "string"},
+        {"name": "price", "type": "number"},
+        {"name": "currency", "type": "string"},
+        {"name": "availability", "type": "boolean"},
+        {"name": "description", "type": "string"},
+        {"name": "image_url", "type": "string"}
+      ]
+    },
+    {
+      "name": "article",
+      "fields": [
+        {"name": "title", "type": "string"},
+        {"name": "author", "type": "string"},
+        {"name": "date", "type": "date"},
+        {"name": "content", "type": "string"},
+        {"name": "categories", "type": "array"}
+      ]
+    }
+  ]
 }`
         }
       ]
     },
     {
       id: 10,
-      title: 'Twilio SMS Automation',
-      description: 'Automate SMS messaging and voice calls with AI-powered responses',
-      category: 'marketing',
-      platform: 'zapier',
-      difficulty: 'Intermediate',
-      rating: 4.7,
-      downloads: 412,
-      dataSource: 'CRM Data',
-      aiModel: 'GPT-4',
-      features: [
-        'Automated SMS campaigns',
-        'AI-generated personalized messages',
-        'Response handling',
-        'Conversation tracking'
-      ],
-      setupTime: '2 hours',
-      preview: `// Twilio MCP Configuration
-{
-  "server_config": {
-    "name": "twilio-mcp",
-    "credentials": {
-      "account_sid": "YOUR_TWILIO_SID",
-      "auth_token": "YOUR_TWILIO_TOKEN"
-    }
-  },
-  "operations": [
-    "send_sms",
-    "make_call",
-    "get_message_history",
-    "handle_response"
-  ]
-}`,
-      tags: ['sms', 'messaging', 'automation', 'customer-engagement'],
-      files: [
-        {
-          name: 'twilio-setup.md',
-          content: `# Twilio MCP Server Setup
-
-## Prerequisites
-- Twilio account with Account SID and Auth Token
-- Zapier account
-- CRM with customer data
-
-## Installation
-1. Configure your MCP server with Twilio credentials:
-   \`\`\`json
-   "mcpServers": {
-     "twilio-mcp": {
-       "command": "npx",
-       "args": [
-         "-y",
-         "twilio-mcp"
-       ],
-       "env": {
-         "TWILIO_ACCOUNT_SID": "YOUR_ACCOUNT_SID",
-         "TWILIO_AUTH_TOKEN": "YOUR_AUTH_TOKEN"
-       }
-     }
-   }
-   \`\`\`
-
-## Features
-- **send_sms**: Send SMS messages to customers
-- **make_call**: Initiate voice calls with AI-generated scripts
-- **get_message_history**: Retrieve conversation history
-- **handle_response**: Process and analyze customer responses
-
-## Example Use Cases
-- Appointment reminders with confirmation requests
-- Order status updates with delivery tracking
-- Customer feedback collection
-- Personalized marketing campaigns
-- Automated support responses`
-        },
-        {
-          name: 'zapier-twilio-integration.json',
-          content: `{
-  "trigger": {
-    "type": "schedule",
-    "frequency": "daily"
-  },
-  "action": {
-    "type": "code",
-    "language": "javascript",
-    "code": "// This code sends personalized messages to customers\\nconst customers = inputData.customers;\\n\\nfor (const customer of customers) {\\n  const message = await generatePersonalizedMessage(customer);\\n  await sendTwilioMessage(customer.phone, message);\\n}\\n\\nasync function generatePersonalizedMessage(customer) {\\n  // Use AI to generate personalized message\\n  const response = await fetch('https://api.openai.com/v1/chat/completions', {\\n    method: 'POST',\\n    headers: {\\n      'Content-Type': 'application/json',\\n      'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY\\n    },\\n    body: JSON.stringify({\\n      model: 'gpt-4',\\n      messages: [\\n        {\\n          role: 'system',\\n          content: 'Generate a personalized SMS message for a customer.'\\n        },\\n        {\\n          role: 'user',\\n          content: \\\`Customer: \\${customer.name}, Last purchase: \\${customer.lastPurchase}, Interests: \\${customer.interests}\\`\\n        }\\n      ]\\n    })\\n  });\\n\\n  const data = await response.json();\\n  return data.choices[0].message.content;\\n}\\n\\nasync function sendTwilioMessage(phone, message) {\\n  // Use Twilio MCP to send message\\n  // Implementation depends on your Twilio MCP setup\\n}"
-  },
-  "output": {
-    "type": "google_sheets",
-    "spreadsheet": "sms_campaign_results",
-    "worksheet": "daily_sends"
-  }
-}`
-        }
-      ]
-    },
-    {
-      id: 11,
-      title: 'GitHub Repository Assistant',
-      description: 'Manage GitHub repositories, issues, and PRs with AI assistance',
-      category: 'project',
+      title: 'Google Keep Note Manager',
+      description: 'Create, update, and organize Google Keep notes with AI assistance',
+      category: 'operations',
       platform: 'make',
-      difficulty: 'Intermediate',
-      rating: 4.5,
-      downloads: 356,
-      dataSource: 'GitHub API',
-      aiModel: 'Claude',
-      features: [
-        'Repository search and analysis',
-        'Issue management',
-        'PR review assistance',
-        'Code search capabilities'
-      ],
-      setupTime: '1.5 hours',
-      preview: `// GitHub MCP Configuration
-{
-  "server_config": {
-    "name": "github-mcp",
-    "credentials": {
-      "github_token": "YOUR_GITHUB_TOKEN"
-    },
-    "repositories": [
-      "owner/repo1",
-      "owner/repo2"
-    ]
-  },
-  "operations": [
-    "search_repositories",
-    "search_code",
-    "manage_issues",
-    "review_prs"
-  ]
-}`,
-      tags: ['github', 'development', 'code-management', 'collaboration'],
-      files: [
-        {
-          name: 'github-mcp-setup.md',
-          content: `# GitHub MCP Server Setup
-
-## Prerequisites
-- GitHub account with personal access token
-- Make.com account
-- Claude or other MCP-compatible AI
-
-## Installation
-1. Configure your MCP server with GitHub credentials:
-   \`\`\`json
-   "mcpServers": {
-     "github-mcp": {
-       "command": "npx",
-       "args": [
-         "-y",
-         "github-mcp"
-       ],
-       "env": {
-         "GITHUB_TOKEN": "YOUR_GITHUB_TOKEN"
-       }
-     }
-   }
-   \`\`\`
-
-## Features
-- **search_repositories**: Find repositories based on criteria
-- **search_code**: Search for code within repositories
-- **manage_issues**: Create, update, and close issues
-- **review_prs**: Get PR details and assist with reviews
-
-## Example Use Cases
-- Automated issue triage and assignment
-- Code search and documentation
-- PR review assistance
-- Repository health monitoring
-- Development workflow automation`
-        },
-        {
-          name: 'make-github-integration.json',
-          content: `{
-  "scenario": {
-    "name": "GitHub Issue Manager",
-    "trigger": {
-      "type": "webhook",
-      "method": "POST"
-    },
-    "steps": [
-      {
-        "name": "Parse Request",
-        "module": "text-parser",
-        "operation": "parse-json",
-        "input": "{{trigger.body}}"
-      },
-      {
-        "name": "Process with AI",
-        "module": "ai",
-        "operation": "generate",
-        "input": {
-          "prompt": "Based on the user request, determine what action to take with GitHub repositories.",
-          "model": "claude-3-sonnet"
-        }
-      },
-      {
-        "name": "Execute GitHub MCP Command",
-        "module": "http",
-        "operation": "make-request",
-        "input": {
-          "url": "http://localhost:8000/github-mcp",
-          "method": "POST",
-          "body": {
-            "action": "{{2.action}}",
-            "parameters": "{{2.parameters}}"
-          }
-        }
-      }
-    ]
-  }
-}`
-        }
-      ]
-    },
-    {
-      id: 12,
-      title: 'JetBrains IDE Assistant',
-      description: 'AI-powered coding assistance integrated with JetBrains IDEs',
-      category: 'project',
-      platform: 'power-platform',
-      difficulty: 'Advanced',
-      rating: 4.8,
-      downloads: 278,
-      dataSource: 'Code Repositories',
+      difficulty: 'Beginner',
+      rating: 4.4,
+      downloads: 542,
+      dataSource: 'Google Keep',
       aiModel: 'GPT-4',
       features: [
-        'Code analysis and suggestions',
-        'Documentation generation',
-        'Bug detection',
-        'Refactoring assistance'
+        'Note creation and organization',
+        'Content summarization',
+        'Task extraction',
+        'Reminder management'
       ],
-      setupTime: '2 hours',
-      preview: `// JetBrains MCP Configuration
+      setupTime: '45 minutes',
+      preview: `// Google Keep Integration
 {
-  "server_config": {
-    "name": "jetbrains-mcp",
-    "ide_integration": {
-      "supported_ides": [
-        "IntelliJ IDEA",
-        "PyCharm",
-        "WebStorm",
-        "Rider"
-      ]
+  "actions": {
+    "create_note": {
+      "title": "{{generated_title}}",
+      "content": "{{note_content}}",
+      "labels": ["{{generated_labels}}"]
+    },
+    "find_notes": {
+      "query": "{{search_term}}",
+      "limit": 10
     }
-  },
-  "operations": [
-    "analyze_code",
-    "generate_documentation",
-    "detect_bugs",
-    "suggest_refactoring"
-  ]
+  }
 }`,
-      tags: ['ide', 'development', 'coding', 'productivity'],
+      tags: ['notes', 'productivity', 'organization'],
       files: [
         {
-          name: 'jetbrains-setup.md',
-          content: `# JetBrains MCP Server Setup
-
-## Prerequisites
-- JetBrains IDE (IntelliJ IDEA, PyCharm, WebStorm, etc.)
-- OpenAI API key or other AI provider
-- Code repositories to analyze
-
-## Installation
-1. Configure your MCP server:
-   \`\`\`json
-   "mcpServers": {
-     "jetbrains-mcp": {
-       "command": "npx",
-       "args": [
-         "-y",
-         "jetbrains-mcp"
-       ],
-       "env": {
-         "OPENAI_API_KEY": "YOUR_API_KEY"
-       }
-     }
-   }
-   \`\`\`
-
-## Features
-- **analyze_code**: Get insights and suggestions for your code
-- **generate_documentation**: Create documentation for code
-- **detect_bugs**: Find potential issues and bugs
-- **suggest_refactoring**: Get recommendations for code improvements
-
-## Example Use Cases
-- Automated code reviews
-- Documentation generation
-- Bug detection and fixing
-- Code optimization
-- Learning new programming patterns`
+          name: 'note-templates.json',
+          content: `{
+  "meeting_notes": {
+    "title": "Meeting: {{meeting_title}} - {{date}}",
+    "content": "# {{meeting_title}}\\n\\n**Date:** {{date}}\\n**Attendees:** {{attendees}}\\n\\n## Agenda\\n{{agenda}}\\n\\n## Discussion\\n{{discussion}}\\n\\n## Action Items\\n{{action_items}}\\n\\n## Next Steps\\n{{next_steps}}"
+  },
+  "project_idea": {
+    "title": "Project Idea: {{project_name}}",
+    "content": "# {{project_name}}\\n\\n**Created:** {{date}}\\n\\n## Overview\\n{{overview}}\\n\\n## Goals\\n{{goals}}\\n\\n## Resources Needed\\n{{resources}}\\n\\n## Timeline\\n{{timeline}}"
+  }
+}`
         }
       ]
     }
   ];
 
   const filteredTemplates = templates.filter(template => {
+    // Apply category and platform filters
     const categoryMatch = selectedCategory === 'all' || template.category === selectedCategory;
     const platformMatch = selectedPlatform === 'all' || template.platform === selectedPlatform;
+    
+    // Apply search filter if query exists
     const searchMatch = searchQuery === '' || 
       template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -1154,385 +765,277 @@ If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.g
           )}
         </div>
 
-        {/* Filters and Search */}
-        <div className="glass rounded-xl p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        {/* Filters - Moved to top and improved */}
+        <div className="glass p-6 rounded-xl mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white flex items-center">
+              <Filter className="w-5 h-5 mr-2 text-matrix-primary" />
+              Find Your Perfect Template
+            </h2>
+            <div className="text-sm text-gray-300">
+              {filteredTemplates.length} templates available
+            </div>
+          </div>
+          
+          {/* Search Bar */}
+          <div className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search templates by name, description, or tags..."
-                className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400"
+                className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400"
               />
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              <div className="flex items-center space-x-2 px-3 py-2 bg-slate-800/70 rounded-lg">
-                <Filter className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-300 text-sm">Filters:</span>
-              </div>
-              
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-slate-800 border border-white/20 rounded-lg px-3 py-2 text-white"
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              
-              <select
-                value={selectedPlatform}
-                onChange={(e) => setSelectedPlatform(e.target.value)}
-                className="bg-slate-800 border border-white/20 rounded-lg px-3 py-2 text-white"
-              >
-                {platforms.map((platform) => (
-                  <option key={platform.id} value={platform.id}>
-                    {platform.name}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
           
-          {/* Popular Tags */}
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center space-x-1 text-gray-400 mr-2">
-              <Tag className="w-3 h-3" />
-              <span className="text-xs">Popular Tags:</span>
+          {/* Filter Sections */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Category Filter */}
+            <div>
+              <label className="block text-white font-medium mb-2">Category</label>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      selectedCategory === category.id
+                        ? 'bg-matrix-primary text-white'
+                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                    }`}
+                  >
+                    <category.icon className="w-4 h-4" />
+                    <span>{category.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            {['community', 'marketing', 'automation', 'security', 'productivity', 'reporting'].map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setSearchQuery(tag)}
-                className={`px-2 py-1 rounded-full text-xs ${
-                  searchQuery === tag
-                    ? 'bg-matrix-primary/20 text-matrix-primary border border-matrix-primary/30'
-                    : 'bg-slate-800/70 text-gray-300 hover:bg-slate-700/70'
-                }`}
-              >
-                #{tag}
-              </button>
-            ))}
+            
+            {/* Platform Filter */}
+            <div>
+              <label className="block text-white font-medium mb-2">Platform</label>
+              <div className="flex flex-wrap gap-2">
+                {platforms.map((platform) => (
+                  <button
+                    key={platform.id}
+                    onClick={() => setSelectedPlatform(platform.id)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      selectedPlatform === platform.id
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                    }`}
+                  >
+                    {platform.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* MCP Servers Section - Compact Grid */}
+        {/* MCP Servers Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-white">Popular MCP Servers</h2>
-            <a 
-              href="https://github.com/topics/mcp-server" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 text-sm flex items-center"
-            >
-              View all on GitHub <ExternalLink className="w-3 h-3 ml-1" />
-            </a>
-          </div>
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center">
+            <Code className="w-5 h-5 mr-2 text-matrix-primary" />
+            Available MCP Servers
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {mcpServers.map((server, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all duration-300">
-                <h3 className="text-sm font-semibold text-white mb-1">{server.name}</h3>
-                <p className="text-gray-400 text-xs mb-2">{server.description}</p>
-                <a
-                  href={server.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 text-xs flex items-center"
-                >
-                  GitHub <ExternalLink className="w-3 h-3 ml-1" />
-                </a>
-              </div>
+              <a
+                key={index}
+                href={server.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all duration-200"
+              >
+                <h3 className="text-sm font-medium text-white mb-1 truncate">{server.name}</h3>
+                <p className="text-gray-400 text-xs truncate">{server.description}</p>
+              </a>
             ))}
           </div>
         </div>
 
         {/* Templates Grid */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-white">Templates ({filteredTemplates.length})</h2>
-            <div className="text-gray-400 text-sm">
-              <Clock className="w-4 h-4 inline mr-1" /> Setup time shown for each template
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTemplates.map((template) => (
-              <div key={template.id} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300 flex flex-col">
-                {/* Header */}
-                <div className="p-4 border-b border-white/10">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-white">{template.title}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
-                      {template.difficulty}
-                    </span>
-                  </div>
-                  
-                  <p className="text-gray-300 text-sm mb-3 line-clamp-2">{template.description}</p>
-                  
-                  {/* Stats */}
-                  <div className="flex items-center space-x-3 text-xs">
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-3 h-3 text-yellow-400" />
-                      <span className="text-yellow-400">{template.rating}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Download className="w-3 h-3 text-green-400" />
-                      <span className="text-green-400">{template.downloads.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-gray-400">
-                      <Clock className="w-3 h-3" />
-                      <span>{template.setupTime}</span>
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTemplates.map((template) => (
+            <div key={template.id} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300">
+              {/* Header */}
+              <div className="p-4 border-b border-white/10">
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="text-lg font-semibold text-white">{template.title}</h3>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
+                    {template.difficulty}
+                  </span>
                 </div>
-
-                {/* Details */}
-                <div className="p-4 flex-1 flex flex-col">
-                  {/* Tech Stack */}
-                  <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
-                    <div>
-                      <span className="text-gray-400">Platform:</span>
-                      <div className="text-blue-300 capitalize">{template.platform.replace('-', ' ')}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">AI Model:</span>
-                      <div className="text-purple-300">{template.aiModel}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Data Source:</span>
-                      <div className="text-green-300">{template.dataSource}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Category:</span>
-                      <div className="text-orange-300 capitalize">{template.category.replace('-', ' ')}</div>
-                    </div>
+                
+                <p className="text-gray-300 mb-3 text-sm">{template.description}</p>
+                
+                {/* Stats */}
+                <div className="flex items-center space-x-3 text-xs">
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-3 h-3 text-yellow-400" />
+                    <span className="text-yellow-400">{template.rating}</span>
                   </div>
-
-                  {/* Features */}
-                  <div className="mb-3 flex-1">
-                    <h4 className="text-white text-xs font-medium mb-2">Key Features:</h4>
-                    <div className="grid grid-cols-1 gap-1">
-                      {template.features.slice(0, 3).map((feature, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                          <span className="text-gray-300 text-xs">{feature}</span>
-                        </div>
-                      ))}
-                      {template.features.length > 3 && (
-                        <div className="text-gray-400 text-xs">+{template.features.length - 3} more features</div>
-                      )}
-                    </div>
+                  <div className="flex items-center space-x-1">
+                    <Download className="w-3 h-3 text-green-400" />
+                    <span className="text-green-400">{template.downloads.toLocaleString()}</span>
                   </div>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {template.tags.slice(0, 3).map((tag, index) => (
-                      <span key={index} className="px-2 py-0.5 bg-gray-700/50 text-gray-300 rounded text-xs">
-                        #{tag}
-                      </span>
-                    ))}
-                    {template.tags.length > 3 && (
-                      <span className="text-gray-400 text-xs">+{template.tags.length - 3} more</span>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => downloadTemplate(template)}
-                      disabled={downloadingTemplate === template.id.toString()}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-1"
-                    >
-                      {downloadingTemplate === template.id.toString() ? (
-                        <>
-                          <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          <span>Downloading...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Download className="w-3 h-3" />
-                          <span>Download</span>
-                        </>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => copyTemplate(template.id.toString(), template.preview)}
-                      className="px-3 py-2 border border-white/20 text-white rounded-lg text-sm font-medium hover:bg-white/10 transition-colors duration-200 flex items-center justify-center space-x-1"
-                    >
-                      {copiedTemplate === template.id.toString() ? (
-                        <>
-                          <Check className="w-3 h-3" />
-                          <span>Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3 h-3" />
-                          <span>Copy Code</span>
-                        </>
-                      )}
-                    </button>
+                  <div className="flex items-center space-x-1">
+                    <Clock className="w-3 h-3 text-blue-400" />
+                    <span className="text-blue-400">{template.setupTime}</span>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* Details */}
+              <div className="p-4">
+                {/* Tech Stack */}
+                <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-gray-400">Platform:</span>
+                    <span className="text-blue-300 capitalize">{template.platform.replace('-', ' ')}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-gray-400">AI Model:</span>
+                    <span className="text-purple-300">{template.aiModel}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-gray-400">Data:</span>
+                    <span className="text-green-300">{template.dataSource}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-gray-400">Category:</span>
+                    <span className="text-orange-300 capitalize">{template.category}</span>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div className="mb-3">
+                  <div className="text-xs text-gray-400 mb-1">Key Features:</div>
+                  <div className="grid grid-cols-2 gap-1">
+                    {template.features.slice(0, 4).map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-1 text-xs">
+                        <div className="w-1 h-1 bg-matrix-primary rounded-full"></div>
+                        <span className="text-gray-300 truncate">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {template.tags.map((tag, index) => (
+                    <span key={index} className="px-1.5 py-0.5 bg-gray-700/50 text-gray-300 rounded text-xs">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Preview Code - Collapsed by default */}
+                <div className="bg-slate-900/50 rounded-lg overflow-hidden mb-3 text-xs">
+                  <div className="flex items-center justify-between p-2 border-b border-white/10">
+                    <span className="text-gray-300 text-xs">Preview</span>
+                    <button
+                      onClick={() => copyTemplate(template.id.toString(), template.preview)}
+                      className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors duration-200"
+                    >
+                      {copiedTemplate === template.id.toString() ? (
+                        <Check className="w-3 h-3" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                      <span className="text-xs">Copy</span>
+                    </button>
+                  </div>
+                  <pre className="p-2 text-xs text-gray-300 overflow-x-auto max-h-20">
+                    <code>{template.preview}</code>
+                  </pre>
+                </div>
+
+                {/* Template Files Info */}
+                {template.files && template.files.length > 0 && (
+                  <div className="mb-3 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs">
+                    <div className="flex items-center space-x-1 mb-1">
+                      <FileDown className="w-3 h-3 text-blue-400" />
+                      <span className="text-blue-300 font-medium">Includes {template.files.length} files</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex space-x-2">
+                  <button 
+                    onClick={() => downloadTemplate(template)}
+                    disabled={downloadingTemplate === template.id.toString()}
+                    className="flex-1 bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground px-3 py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-1 text-sm"
+                  >
+                    {downloadingTemplate === template.id.toString() ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>Downloading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-3 h-3" />
+                        <span>Download</span>
+                      </>
+                    )}
+                  </button>
+                  <Link
+                    to="/demo"
+                    className="px-3 py-1.5 border border-white/20 text-white rounded-lg font-medium hover:bg-white/10 transition-colors duration-200 flex items-center justify-center space-x-1 text-sm"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>Demo</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* No Results */}
         {filteredTemplates.length === 0 && (
           <div className="text-center py-12 glass rounded-xl">
-            <div className="text-gray-400 mb-4">No templates found for the selected filters.</div>
+            <Database className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="heading-sm mb-2">No templates found</h3>
+            <p className="text-muted-foreground mb-4">
+              {searchQuery 
+                ? `No results for "${searchQuery}". Try different search terms or filters.` 
+                : 'No templates match your selected filters.'}
+            </p>
             <button
               onClick={() => {
                 setSelectedCategory('all');
                 setSelectedPlatform('all');
                 setSearchQuery('');
               }}
-              className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
+              className="btn-primary"
             >
-              Clear all filters
+              Clear All Filters
             </button>
           </div>
         )}
 
-        {/* Featured Template Highlights */}
-        <div className="space-y-8 mt-12">
-          {/* Google Keep MCP Server Highlight */}
-          <div className="bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="text-4xl">📝</div>
-              <div>
-                <h3 className="text-xl font-bold text-white">Google Keep MCP Server</h3>
-                <p className="text-green-300">Manage your Google Keep notes with AI-powered assistance</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Key Features</h4>
-                <div className="space-y-2">
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                    <span className="text-gray-300">Search for notes based on query strings</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                    <span className="text-gray-300">Create new notes with title and text content</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                    <span className="text-gray-300">Update existing notes with new content</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                    <span className="text-gray-300">Delete notes when they're no longer needed</span>
-                  </div>
-                </div>
-                
-                <div className="mt-4">
-                  <a 
-                    href="https://github.com/keep-mcp/keep-mcp" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
-                  >
-                    <span>View on GitHub</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-              
-              <div className="bg-slate-900/50 rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-3">Example Commands</h4>
-                <div className="space-y-2">
-                  <div className="bg-slate-800/70 p-2 rounded-lg text-green-200 text-sm">
-                    "Find all my notes about project ideas"
-                  </div>
-                  <div className="bg-slate-800/70 p-2 rounded-lg text-green-200 text-sm">
-                    "Create a new note titled 'Shopping List' with the text 'Milk, Eggs, Bread'"
-                  </div>
-                  <div className="bg-slate-800/70 p-2 rounded-lg text-green-200 text-sm">
-                    "Update my note about meeting agenda with new action items"
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* AgentQL MCP Server Highlight */}
-          <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="text-4xl">🔍</div>
-              <div>
-                <h3 className="text-xl font-bold text-white">AgentQL MCP Server</h3>
-                <p className="text-purple-300">Extract structured data from websites with powerful data extraction</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <h4 className="text-lg font-semibold text-white mb-3">Key Features</h4>
-                <div className="space-y-2">
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
-                    <span className="text-gray-300">Extract structured data from any website</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
-                    <span className="text-gray-300">Define custom data schemas with field-level extraction</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
-                    <span className="text-gray-300">Process multiple pages in batch operations</span>
-                  </div>
-                </div>
-                
-                <div className="mt-4">
-                  <a 
-                    href="https://github.com/agentql/agentql-mcp" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
-                  >
-                    <span>View on GitHub</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-              
-              <div className="bg-slate-900/50 rounded-lg p-4">
-                <h4 className="text-white font-semibold mb-3">Example Extraction Task</h4>
-                <div className="bg-slate-800/70 p-2 rounded-lg text-purple-200 text-sm">
-                  "Extract all products from the page https://example.com/products with their names, prices, and descriptions. Format as a markdown table."
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Call to Action */}
-        <div className="mt-12 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6 text-center">
-          <h3 className="text-xl font-bold text-white mb-3">Need a Custom Template?</h3>
-          <p className="text-gray-300 mb-4 max-w-2xl mx-auto">
+        <div className="mt-16 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-white mb-4">Need a Custom Template?</h3>
+          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
             Don't see exactly what you need? Our community creates new templates regularly, or you can request a custom one.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/request-template"
-              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
             >
               Request Template
             </Link>
             <Link
               to="/submit-template"
-              className="border border-white/20 text-white px-6 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors duration-200"
+              className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
             >
               Submit Your Template
             </Link>
