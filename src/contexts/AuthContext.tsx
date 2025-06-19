@@ -60,16 +60,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         console.log('🔄 Initializing auth...')
         
-        // Get current session from Supabase
-        const { data: sessionData } = await supabase.auth.getSession()
-        
-        if (sessionData?.session && mounted) {
-          console.log('✅ Found existing session:', sessionData.session.user.email)
-          setUser(sessionData.session.user)
-          setSession(sessionData.session)
-          await fetchProfile(sessionData.session.user.id)
+        // Check for existing mock user
+        const mockUser = localStorage.getItem('mock-user')
+        if (mockUser && mounted) {
+          const userData = JSON.parse(mockUser)
+          console.log('✅ Found existing user:', userData.email)
+          
+          // Create a proper session object
+          const mockSession = {
+            access_token: 'mock-token-' + Date.now(),
+            user: userData,
+            expires_at: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+            expires_in: 24 * 60 * 60,
+            refresh_token: 'mock-refresh-' + Date.now(),
+            token_type: 'bearer'
+          } as Session
+
+          setUser(userData)
+          setSession(mockSession)
+          await fetchProfile(userData.id)
         } else {
-          console.log('❌ No active session found')
           setLoading(false)
         }
       } catch (error) {
@@ -111,66 +121,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔍 Fetching profile for user:', userId)
       
-      // For demo purposes, we'll use mock data
-      const mockProfile = {
-        id: userId,
-        email: user?.email || 'user@example.com',
-        full_name: user?.user_metadata?.full_name || 'Demo User',
-        role: user?.user_metadata?.role || 'Community Member',
-        company: user?.user_metadata?.company || 'MCP Academy',
-        avatar_url: user?.user_metadata?.avatar_url || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+      // Check localStorage first
+      const mockProfile = localStorage.getItem('mock-profile')
+      if (mockProfile) {
+        const profileData = JSON.parse(mockProfile)
+        console.log('✅ Found existing profile:', profileData.email)
+        setProfile(profileData)
+        setLoading(false)
+        return
       }
-      
-      // Store in localStorage for persistence
-      localStorage.setItem('mock-profile', JSON.stringify(mockProfile))
-      
-      console.log('✅ Profile fetched successfully:', mockProfile.email)
-      setProfile(mockProfile)
-      setLoading(false)
+
+      // Create a basic profile if none exists
+      const mockUser = localStorage.getItem('mock-user')
+      if (mockUser) {
+        const userData = JSON.parse(mockUser)
+        const basicProfile = {
+          id: userId,
+          email: userData.email,
+          full_name: userData.user_metadata?.full_name || null,
+          role: userData.user_metadata?.role || null,
+          company: userData.user_metadata?.company || null,
+          avatar_url: userData.user_metadata?.avatar_url || null,
+          created_at: userData.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+        console.log('✅ Created new profile:', basicProfile.email)
+        localStorage.setItem('mock-profile', JSON.stringify(basicProfile))
+        setProfile(basicProfile)
+        setLoading(false)
+      } else {
+        setLoading(false)
+      }
     } catch (error) {
       console.error('❌ Error in fetchProfile:', error)
       setProfile(null)
-      setLoading(false)
-    }
-  }
-
-  const createProfile = async (userId: string) => {
-    try {
-      // Get user data from auth
-      const { data: userData } = await supabase.auth.getUser()
-      
-      if (!userData?.user) {
-        throw new Error('No user data available')
-      }
-      
-      const user = userData.user
-      const now = new Date().toISOString()
-      
-      // Create basic profile
-      const newProfile = {
-        id: userId,
-        email: user.email!,
-        full_name: user.user_metadata?.full_name || 'Demo User',
-        role: user.user_metadata?.role || 'Community Member',
-        company: user.user_metadata?.company || 'MCP Academy',
-        avatar_url: user.user_metadata?.avatar_url || null,
-        created_at: now,
-        updated_at: now
-      }
-      
-      // For demo purposes, store in localStorage
-      localStorage.setItem('mock-profile', JSON.stringify(newProfile))
-      
-      console.log('✅ Profile created successfully')
-      setProfile(newProfile)
-      
-      // Initialize user data
-      initializeUserData(userId)
-      setLoading(false)
-    } catch (error) {
-      console.error('❌ Error in createProfile:', error)
       setLoading(false)
     }
   }
@@ -183,9 +167,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Simulate network delay for realistic experience
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Create a mock user
+      // Create a mock user with a persistent ID
+      const userId = `user-${Date.now()}`
       const mockUser = {
-        id: `user-${Date.now()}`,
+        id: userId,
         email,
         user_metadata: {
           full_name: userData?.full_name,
@@ -198,23 +183,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Store in localStorage
       localStorage.setItem('mock-user', JSON.stringify(mockUser))
       
-      // Update state
-      setUser(mockUser as User)
-      
-      // Create profile
-      const mockProfile = {
-        id: mockUser.id,
-        email,
+      // Create profile with current timestamp
+      const now = new Date().toISOString()
+      const profileData = {
+        id: userId,
+        email: email,
         full_name: userData?.full_name || null,
         role: userData?.role || null,
         company: userData?.company || null,
         avatar_url: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       }
       
-      localStorage.setItem('mock-profile', JSON.stringify(mockProfile))
-      setProfile(mockProfile)
+      // Store profile in localStorage
+      localStorage.setItem('mock-profile', JSON.stringify(profileData))
+      
+      // Update state
+      setUser(mockUser as User)
+      setProfile(profileData)
       
       // Create session
       const mockSession = {
@@ -228,7 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(mockSession)
       
       // Initialize user data
-      initializeUserData(mockUser.id)
+      initializeUserData(userId)
       
       addNotification({
         id: `success-${Date.now()}`,
@@ -236,7 +223,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         type: 'success'
       })
       
-      setLoading(false)
       return { error: null }
     } catch (error: any) {
       console.error('❌ Error in signUp:', error)
@@ -245,8 +231,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         message: error.message || 'An error occurred during sign up',
         type: 'error'
       })
-      setLoading(false)
       return { error }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -258,9 +245,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Simulate network delay for realistic experience
       await new Promise(resolve => setTimeout(resolve, 800))
       
+      // For demo purposes, create a persistent user ID
+      const userId = `user-${Date.now()}`
+      
       // Create a mock user
       const mockUser = {
-        id: `user-${Date.now()}`,
+        id: userId,
         email,
         user_metadata: {
           full_name: 'Demo User',
@@ -273,12 +263,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Store in localStorage
       localStorage.setItem('mock-user', JSON.stringify(mockUser))
       
-      // Update state
-      setUser(mockUser as User)
-      
       // Create profile
       const mockProfile = {
-        id: mockUser.id,
+        id: userId,
         email,
         full_name: 'Demo User',
         role: 'Community Member',
@@ -289,6 +276,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       localStorage.setItem('mock-profile', JSON.stringify(mockProfile))
+      
+      // Update state
+      setUser(mockUser as User)
       setProfile(mockProfile)
       
       // Create session
@@ -303,7 +293,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(mockSession)
       
       // Initialize user data
-      initializeUserData(mockUser.id)
+      initializeUserData(userId)
       
       addNotification({
         id: `success-${Date.now()}`,
@@ -311,7 +301,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         type: 'success'
       })
       
-      setLoading(false)
       return { error: null }
     } catch (error: any) {
       console.error('❌ Error in signIn:', error)
@@ -320,8 +309,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         message: error.message || 'An error occurred during sign in',
         type: 'error'
       })
-      setLoading(false)
       return { error }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -335,23 +325,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
       setSession(null)
       
-      // Clear localStorage
-      localStorage.removeItem('mock-user')
-      localStorage.removeItem('mock-profile')
+      // Then sign out from Supabase (which clears localStorage)
+      const { error } = await supabase.auth.signOut()
       
-      console.log('✅ User signed out successfully')
-      addNotification({
-        id: `success-${Date.now()}`,
-        message: 'You have been signed out successfully',
-        type: 'success'
-      })
-    } catch (error: any) {
+      if (error) {
+        console.error('❌ Error signing out:', error)
+      } else {
+        console.log('✅ User signed out successfully')
+      }
+    } catch (error) {
       console.error('❌ Error in signOut:', error)
-      addNotification({
-        id: `error-${Date.now()}`,
-        message: error.message || 'An error occurred during sign out',
-        type: 'error'
-      })
     } finally {
       setLoading(false)
     }
@@ -361,32 +344,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return { error: new Error('No user logged in') }
 
     try {
-      setLoading(true)
-      
-      // Get existing profile
-      const existingProfile = JSON.parse(localStorage.getItem('mock-profile') || '{}')
-      
-      // Update profile
-      const updatedProfile = {
-        ...existingProfile,
-        ...updates,
-        updated_at: new Date().toISOString()
-      }
-      
-      // Save to localStorage
-      localStorage.setItem('mock-profile', JSON.stringify(updatedProfile))
-      
-      // Update state
-      setProfile(updatedProfile)
+      const existing = JSON.parse(localStorage.getItem('mock-profile') || '{}')
+      const updated = { ...existing, ...updates, updated_at: new Date().toISOString() }
+      localStorage.setItem('mock-profile', JSON.stringify(updated))
+      setProfile(updated)
       
       // Also update the user metadata if avatar_url is being updated
       if (updates.avatar_url !== undefined) {
-        const mockUser = JSON.parse(localStorage.getItem('mock-user') || '{}')
-        mockUser.user_metadata = {
-          ...mockUser.user_metadata,
-          avatar_url: updates.avatar_url
+        const mockUser = localStorage.getItem('mock-user')
+        if (mockUser) {
+          const userData = JSON.parse(mockUser)
+          userData.user_metadata = { ...userData.user_metadata, avatar_url: updates.avatar_url }
+          localStorage.setItem('mock-user', JSON.stringify(userData))
         }
-        localStorage.setItem('mock-user', JSON.stringify(mockUser))
       }
       
       addNotification({
@@ -395,16 +365,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         type: 'success'
       })
       
-      setLoading(false)
       return { error: null }
-    } catch (error: any) {
+    } catch (error) {
       console.error('❌ Error in updateProfile:', error)
-      addNotification({
-        id: `error-${Date.now()}`,
-        message: error.message || 'An error occurred while updating profile',
-        type: 'error'
-      })
-      setLoading(false)
       return { error }
     }
   }
@@ -440,6 +403,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const templateKey = `templates-${userId}`
     if (!localStorage.getItem(templateKey)) {
       localStorage.setItem(templateKey, JSON.stringify([]))
+    }
+    
+    // Initialize guide completions
+    const guidesKey = `completed-guides-${userId}`
+    if (!localStorage.getItem(guidesKey)) {
+      localStorage.setItem(guidesKey, JSON.stringify([]))
+    }
+    
+    // Initialize user posts
+    const postsKey = `user-posts-${userId}`
+    if (!localStorage.getItem(postsKey)) {
+      localStorage.setItem(postsKey, JSON.stringify([]))
+    }
+    
+    // Initialize user discussions
+    const discussionsKey = `user-discussions-${userId}`
+    if (!localStorage.getItem(discussionsKey)) {
+      localStorage.setItem(discussionsKey, JSON.stringify([]))
+    }
+    
+    // Initialize liked members
+    const likedMembersKey = `liked-members-${userId}`
+    if (!localStorage.getItem(likedMembersKey)) {
+      localStorage.setItem(likedMembersKey, JSON.stringify([]))
     }
   }
 

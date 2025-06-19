@@ -521,7 +521,7 @@ function Community() {
             <div>
               <h2 className="heading-md mb-8">Featured Community Members</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {filteredMembers.map((member, index) => (
+                {filteredMembers.map((member) => (
                   <div key={member.id} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="text-3xl">{member.avatar}</div>
@@ -629,9 +629,13 @@ function Community() {
                     
                     <div className="flex flex-wrap gap-2">
                       {discussion.tags.map((tag, tagIndex) => (
-                        <span key={tagIndex} className="badge-secondary">
+                        <button 
+                          key={tagIndex} 
+                          onClick={() => setSearchQuery(tag)}
+                          className="badge-secondary hover:bg-muted/80 transition-colors duration-200"
+                        >
                           #{tag}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -903,9 +907,24 @@ function Community() {
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <button className="text-muted-foreground hover:text-foreground p-1 rounded-full hover:bg-muted">
-                              <MoreHorizontal className="w-5 h-5" />
-                            </button>
+                            <div className="relative group">
+                              <button className="text-muted-foreground hover:text-foreground p-1 rounded-full hover:bg-muted">
+                                <MoreHorizontal className="w-5 h-5" />
+                              </button>
+                              <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                                <div className="py-1">
+                                  <button className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
+                                    Report Discussion
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
+                                    Hide Discussion
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
+                                    Follow {discussion.author}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         
@@ -1089,16 +1108,6 @@ function Community() {
                   </Link>
                 </div>
               ))}
-            </div>
-            
-            <div className="mt-8 glass-strong bg-gradient-to-r from-matrix-primary/10 to-matrix-secondary/10 border-matrix-primary/30 p-6 rounded-xl text-center">
-              <h3 className="heading-sm mb-4">Want to Contribute?</h3>
-              <p className="text-muted-foreground mb-6">
-                Share your knowledge by creating tutorials, guides, or learning paths for the community.
-              </p>
-              <button className="btn-primary">
-                Become a Contributor
-              </button>
             </div>
           </div>
         )}

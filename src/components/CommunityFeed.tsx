@@ -108,6 +108,7 @@ export default function CommunityFeed() {
   const { user, profile } = useAuth()
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([])
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [expandedPosts, setExpandedPosts] = useState<string[]>([])
 
   // Load user posts from localStorage on component mount
   useEffect(() => {
@@ -123,19 +124,11 @@ export default function CommunityFeed() {
   const allPosts = [...userPosts, ...posts]
 
   const handleLike = (postId: string) => {
-    const updatedPosts = allPosts.map(post => 
-      post.id === postId 
-        ? { 
-            ...post, 
-            isLiked: !post.isLiked,
-            likes: post.isLiked ? post.likes - 1 : post.likes + 1
-          }
-        : post
-    )
-    
-    // Update user posts if the liked post is a user post
+    // Check if it's a user post
     const userPost = userPosts.find(post => post.id === postId)
+    
     if (userPost) {
+      // Update user posts
       const updatedUserPosts = userPosts.map(post => 
         post.id === postId 
           ? { 
@@ -146,36 +139,50 @@ export default function CommunityFeed() {
           : post
       )
       setUserPosts(updatedUserPosts)
+      
+      // Save to localStorage
       if (user) {
         localStorage.setItem(`user-posts-${user.id}`, JSON.stringify(updatedUserPosts))
       }
+    } else {
+      // Update sample posts
+      setPosts(posts.map(post => 
+        post.id === postId 
+          ? { 
+              ...post, 
+              isLiked: !post.isLiked,
+              likes: post.isLiked ? post.likes - 1 : post.likes + 1
+            }
+          : post
+      ))
     }
-    
-    setPosts(updatedPosts.filter(post => !userPosts.some(up => up.id === post.id)))
   }
 
   const handleBookmark = (postId: string) => {
-    const updatedPosts = allPosts.map(post => 
-      post.id === postId 
-        ? { ...post, isBookmarked: !post.isBookmarked }
-        : post
-    )
-    
-    // Update user posts if the bookmarked post is a user post
+    // Check if it's a user post
     const userPost = userPosts.find(post => post.id === postId)
+    
     if (userPost) {
+      // Update user posts
       const updatedUserPosts = userPosts.map(post => 
         post.id === postId 
           ? { ...post, isBookmarked: !post.isBookmarked }
           : post
       )
       setUserPosts(updatedUserPosts)
+      
+      // Save to localStorage
       if (user) {
         localStorage.setItem(`user-posts-${user.id}`, JSON.stringify(updatedUserPosts))
       }
+    } else {
+      // Update sample posts
+      setPosts(posts.map(post => 
+        post.id === postId 
+          ? { ...post, isBookmarked: !post.isBookmarked }
+          : post
+      ))
     }
-    
-    setPosts(updatedPosts.filter(post => !userPosts.some(up => up.id === post.id)))
   }
 
   const handlePostContent = () => {
@@ -218,26 +225,6 @@ export default function CommunityFeed() {
     }, 1500);
   }
 
-  const getPostIcon = (type: string) => {
-    switch (type) {
-      case 'success_story': return <Trophy className="w-5 h-5 text-yellow-400" />
-      case 'question': return <MessageSquare className="w-5 h-5 text-blue-400" />
-      case 'showcase': return <Star className="w-5 h-5 text-purple-400" />
-      case 'tip': return <Zap className="w-5 h-5 text-green-400" />
-      default: return <Users className="w-5 h-5 text-gray-400" />
-    }
-  }
-
-  const getPostTypeColor = (type: string) => {
-    switch (type) {
-      case 'success_story': return 'badge-warning'
-      case 'question': return 'badge-primary'
-      case 'showcase': return 'badge-success'
-      case 'tip': return 'badge-success'
-      default: return 'badge-secondary'
-    }
-  }
-
   // Handle tag selection
   const handleTagClick = (tag: string) => {
     if (selectedTag === tag) {
@@ -245,6 +232,15 @@ export default function CommunityFeed() {
     } else {
       setSelectedTag(tag);
     }
+  }
+
+  // Toggle post expansion
+  const togglePostExpansion = (postId: string) => {
+    setExpandedPosts(prev => 
+      prev.includes(postId) 
+        ? prev.filter(id => id !== postId) 
+        : [...prev, postId]
+    );
   }
 
   // Filter posts by tag if a tag is selected
@@ -368,32 +364,59 @@ export default function CommunityFeed() {
           filteredPosts.map((post) => (
             <div key={post.id} className="glass rounded-xl p-6 hover:bg-card/70 transition-all duration-300">
               {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="text-3xl">{post.author.avatar}</div>
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-semibold text-foreground">{post.author.name}</span>
-                      <span className={`${getPostTypeColor(post.type)}`}>
-                        {post.author.level}
-                      </span>
-                    </div>
-                    <div className="text-muted-foreground text-sm">{post.author.role}</div>
-                    <div className="text-muted-foreground text-xs">{post.timestamp}</div>
+              <div className="flex items-start mb-4">
+                <div className="text-3xl">{post.author.avatar}</div>
+                <div className="flex-1 ml-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-semibold text-foreground">{post.author.name}</span>
+                    <span className={`${getPostTypeColor(post.type)}`}>
+                      {post.author.level}
+                    </span>
                   </div>
+                  <div className="text-muted-foreground text-sm">{post.author.role}</div>
+                  <div className="text-muted-foreground text-xs">{post.timestamp}</div>
                 </div>
                 
                 <div className="flex items-center space-x-2">
                   {getPostIcon(post.type)}
-                  <button className="text-muted-foreground hover:text-foreground transition-colors duration-200">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
+                  <div className="relative group">
+                    <button className="text-muted-foreground hover:text-foreground transition-colors duration-200">
+                      <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                    <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                      <div className="py-1">
+                        <button className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
+                          Report Post
+                        </button>
+                        <button className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
+                          Hide Post
+                        </button>
+                        <button className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
+                          Follow {post.author.name}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Content */}
               <div className="mb-4">
-                <p className="text-foreground leading-relaxed">{post.content}</p>
+                <p className={`text-foreground leading-relaxed ${
+                  !expandedPosts.includes(post.id) && post.content.length > 300 
+                    ? 'line-clamp-3' 
+                    : ''
+                }`}>
+                  {post.content}
+                </p>
+                {post.content.length > 300 && (
+                  <button 
+                    onClick={() => togglePostExpansion(post.id)}
+                    className="text-matrix-primary hover:text-matrix-secondary mt-2 text-sm font-medium"
+                  >
+                    {expandedPosts.includes(post.id) ? 'Show less' : 'Read more'}
+                  </button>
+                )}
               </div>
 
               {/* Project Showcase */}
@@ -404,7 +427,7 @@ export default function CommunityFeed() {
                     <span className="font-semibold text-foreground">{post.project.title}</span>
                   </div>
                   <p className="text-muted-foreground text-sm mb-2">{post.project.description}</p>
-                  <div className="text-matrix-primary text-sm font-medium">
+                  <div className="text-matrix-primary text-xs">
                     <p>{post.project.metrics}</p>
                   </div>
                 </div>
@@ -493,4 +516,25 @@ export default function CommunityFeed() {
       )}
     </div>
   )
+}
+
+// Helper functions
+function getPostIcon(type: string) {
+  switch (type) {
+    case 'success_story': return <Trophy className="w-5 h-5 text-yellow-400" />
+    case 'question': return <MessageSquare className="w-5 h-5 text-blue-400" />
+    case 'showcase': return <Star className="w-5 h-5 text-purple-400" />
+    case 'tip': return <Zap className="w-5 h-5 text-green-400" />
+    default: return <Users className="w-5 h-5 text-gray-400" />
+  }
+}
+
+function getPostTypeColor(type: string) {
+  switch (type) {
+    case 'success_story': return 'badge-warning'
+    case 'question': return 'badge-primary'
+    case 'showcase': return 'badge-success'
+    case 'tip': return 'badge-success'
+    default: return 'badge-secondary'
+  }
 }
