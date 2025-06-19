@@ -37,6 +37,9 @@ export default function UserMenu() {
     }
   }, [])
 
+  // Check if user is admin
+  const isAdmin = profile?.role?.toLowerCase().includes('admin') || false;
+
   if (!user || !profile) return null
 
   return (
@@ -138,6 +141,27 @@ export default function UserMenu() {
               </div>
             </Link>
 
+            {/* Admin Section - Only show for admins */}
+            {isAdmin && (
+              <>
+                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-3 py-2 mt-2">
+                  Administration
+                </div>
+                
+                <Link
+                  to="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center space-x-3 px-3 py-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors duration-200 w-full"
+                >
+                  <Shield className="w-5 h-5 text-red-400" />
+                  <div>
+                    <div className="font-medium">Admin Dashboard</div>
+                    <div className="text-xs text-muted-foreground">Manage users and content</div>
+                  </div>
+                </Link>
+              </>
+            )}
+
             <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-3 py-2 mt-2">
               Support
             </div>
@@ -166,21 +190,6 @@ export default function UserMenu() {
               <div>
                 <div className="font-medium">Download My Data</div>
                 <div className="text-xs text-muted-foreground">Export your learning progress</div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => {
-                setIsOpen(false)
-                // Add privacy settings functionality here
-                console.log('Privacy settings requested')
-              }}
-              className="flex items-center space-x-3 px-3 py-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors duration-200 w-full text-left"
-            >
-              <Shield className="w-5 h-5" />
-              <div>
-                <div className="font-medium">Privacy Settings</div>
-                <div className="text-xs text-muted-foreground">Manage your data and privacy</div>
               </div>
             </button>
           </div>
