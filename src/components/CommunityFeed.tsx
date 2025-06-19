@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Heart, MessageSquare, Share2, Bookmark, MoreHorizontal, Trophy, Star, Users, Zap, X, Send } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { Link } from 'react-router-dom'
 
 interface CommunityPost {
   id: string
@@ -100,15 +100,29 @@ const samplePosts: CommunityPost[] = [
 ]
 
 export default function CommunityFeed() {
-  const [posts, setPosts] = useState(samplePosts)
+  const [posts, setPosts] = useState<CommunityPost[]>(samplePosts)
   const [filter, setFilter] = useState('all')
   const [newPostContent, setNewPostContent] = useState('')
   const [isPostingContent, setIsPostingContent] = useState(false)
   const [showNewPostForm, setShowNewPostForm] = useState(false)
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const [userPosts, setUserPosts] = useState<CommunityPost[]>([])
+
+  // Load user posts from localStorage on component mount
+  useEffect(() => {
+    if (user) {
+      const savedPosts = localStorage.getItem(`user-posts-${user.id}`)
+      if (savedPosts) {
+        setUserPosts(JSON.parse(savedPosts))
+      }
+    }
+  }, [user])
+
+  // Combine sample posts with user posts
+  const allPosts = [...userPosts, ...posts]
 
   const handleLike = (postId: string) => {
-    setPosts(posts.map(post => 
+    const updatedPosts = allPosts.map(post => 
       post.id === postId 
         ? { 
             ...post, 
@@ -116,30 +130,66 @@ export default function CommunityFeed() {
             likes: post.isLiked ? post.likes - 1 : post.likes + 1
           }
         : post
-    ))
+    )
+    
+    // Update user posts if the liked post is a user post
+    const userPost = userPosts.find(post => post.id === postId)
+    if (userPost) {
+      const updatedUserPosts = userPosts.map(post => 
+        post.id === postId 
+          ? { 
+              ...post, 
+              isLiked: !post.isLiked,
+              likes: post.isLiked ? post.likes - 1 : post.likes + 1
+            }
+          : post
+      )
+      setUserPosts(updatedUserPosts)
+      if (user) {
+        localStorage.setItem(`user-posts-${user.id}`, JSON.stringify(updatedUserPosts))
+      }
+    }
+    
+    setPosts(updatedPosts.filter(post => !userPosts.some(up => up.id === post.id)))
   }
 
   const handleBookmark = (postId: string) => {
-    setPosts(posts.map(post => 
+    const updatedPosts = allPosts.map(post => 
       post.id === postId 
         ? { ...post, isBookmarked: !post.isBookmarked }
         : post
-    ))
+    )
+    
+    // Update user posts if the bookmarked post is a user post
+    const userPost = userPosts.find(post => post.id === postId)
+    if (userPost) {
+      const updatedUserPosts = userPosts.map(post => 
+        post.id === postId 
+          ? { ...post, isBookmarked: !post.isBookmarked }
+          : post
+      )
+      setUserPosts(updatedUserPosts)
+      if (user) {
+        localStorage.setItem(`user-posts-${user.id}`, JSON.stringify(updatedUserPosts))
+      }
+    }
+    
+    setPosts(updatedPosts.filter(post => !userPosts.some(up => up.id === post.id)))
   }
 
   const handlePostContent = () => {
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim() || !user || !profile) return;
     
     setIsPostingContent(true);
     
     // Simulate API call
     setTimeout(() => {
       const newPost: CommunityPost = {
-        id: `new-${Date.now()}`,
+        id: `user-${Date.now()}`,
         author: {
-          name: user?.email?.split('@')[0] || 'Anonymous',
+          name: profile?.full_name || user?.email?.split('@')[0] || 'Anonymous',
           avatar: '👤',
-          role: 'Community Member',
+          role: profile?.role || 'Community Member',
           level: 'MCP Learner'
         },
         content: newPostContent,
@@ -152,7 +202,15 @@ export default function CommunityFeed() {
         isBookmarked: false
       };
       
-      setPosts([newPost, ...posts]);
+      // Add to user posts
+      const updatedUserPosts = [newPost, ...userPosts];
+      setUserPosts(updatedUserPosts);
+      
+      // Save to localStorage
+      if (user) {
+        localStorage.setItem(`user-posts-${user.id}`, JSON.stringify(updatedUserPosts));
+      }
+      
       setNewPostContent('');
       setIsPostingContent(false);
       setShowNewPostForm(false);
@@ -179,7 +237,7 @@ export default function CommunityFeed() {
     }
   }
 
-  const filteredPosts = filter === 'all' ? posts : posts.filter(post => post.type === filter)
+  const filteredPosts = filter === 'all' ? allPosts : allPosts.filter(post => post.type === filter)
 
   return (
     <div className="space-y-6">
@@ -228,7 +286,7 @@ export default function CommunityFeed() {
                   <Users className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <div className="text-sm font-medium text-foreground">
-                  {user.email?.split('@')[0] || 'You'}
+                  {profile?.full_name || user.email?.split('@')[0] || 'You'}
                 </div>
               </div>
               <textarea

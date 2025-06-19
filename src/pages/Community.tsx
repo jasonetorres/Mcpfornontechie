@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import CommunityFeed from '../components/CommunityFeed';
 
 function Community() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [showNewDiscussionForm, setShowNewDiscussionForm] = useState(false);
   const [discussionFormData, setDiscussionFormData] = useState({
@@ -163,6 +163,21 @@ function Community() {
     }
   ]);
 
+  // Load user discussions from localStorage
+  const [userDiscussions, setUserDiscussions] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      const savedDiscussions = localStorage.getItem(`user-discussions-${user.id}`);
+      if (savedDiscussions) {
+        setUserDiscussions(JSON.parse(savedDiscussions));
+      }
+    }
+  }, [user]);
+
+  // Combine sample discussions with user discussions
+  const allDiscussions = [...userDiscussions, ...recentDiscussions];
+
   const upcomingEvents = [
     {
       title: 'MCP Office Hours',
@@ -265,9 +280,9 @@ function Community() {
     // Simulate API call
     setTimeout(() => {
       const newDiscussion = {
-        id: (recentDiscussions.length + 1).toString(),
+        id: `user-${Date.now()}`,
         title: discussionFormData.title,
-        author: user?.email?.split('@')[0] || 'Anonymous',
+        author: profile?.full_name || user?.email?.split('@')[0] || 'Anonymous',
         authorAvatar: '👤',
         replies: 0,
         lastActivity: 'Just now',
@@ -280,7 +295,15 @@ function Community() {
         isLiked: false
       };
 
-      setRecentDiscussions([newDiscussion, ...recentDiscussions]);
+      // Add to user discussions
+      const updatedUserDiscussions = [newDiscussion, ...userDiscussions];
+      setUserDiscussions(updatedUserDiscussions);
+      
+      // Save to localStorage
+      if (user) {
+        localStorage.setItem(`user-discussions-${user.id}`, JSON.stringify(updatedUserDiscussions));
+      }
+
       setDiscussionFormData({
         title: '',
         content: '',
@@ -293,20 +316,40 @@ function Community() {
   };
 
   const handleLikeDiscussion = (discussionId: string) => {
-    setRecentDiscussions(recentDiscussions.map(discussion => {
-      if (discussion.id === discussionId) {
-        return {
-          ...discussion,
-          likes: discussion.isLiked ? discussion.likes - 1 : discussion.likes + 1,
-          isLiked: !discussion.isLiked
-        };
+    // Update user discussions if the liked discussion is a user discussion
+    const userDiscussion = userDiscussions.find(discussion => discussion.id === discussionId);
+    if (userDiscussion) {
+      const updatedUserDiscussions = userDiscussions.map(discussion => {
+        if (discussion.id === discussionId) {
+          return {
+            ...discussion,
+            likes: discussion.isLiked ? discussion.likes - 1 : discussion.likes + 1,
+            isLiked: !discussion.isLiked
+          };
+        }
+        return discussion;
+      });
+      setUserDiscussions(updatedUserDiscussions);
+      if (user) {
+        localStorage.setItem(`user-discussions-${user.id}`, JSON.stringify(updatedUserDiscussions));
       }
-      return discussion;
-    }));
+    } else {
+      // Update sample discussions
+      setRecentDiscussions(recentDiscussions.map(discussion => {
+        if (discussion.id === discussionId) {
+          return {
+            ...discussion,
+            likes: discussion.isLiked ? discussion.likes - 1 : discussion.likes + 1,
+            isLiked: !discussion.isLiked
+          };
+        }
+        return discussion;
+      }));
+    }
   };
 
   // Filter discussions based on search query and category
-  const filteredDiscussions = recentDiscussions.filter(discussion => {
+  const filteredDiscussions = allDiscussions.filter(discussion => {
     const matchesSearch = searchQuery === '' || 
       discussion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       discussion.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -419,6 +462,60 @@ function Community() {
                   </div>
                 ))}
               </div>
+              
+              {/* User Card - Show if logged in */}
+              {user && profile && (
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Your Community Profile</h3>
+                  <div className="glass p-6 hover:bg-card/70 transition-all duration-300">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center overflow-hidden">
+                        {profile.avatar_url ? (
+                          <img src={profile.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
+                        ) : (
+                          <Users className="w-6 h-6 text-primary-foreground" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground">{profile.full_name || user.email?.split('@')[0]}</h3>
+                        <p className="text-matrix-primary">{profile.role || 'Community Member'}</p>
+                        <p className="text-muted-foreground text-sm">{profile.company || 'MCP Academy'}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="flex items-center space-x-1">
+                        <Heart className="w-4 h-4 text-red-400" />
+                        <span className="text-red-300 text-sm">{userDiscussions.length + userPosts.length}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-4 h-4 text-yellow-400" />
+                        <span className="text-yellow-300 text-sm">Active Member</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <h4 className="text-foreground font-medium mb-2">Your Activity:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="badge-primary bg-purple-500/20 text-purple-300 border-purple-500/30">
+                          {userDiscussions.length} Discussions
+                        </span>
+                        <span className="badge-primary bg-blue-500/20 text-blue-300 border-blue-500/30">
+                          {userPosts.length} Posts
+                        </span>
+                        <span className="badge-primary bg-green-500/20 text-green-300 border-green-500/30">
+                          Community Member
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="glass bg-muted/20 rounded-lg p-3">
+                      <h4 className="text-green-300 font-medium text-sm mb-1">Get More Involved:</h4>
+                      <p className="text-muted-foreground text-sm">Share your MCP projects, answer questions, and connect with other members to increase your community standing!</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Join Community CTA */}
@@ -451,7 +548,7 @@ function Community() {
               </div>
               
               <div className="space-y-4">
-                {recentDiscussions.slice(0, 3).map((discussion) => (
+                {allDiscussions.slice(0, 3).map((discussion) => (
                   <div key={discussion.id} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
