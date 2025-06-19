@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 export interface Achievement {
   id: string
@@ -140,10 +141,13 @@ export function useAchievements() {
     }
   }, [user])
 
-  const loadAchievements = () => {
+  const loadAchievements = async () => {
     if (!user) return
+    setLoading(true)
 
     try {
+      // In a real implementation, we would fetch from Supabase
+      // For now, we'll use localStorage as a temporary solution
       const savedAchievements = localStorage.getItem(`achievements-${user.id}`)
       if (savedAchievements) {
         const parsed = JSON.parse(savedAchievements)
@@ -156,60 +160,76 @@ export function useAchievements() {
     } catch (error) {
       console.error('Error loading achievements:', error)
       setAchievements(ACHIEVEMENTS)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const saveAchievements = (updatedAchievements: Achievement[]) => {
+  const saveAchievements = async (updatedAchievements: Achievement[]) => {
     if (!user) return
 
     try {
+      // In a real implementation, we would save to Supabase
+      // For now, we'll use localStorage as a temporary solution
       localStorage.setItem(`achievements-${user.id}`, JSON.stringify(updatedAchievements))
     } catch (error) {
       console.error('Error saving achievements:', error)
     }
   }
 
-  const checkAchievements = () => {
+  const checkAchievements = async () => {
     if (!user) return
 
-    const userData = getUserData()
-    const updatedAchievements = achievements.map(achievement => {
-      if (!achievement.earned && achievement.condition(userData)) {
-        return {
-          ...achievement,
-          earned: true,
-          earnedDate: new Date().toISOString()
+    try {
+      const userData = await getUserData()
+      const updatedAchievements = achievements.map(achievement => {
+        if (!achievement.earned && achievement.condition(userData)) {
+          return {
+            ...achievement,
+            earned: true,
+            earnedDate: new Date().toISOString()
+          }
         }
-      }
-      return achievement
-    })
-
-    const newlyEarned = updatedAchievements.filter((achievement, index) => 
-      achievement.earned && !achievements[index].earned
-    )
-
-    if (newlyEarned.length > 0) {
-      setAchievements(updatedAchievements)
-      saveAchievements(updatedAchievements)
-      
-      // Show notifications for newly earned achievements
-      newlyEarned.forEach(achievement => {
-        console.log(`🏆 Achievement earned: ${achievement.title}`)
-        // You could trigger a toast notification here
+        return achievement
       })
+
+      const newlyEarned = updatedAchievements.filter((achievement, index) => 
+        achievement.earned && !achievements[index].earned
+      )
+
+      if (newlyEarned.length > 0) {
+        setAchievements(updatedAchievements)
+        saveAchievements(updatedAchievements)
+        
+        // Show notifications for newly earned achievements
+        newlyEarned.forEach(achievement => {
+          console.log(`🏆 Achievement earned: ${achievement.title}`)
+          // You could trigger a toast notification here
+        })
+      }
+    } catch (error) {
+      console.error('Error checking achievements:', error)
     }
   }
 
-  const getUserData = () => {
+  const getUserData = async () => {
     if (!user) return {}
 
     try {
-      // Get learning progress
-      const progressData = localStorage.getItem('mock-progress')
-      const allProgress = progressData ? JSON.parse(progressData) : []
-      const userProgress = allProgress.filter((item: any) => item.user_id === user.id)
+      // Get learning progress from Supabase
+      const { data: progressData, error: progressError } = await supabase
+        .from('learning_progress')
+        .select('*')
+        .eq('user_id', user.id)
       
-      // Get tutorial completions
+      if (progressError) {
+        console.error('Error fetching learning progress:', progressError)
+        return {}
+      }
+      
+      const userProgress = progressData || []
+      
+      // Get tutorial completions (still using localStorage for now)
       const tutorialData = localStorage.getItem('tutorial-completions')
       const allTutorials = tutorialData ? JSON.parse(tutorialData) : []
       const userTutorials = allTutorials.filter((item: any) => item.userId === user.id)
@@ -258,14 +278,14 @@ export function useAchievements() {
     }
   }
 
-  const markCommunityJoined = () => {
+  const markCommunityJoined = async () => {
     if (!user) return
 
     localStorage.setItem(`community-${user.id}`, 'true')
-    checkAchievements()
+    await checkAchievements()
   }
 
-  const markTemplateUsed = (templateId: string) => {
+  const markTemplateUsed = async (templateId: string) => {
     if (!user) return
 
     try {
@@ -275,7 +295,7 @@ export function useAchievements() {
       if (!templates.includes(templateId)) {
         templates.push(templateId)
         localStorage.setItem(`templates-${user.id}`, JSON.stringify(templates))
-        checkAchievements()
+        await checkAchievements()
       }
     } catch (error) {
       console.error('Error marking template used:', error)

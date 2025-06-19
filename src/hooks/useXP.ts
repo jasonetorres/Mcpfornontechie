@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 export interface XPActivity {
   id: string
@@ -31,8 +32,8 @@ export function useXP() {
 
     setLoading(true)
     try {
-      // In a real app, we would fetch this from the backend
-      // For now, we'll use mock data stored in localStorage
+      // In a real implementation, we would fetch from Supabase
+      // For now, we'll use localStorage as a temporary solution until we create the XP table
       const xpData = localStorage.getItem(`xp-${user.id}`)
       if (xpData) {
         const parsedData = JSON.parse(xpData)
@@ -66,8 +67,8 @@ export function useXP() {
     return 1 + Math.floor(xp / 100)
   }
 
-  const addXP = async (amount: number, type: XPActivity['type'], details: string): Promise<void> => {
-    if (!user) return
+  const addXP = async (amount: number, type: XPActivity['type'], details: string): Promise<boolean> => {
+    if (!user) return false
 
     try {
       // Create new activity
@@ -88,7 +89,7 @@ export function useXP() {
       setLevel(newLevel)
       setRecentActivities([newActivity, ...recentActivities].slice(0, 10)) // Keep only 10 most recent
 
-      // Save to localStorage
+      // Save to localStorage (temporary until we create the XP table)
       localStorage.setItem(`xp-${user.id}`, JSON.stringify({
         totalXP: newTotalXP,
         activities: [newActivity, ...recentActivities].slice(0, 10)
@@ -98,6 +99,7 @@ export function useXP() {
       return leveledUp
     } catch (error) {
       console.error('Error adding XP:', error)
+      return false
     }
   }
 
