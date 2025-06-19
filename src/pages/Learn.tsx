@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight, Trophy, Star } from 'lucide-react';
+import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight, Trophy, Star, Clock, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useXP } from '../hooks/useXP';
 import LevelUpModal from '../components/LevelUpModal';
