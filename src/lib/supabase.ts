@@ -1,11 +1,60 @@
 import { createClient } from '@supabase/supabase-js'
 
 // Get environment variables for Supabase connection
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://demo-project.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'demo-anon-key'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// Create the Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Only create a real Supabase client if both URL and key are provided
+let supabase: any = null
+let isSupabaseConfigured = false
+
+if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url' && supabaseAnonKey !== 'your_supabase_anon_key') {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey)
+    isSupabaseConfigured = true
+    console.log('✅ Supabase client configured successfully')
+  } catch (error) {
+    console.warn('⚠️ Failed to create Supabase client:', error)
+    isSupabaseConfigured = false
+  }
+} else {
+  console.log('⚠️ Supabase not configured - using mock data')
+  isSupabaseConfigured = false
+}
+
+// Create a mock client for when Supabase is not configured
+const mockSupabaseClient = {
+  auth: {
+    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+    signUp: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
+    signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
+    signOut: () => Promise.resolve({ error: null }),
+    onAuthStateChange: (callback: any) => {
+      // Return a mock subscription
+      return {
+        data: {
+          subscription: {
+            unsubscribe: () => {}
+          }
+        }
+      }
+    }
+  },
+  from: (table: string) => ({
+    select: () => ({
+      eq: () => ({
+        single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
+      })
+    }),
+    insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+    update: () => ({
+      eq: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } })
+    })
+  })
+}
+
+// Export the configured client or mock client
+export { supabase: supabase || mockSupabaseClient, isSupabaseConfigured }
 
 export type Database = {
   public: {
