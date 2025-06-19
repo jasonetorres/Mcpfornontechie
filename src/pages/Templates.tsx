@@ -400,6 +400,60 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
 4. Set up common Q&A topics`
         }
       ]
+    },
+    {
+      id: 7,
+      title: 'Secure Enterprise MCP Bridge',
+      description: 'Connect AI to enterprise systems with enhanced security and compliance',
+      category: 'operations',
+      platform: 'power-platform',
+      difficulty: 'Advanced',
+      rating: 4.7,
+      downloads: 512,
+      dataSource: 'Multiple Enterprise Systems',
+      aiModel: 'Azure OpenAI',
+      features: [
+        'Role-based access control',
+        'Audit logging',
+        'Data encryption',
+        'Compliance reporting'
+      ],
+      setupTime: '5 hours',
+      preview: `// Enterprise Security Configuration
+{
+  "access_control": {
+    "roles": ["viewer", "editor", "admin"],
+    "permissions": {
+      "viewer": ["read"],
+      "editor": ["read", "write"],
+      "admin": ["read", "write", "delete", "configure"]
+    }
+  },
+  "audit": {
+    "log_retention": "90 days",
+    "events_to_log": ["access", "query", "modification"]
+  }
+}`,
+      tags: ['security', 'enterprise', 'compliance'],
+      files: [
+        {
+          name: 'security-setup.md',
+          content: `# Enterprise Security Setup
+
+## Security Configuration
+1. Set up Azure AD integration
+2. Configure role-based access control
+3. Enable audit logging
+4. Set up data encryption
+5. Configure compliance reporting
+
+## Compliance Features
+- GDPR compliance tools
+- HIPAA security features
+- SOC 2 audit support
+- PCI DSS compliance options`
+        }
+      ]
     }
   ];
 
@@ -712,6 +766,83 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
             </button>
           </div>
         )}
+
+        {/* Block Goose Template */}
+        <div className="mt-12 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8">
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="text-4xl">🔒</div>
+            <div>
+              <h3 className="text-2xl font-bold text-white">Block Goose Enterprise Security</h3>
+              <p className="text-blue-300">Secure MCP server for enterprise applications with enhanced security controls</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Enterprise-Grade Security</h4>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Role-based access control with fine-grained permissions</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">End-to-end encryption for sensitive data</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Comprehensive audit logging and compliance reporting</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Data residency controls and sovereignty features</span>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <a 
+                  href="https://github.com/block/goose" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
+                >
+                  <span>View on GitHub</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+            
+            <div className="bg-slate-900/50 rounded-lg p-6">
+              <h4 className="text-white font-semibold mb-4">Perfect For:</h4>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <Users className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <span className="text-gray-300">Enterprise organizations with strict security requirements</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <Database className="w-4 h-4 text-green-400" />
+                  </div>
+                  <span className="text-gray-300">Companies handling sensitive customer or financial data</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <Code className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <span className="text-gray-300">Organizations in regulated industries (healthcare, finance)</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-red-400" />
+                  </div>
+                  <span className="text-gray-300">Teams requiring advanced compliance features</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Call to Action */}
         <div className="mt-16 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8 text-center">

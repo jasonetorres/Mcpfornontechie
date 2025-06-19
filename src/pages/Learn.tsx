@@ -288,13 +288,6 @@ all tasks assigned to me this week and summarize them."`
       url: 'https://github.com/k-jarzyna/mcp-miro'
     },
     {
-      name: 'Block Goose',
-      description: 'Secure MCP server for enterprise applications',
-      useCase: 'Enterprise data access with enhanced security controls',
-      icon: '🔒',
-      url: 'https://github.com/block/goose'
-    },
-    {
       name: 'ElevenLabs MCP',
       description: 'Voice synthesis and audio generation for AI',
       useCase: 'Text-to-speech, voice cloning, and audio content creation',
