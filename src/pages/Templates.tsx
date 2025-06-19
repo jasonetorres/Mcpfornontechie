@@ -454,6 +454,122 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
 - PCI DSS compliance options`
         }
       ]
+    },
+    {
+      id: 8,
+      title: 'Web Data Extraction with AgentQL',
+      description: 'Extract structured data from websites using AgentQL MCP Server',
+      category: 'marketing',
+      platform: 'zapier',
+      difficulty: 'Intermediate',
+      rating: 4.8,
+      downloads: 378,
+      dataSource: 'Web Pages',
+      aiModel: 'Claude',
+      features: [
+        'Structured data extraction',
+        'Automated web scraping',
+        'Custom data fields',
+        'Batch processing'
+      ],
+      setupTime: '1 hour',
+      preview: `// AgentQL Data Extraction Configuration
+{
+  "extraction_config": {
+    "url": "https://example.com/products",
+    "data_schema": {
+      "products": [
+        {
+          "name": "string",
+          "price": "number",
+          "description": "string",
+          "rating": "number",
+          "in_stock": "boolean"
+        }
+      ]
+    },
+    "output_format": "json"
+  }
+}`,
+      tags: ['web-scraping', 'data-extraction', 'automation'],
+      files: [
+        {
+          name: 'agentql-setup.md',
+          content: `# AgentQL MCP Server Setup
+
+## Installation
+1. Install the package: \`npm install -g agentql-mcp\`
+2. Get an API key from the AgentQL Dev Portal
+3. Configure in your MCP-compatible application
+
+## Configuration for Claude
+\`\`\`json
+{
+  "mcpServers": {
+    "agentql": {
+      "command": "npx",
+      "args": ["-y", "agentql-mcp"],
+      "env": {
+        "AGENTQL_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+\`\`\`
+
+## Configuration for VS Code
+\`\`\`json
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "apiKey",
+        "description": "AgentQL API Key",
+        "password": true
+      }
+    ],
+    "servers": {
+      "agentql": {
+        "command": "npx",
+        "args": ["-y", "agentql-mcp"],
+        "env": {
+          "AGENTQL_API_KEY": "\${input:apiKey}"
+        }
+      }
+    }
+  }
+}
+\`\`\`
+
+## Example Extraction Task
+"Extract the list of videos from the page https://www.youtube.com/results?search_query=agentql, every video should have a title, an author name, a number of views and a url to the video. Make sure to exclude ads items. Format this as a markdown table."
+
+## Troubleshooting
+- If your agent complains it can't open URLs, try adding "use tools" or "use agentql tool" hint
+- Ensure your API key has the correct permissions
+- Check that the URL is accessible and not behind authentication`
+        },
+        {
+          name: 'zapier-agentql-integration.json',
+          content: `{
+  "trigger": {
+    "type": "schedule",
+    "frequency": "daily"
+  },
+  "action": {
+    "type": "code",
+    "language": "javascript",
+    "code": "// This code calls the AgentQL API to extract data from a website\\nconst url = 'https://example.com/products';\\nconst prompt = 'Extract all products with their names, prices, and descriptions';\\n\\nconst response = await fetch('https://api.agentql.com/extract', {\\n  method: 'POST',\\n  headers: {\\n    'Content-Type': 'application/json',\\n    'Authorization': 'Bearer ' + process.env.AGENTQL_API_KEY\\n  },\\n  body: JSON.stringify({ url, prompt })\\n});\\n\\nreturn await response.json();"
+  },
+  "output": {
+    "type": "google_sheets",
+    "spreadsheet": "extracted_products",
+    "worksheet": "daily_update"
+  }
+}`
+        }
+      ]
     }
   ];
 
@@ -574,6 +690,11 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
       name: 'ElevenLabs MCP',
       description: 'For voice synthesis and audio generation',
       url: 'https://github.com/elevenlabs/elevenlabs-mcp'
+    },
+    {
+      name: 'AgentQL MCP Server',
+      description: 'For data extraction capabilities',
+      url: 'https://github.com/agentql/agentql-mcp'
     }
   ];
 
@@ -894,6 +1015,87 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
                     <Shield className="w-4 h-4 text-red-400" />
                   </div>
                   <span className="text-gray-300">Teams requiring advanced compliance features</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* AgentQL MCP Server Highlight */}
+        <div className="mt-12 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-8">
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="text-4xl">🔍</div>
+            <div>
+              <h3 className="text-2xl font-bold text-white">AgentQL MCP Server</h3>
+              <p className="text-purple-300">Extract structured data from websites with AgentQL's powerful data extraction capabilities</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Key Features</h4>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Extract structured data from any website</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Define custom data schemas with field-level extraction</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Process multiple pages in batch operations</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Seamless integration with Claude, VS Code, Cursor, and Windsurf</span>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <a 
+                  href="https://github.com/agentql/agentql-mcp" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
+                >
+                  <span>View on GitHub</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+            
+            <div className="bg-slate-900/50 rounded-lg p-6">
+              <h4 className="text-white font-semibold mb-4">Installation</h4>
+              <div className="space-y-4">
+                <div className="bg-slate-800/70 p-3 rounded-lg">
+                  <div className="text-purple-300 font-mono text-sm mb-1">npm install -g agentql-mcp</div>
+                  <div className="text-gray-400 text-xs">Install the package globally</div>
+                </div>
+                
+                <div className="bg-slate-800/70 p-3 rounded-lg">
+                  <div className="text-purple-300 font-mono text-sm mb-1">
+                    {`{
+  "mcpServers": {
+    "agentql": {
+      "command": "npx",
+      "args": ["-y", "agentql-mcp"],
+      "env": {
+        "AGENTQL_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}`}
+                  </div>
+                  <div className="text-gray-400 text-xs">Configure in Claude Desktop</div>
+                </div>
+                
+                <div className="text-gray-300 text-sm">
+                  <p>Try an example extraction task:</p>
+                  <div className="bg-slate-800/70 p-3 rounded-lg mt-2 text-purple-200 italic">
+                    "Extract all products from the page https://example.com/products with their names, prices, and descriptions. Format as a markdown table."
+                  </div>
                 </div>
               </div>
             </div>
