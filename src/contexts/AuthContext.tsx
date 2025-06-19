@@ -51,24 +51,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [supabaseAvailable, setSupabaseAvailable] = useState(isSupabaseConfigured)
+  const [supabaseAvailable, setSupabaseAvailable] = useState(false)
 
-  // Test Supabase connection
+  // Test Supabase connection with timeout and better error handling
   const testSupabaseConnection = async (): Promise<boolean> => {
     if (!isSupabaseConfigured) {
       return false
     }
 
     try {
-      // Try a simple query to test the connection
-      const { error } = await supabase.from('profiles').select('id').limit(1)
+      // Create a promise that rejects after 5 seconds
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Connection timeout')), 5000)
+      })
+
+      // Try a simple query to test the connection with timeout
+      const queryPromise = supabase.from('profiles').select('id').limit(1)
+      
+      const { error } = await Promise.race([queryPromise, timeoutPromise]) as any
+      
       if (error) {
         console.warn('⚠️ Supabase connection test failed:', error.message)
         return false
       }
       return true
-    } catch (error) {
-      console.warn('⚠️ Supabase connection test failed:', error)
+    } catch (error: any) {
+      console.warn('⚠️ Supabase connection test failed:', error.message || error)
       return false
     }
   }
@@ -91,8 +99,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log('✅ Supabase connection successful, checking for session...')
             
             try {
-              // Check for existing session in Supabase
-              const { data: sessionData, error } = await supabase.auth.getSession()
+              // Check for existing session in Supabase with timeout
+              const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Session check timeout')), 5000)
+              })
+              
+              const sessionPromise = supabase.auth.getSession()
+              const { data: sessionData, error } = await Promise.race([sessionPromise, timeoutPromise]) as any
               
               if (error) {
                 console.warn('⚠️ Error getting Supabase session:', error.message)
@@ -107,8 +120,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setLoading(false)
                 return
               }
-            } catch (sessionError) {
-              console.warn('⚠️ Supabase session check failed, falling back to mock:', sessionError)
+            } catch (sessionError: any) {
+              console.warn('⚠️ Supabase session check failed, falling back to mock:', sessionError.message || sessionError)
               setSupabaseAvailable(false)
             }
           } else {
@@ -212,11 +225,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Try to get profile from Supabase only if available
       if (supabaseAvailable) {
         try {
-          const { data: supabaseProfile, error } = await supabase
+          // Add timeout to profile fetch
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
+          })
+          
+          const profilePromise = supabase
             .from('profiles')
             .select('*')
             .eq('id', userId)
             .single()
+          
+          const { data: supabaseProfile, error } = await Promise.race([profilePromise, timeoutPromise]) as any
           
           if (supabaseProfile && !error) {
             console.log('✅ Found profile in Supabase:', supabaseProfile.email)
@@ -227,8 +247,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.warn('⚠️ Supabase profile fetch error:', error.message)
             // Don't throw here, fall back to localStorage
           }
-        } catch (supabaseError) {
-          console.warn('⚠️ Supabase profile fetch failed, falling back to localStorage:', supabaseError)
+        } catch (supabaseError: any) {
+          console.warn('⚠️ Supabase profile fetch failed, falling back to localStorage:', supabaseError.message || supabaseError)
           setSupabaseAvailable(false)
         }
       }
@@ -279,7 +299,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Try to sign up with Supabase first only if available
       if (supabaseAvailable) {
         try {
-          const { data: supabaseData, error: supabaseError } = await supabase.auth.signUp({
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Signup timeout')), 10000)
+          })
+          
+          const signupPromise = supabase.auth.signUp({
             email,
             password,
             options: {
@@ -290,6 +314,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }
             }
           })
+          
+          const { data: supabaseData, error: supabaseError } = await Promise.race([signupPromise, timeoutPromise]) as any
           
           if (!supabaseError && supabaseData.user) {
             console.log('✅ User signed up successfully with Supabase')
@@ -335,8 +361,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.warn('⚠️ Supabase signup error:', supabaseError.message)
             throw supabaseError
           }
-        } catch (supabaseError) {
-          console.warn('⚠️ Supabase signup failed, falling back to mock:', supabaseError)
+        } catch (supabaseError: any) {
+          console.warn('⚠️ Supabase signup failed, falling back to mock:', supabaseError.message || supabaseError)
           setSupabaseAvailable(false)
         }
       }
@@ -425,10 +451,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Try to sign in with Supabase first only if available
       if (supabaseAvailable) {
         try {
-          const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Signin timeout')), 10000)
+          })
+          
+          const signinPromise = supabase.auth.signInWithPassword({
             email,
             password,
           })
+          
+          const { data: supabaseData, error: supabaseError } = await Promise.race([signinPromise, timeoutPromise]) as any
           
           if (!supabaseError && supabaseData.user) {
             console.log('✅ User signed in successfully with Supabase')
@@ -451,8 +483,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.warn('⚠️ Supabase signin error:', supabaseError.message)
             throw supabaseError
           }
-        } catch (supabaseError) {
-          console.warn('⚠️ Supabase signin failed, falling back to mock:', supabaseError)
+        } catch (supabaseError: any) {
+          console.warn('⚠️ Supabase signin failed, falling back to mock:', supabaseError.message || supabaseError)
           setSupabaseAvailable(false)
         }
       }
