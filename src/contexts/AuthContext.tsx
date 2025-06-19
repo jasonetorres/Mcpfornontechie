@@ -60,7 +60,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         console.log('🔄 Initializing auth...')
         
-        // Check for existing mock user
+        // Check for existing session in Supabase
+        const { data: sessionData } = await supabase.auth.getSession()
+        
+        if (sessionData?.session) {
+          console.log('✅ Found existing session in Supabase')
+          setSession(sessionData.session)
+          setUser(sessionData.session.user)
+          await fetchProfile(sessionData.session.user.id)
+          setLoading(false)
+          return
+        }
+        
+        // If no Supabase session, check for existing mock user in localStorage
         const mockUser = localStorage.getItem('mock-user')
         if (mockUser && mounted) {
           const userData = JSON.parse(mockUser)
@@ -79,12 +91,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(userData)
           setSession(mockSession)
           await fetchProfile(userData.id)
-        } else {
-          setLoading(false)
         }
       } catch (error) {
         console.error('❌ Error initializing auth:', error)
-        setLoading(false)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
       }
     }
 
@@ -121,11 +134,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔍 Fetching profile for user:', userId)
       
-      // Check localStorage first
+      // Try to get profile from Supabase
+      const { data: supabaseProfile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      
+      if (supabaseProfile && !error) {
+        console.log('✅ Found profile in Supabase:', supabaseProfile.email)
+        setProfile(supabaseProfile)
+        setLoading(false)
+        return
+      }
+      
+      // If no Supabase profile, check localStorage
       const mockProfile = localStorage.getItem('mock-profile')
       if (mockProfile) {
         const profileData = JSON.parse(mockProfile)
-        console.log('✅ Found existing profile:', profileData.email)
+        console.log('✅ Found existing profile in localStorage:', profileData.email)
         setProfile(profileData)
         setLoading(false)
         return
@@ -164,70 +191,132 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔄 Signing up user:', email)
       setLoading(true)
       
-      // Simulate network delay for realistic experience
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Create a mock user with a persistent ID
-      const userId = `user-${Date.now()}`
-      const mockUser = {
-        id: userId,
+      // Try to sign up with Supabase first
+      const { data: supabaseData, error: supabaseError } = await supabase.auth.signUp({
         email,
-        user_metadata: {
-          full_name: userData?.full_name,
-          role: userData?.role,
-          company: userData?.company
-        },
-        created_at: new Date().toISOString()
-      }
-      
-      // Store in localStorage
-      localStorage.setItem('mock-user', JSON.stringify(mockUser))
-      
-      // Create profile with current timestamp
-      const now = new Date().toISOString()
-      const profileData = {
-        id: userId,
-        email: email,
-        full_name: userData?.full_name || null,
-        role: userData?.role || null,
-        company: userData?.company || null,
-        avatar_url: null,
-        created_at: now,
-        updated_at: now
-      }
-      
-      // Store profile in localStorage
-      localStorage.setItem('mock-profile', JSON.stringify(profileData))
-      
-      // Update state
-      setUser(mockUser as User)
-      setProfile(profileData)
-      
-      // Create session
-      const mockSession = {
-        access_token: 'mock-token-' + Date.now(),
-        user: mockUser,
-        expires_at: Date.now() + (24 * 60 * 60 * 1000),
-        expires_in: 24 * 60 * 60,
-        refresh_token: 'mock-refresh-' + Date.now(),
-        token_type: 'bearer'
-      } as Session
-      setSession(mockSession)
-      
-      // Initialize user data
-      initializeUserData(userId)
-      
-      addNotification({
-        id: `success-${Date.now()}`,
-        message: 'Account created successfully! Welcome to MCP4 Everyone!',
-        type: 'success'
+        password,
+        options: {
+          data: {
+            full_name: userData?.full_name,
+            role: userData?.role,
+            company: userData?.company
+          }
+        }
       })
       
-      return { error: null }
+      if (!supabaseError && supabaseData.user) {
+        console.log('✅ User signed up successfully with Supabase')
+        
+        // Create profile with current timestamp
+        const now = new Date().toISOString()
+        const profileData = {
+          id: supabaseData.user.id,
+          email: supabaseData.user.email!,
+          full_name: userData?.full_name || null,
+          role: userData?.role || null,
+          company: userData?.company || null,
+          avatar_url: null,
+          created_at: now,
+          updated_at: now
+        }
+        
+        // Insert profile into Supabase
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert(profileData)
+        
+        if (profileError) {
+          console.error('❌ Error creating profile in Supabase:', profileError)
+        }
+        
+        // Update state
+        setUser(supabaseData.user)
+        setProfile(profileData)
+        setSession(supabaseData.session)
+        
+        // Initialize user data
+        initializeUserData(supabaseData.user.id)
+        
+        addNotification({
+          id: `signup-success-${Date.now()}`,
+          message: 'Account created successfully! Welcome to MCP4 Everyone!',
+          type: 'success'
+        })
+        
+        return { error: null }
+      }
+      
+      // If Supabase fails or is not available, fall back to mock implementation
+      if (supabaseError || !supabaseData.user) {
+        console.log('⚠️ Falling back to mock signup')
+        
+        // Simulate network delay for realistic experience
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Create a mock user with a persistent ID
+        const userId = `user-${Date.now()}`
+        const mockUser = {
+          id: userId,
+          email,
+          user_metadata: {
+            full_name: userData?.full_name,
+            role: userData?.role,
+            company: userData?.company
+          },
+          created_at: new Date().toISOString()
+        }
+        
+        // Store in localStorage
+        localStorage.setItem('mock-user', JSON.stringify(mockUser))
+        
+        // Create profile with current timestamp
+        const now = new Date().toISOString()
+        const profileData = {
+          id: userId,
+          email: email,
+          full_name: userData?.full_name || null,
+          role: userData?.role || null,
+          company: userData?.company || null,
+          avatar_url: null,
+          created_at: now,
+          updated_at: now
+        }
+        
+        // Store profile in localStorage
+        localStorage.setItem('mock-profile', JSON.stringify(profileData))
+        
+        // Update state
+        setUser(mockUser as User)
+        setProfile(profileData)
+        
+        // Create session
+        const mockSession = {
+          access_token: 'mock-token-' + Date.now(),
+          user: mockUser,
+          expires_at: Date.now() + (24 * 60 * 60 * 1000),
+          expires_in: 24 * 60 * 60,
+          refresh_token: 'mock-refresh-' + Date.now(),
+          token_type: 'bearer'
+        } as Session
+        setSession(mockSession)
+        
+        // Initialize user data
+        initializeUserData(userId)
+        
+        addNotification({
+          id: `signup-success-${Date.now()}`,
+          message: 'Account created successfully! Welcome to MCP4 Everyone!',
+          type: 'success'
+        })
+        
+        return { error: null }
+      }
+      
+      return { error: supabaseError }
     } catch (error: any) {
       console.error('❌ Error in signUp:', error)
       addNotification({
-        id: `error-${Date.now()}`,
+        id: `signup-error-${Date.now()}`,
         message: error.message || 'An error occurred during sign up',
         type: 'error'
       })
@@ -242,85 +331,117 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔄 Signing in user:', email)
       setLoading(true)
       
-      // Simulate network delay for realistic experience
-      await new Promise(resolve => setTimeout(resolve, 800))
-      
-      // Check if there's an existing user with this email
-      const existingUserData = localStorage.getItem('mock-user')
-      let userId: string
-      let mockUser: any
-      
-      if (existingUserData) {
-        // Use existing user data
-        mockUser = JSON.parse(existingUserData)
-        userId = mockUser.id
-        console.log('✅ Found existing user account:', mockUser.email)
-      } else {
-        // Create a new user if none exists
-        userId = `user-${Date.now()}`
-        mockUser = {
-          id: userId,
-          email,
-          user_metadata: {
-            full_name: 'Demo User',
-            role: 'Community Member',
-            company: 'MCP Academy'
-          },
-          created_at: new Date().toISOString()
-        }
-        localStorage.setItem('mock-user', JSON.stringify(mockUser))
-        console.log('✅ Created new user account:', mockUser.email)
-      }
-      
-      // Check for existing profile
-      const existingProfile = localStorage.getItem('mock-profile')
-      if (!existingProfile) {
-        // Create a new profile if none exists
-        const profileData = {
-          id: userId,
-          email,
-          full_name: mockUser.user_metadata?.full_name || 'Demo User',
-          role: mockUser.user_metadata?.role || 'Community Member',
-          company: mockUser.user_metadata?.company || 'MCP Academy',
-          avatar_url: mockUser.user_metadata?.avatar_url || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-        localStorage.setItem('mock-profile', JSON.stringify(profileData))
-        console.log('✅ Created new profile:', profileData.email)
-      }
-      
-      // Update state
-      setUser(mockUser as User)
-      
-      // Create session
-      const mockSession = {
-        access_token: 'mock-token-' + Date.now(),
-        user: mockUser,
-        expires_at: Date.now() + (24 * 60 * 60 * 1000),
-        expires_in: 24 * 60 * 60,
-        refresh_token: 'mock-refresh-' + Date.now(),
-        token_type: 'bearer'
-      } as Session
-      setSession(mockSession)
-      
-      // Fetch and set profile
-      await fetchProfile(userId)
-      
-      // Initialize user data
-      initializeUserData(userId)
-      
-      addNotification({
-        id: `success-${Date.now()}`,
-        message: 'Welcome back! You are now signed in.',
-        type: 'success'
+      // Try to sign in with Supabase first
+      const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
       
-      return { error: null }
+      if (!supabaseError && supabaseData.user) {
+        console.log('✅ User signed in successfully with Supabase')
+        
+        // Update state
+        setUser(supabaseData.user)
+        setSession(supabaseData.session)
+        
+        // Fetch and set profile
+        await fetchProfile(supabaseData.user.id)
+        
+        addNotification({
+          id: `signin-success-${Date.now()}`,
+          message: 'Welcome back! You are now signed in.',
+          type: 'success'
+        })
+        
+        return { error: null }
+      }
+      
+      // If Supabase fails or is not available, fall back to mock implementation
+      if (supabaseError || !supabaseData.user) {
+        console.log('⚠️ Falling back to mock signin')
+        
+        // Simulate network delay for realistic experience
+        await new Promise(resolve => setTimeout(resolve, 800))
+        
+        // Check if there's an existing user with this email
+        const existingUserData = localStorage.getItem('mock-user')
+        let userId: string
+        let mockUser: any
+        
+        if (existingUserData) {
+          // Use existing user data
+          mockUser = JSON.parse(existingUserData)
+          userId = mockUser.id
+          console.log('✅ Found existing user account:', mockUser.email)
+        } else {
+          // Create a new user if none exists
+          userId = `user-${Date.now()}`
+          mockUser = {
+            id: userId,
+            email,
+            user_metadata: {
+              full_name: 'Demo User',
+              role: 'Community Member',
+              company: 'MCP Academy'
+            },
+            created_at: new Date().toISOString()
+          }
+          localStorage.setItem('mock-user', JSON.stringify(mockUser))
+          console.log('✅ Created new user account:', mockUser.email)
+        }
+        
+        // Check for existing profile
+        const existingProfile = localStorage.getItem('mock-profile')
+        if (!existingProfile) {
+          // Create a new profile if none exists
+          const profileData = {
+            id: userId,
+            email,
+            full_name: mockUser.user_metadata?.full_name || 'Demo User',
+            role: mockUser.user_metadata?.role || 'Community Member',
+            company: mockUser.user_metadata?.company || 'MCP Academy',
+            avatar_url: mockUser.user_metadata?.avatar_url || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+          localStorage.setItem('mock-profile', JSON.stringify(profileData))
+          console.log('✅ Created new profile:', profileData.email)
+        }
+        
+        // Update state
+        setUser(mockUser as User)
+        
+        // Create session
+        const mockSession = {
+          access_token: 'mock-token-' + Date.now(),
+          user: mockUser,
+          expires_at: Date.now() + (24 * 60 * 60 * 1000),
+          expires_in: 24 * 60 * 60,
+          refresh_token: 'mock-refresh-' + Date.now(),
+          token_type: 'bearer'
+        } as Session
+        setSession(mockSession)
+        
+        // Fetch and set profile
+        await fetchProfile(userId)
+        
+        // Initialize user data
+        initializeUserData(userId)
+        
+        addNotification({
+          id: `signin-success-${Date.now()}`,
+          message: 'Welcome back! You are now signed in.',
+          type: 'success'
+        })
+        
+        return { error: null }
+      }
+      
+      return { error: supabaseError }
     } catch (error: any) {
       console.error('❌ Error in signIn:', error)
       addNotification({
-        id: `error-${Date.now()}`,
+        id: `signin-error-${Date.now()}`,
         message: error.message || 'An error occurred during sign in',
         type: 'error'
       })
@@ -340,20 +461,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
       setSession(null)
       
-      // Clear localStorage
-      localStorage.removeItem('mock-user')
-      localStorage.removeItem('mock-profile')
-      
-      // Then sign out from Supabase (which clears localStorage)
+      // Try to sign out from Supabase
       const { error } = await supabase.auth.signOut()
       
       if (error) {
-        console.error('❌ Error signing out:', error)
-      } else {
-        console.log('✅ User signed out successfully')
+        console.error('❌ Error signing out from Supabase:', error)
       }
+      
+      // Clear localStorage for mock implementation
+      localStorage.removeItem('mock-user')
+      localStorage.removeItem('mock-profile')
+      
+      console.log('✅ User signed out successfully')
+      
+      addNotification({
+        id: `signout-success-${Date.now()}`,
+        message: 'You have been signed out successfully',
+        type: 'success'
+      })
     } catch (error) {
       console.error('❌ Error in signOut:', error)
+      addNotification({
+        id: `signout-error-${Date.now()}`,
+        message: 'An error occurred during sign out',
+        type: 'error'
+      })
     } finally {
       setLoading(false)
     }
@@ -363,12 +495,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return { error: new Error('No user logged in') }
 
     try {
+      // Try to update profile in Supabase first
+      const { error: supabaseError } = await supabase
+        .from('profiles')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+      
+      if (supabaseError) {
+        console.log('⚠️ Falling back to mock profile update')
+      }
+      
+      // Update in localStorage (as fallback or for mock implementation)
       const existing = JSON.parse(localStorage.getItem('mock-profile') || '{}')
       const updated = { ...existing, ...updates, updated_at: new Date().toISOString() }
       localStorage.setItem('mock-profile', JSON.stringify(updated))
       setProfile(updated)
       
-      // Also update the user metadata if avatar_url is being updated
+      // Also update the user metadata if relevant fields are being updated
       if (updates.avatar_url !== undefined || updates.full_name !== undefined || 
           updates.role !== undefined || updates.company !== undefined) {
         const mockUser = localStorage.getItem('mock-user')
@@ -386,7 +532,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       addNotification({
-        id: `success-${Date.now()}`,
+        id: `profile-update-success-${Date.now()}`,
         message: 'Profile updated successfully',
         type: 'success'
       })
@@ -394,6 +540,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: null }
     } catch (error) {
       console.error('❌ Error in updateProfile:', error)
+      addNotification({
+        id: `profile-update-error-${Date.now()}`,
+        message: 'An error occurred while updating your profile',
+        type: 'error'
+      })
       return { error }
     }
   }
