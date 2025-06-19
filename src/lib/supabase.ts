@@ -53,8 +53,13 @@ const mockSupabaseClient = {
   })
 }
 
+// Set supabase to mock client if not already configured
+if (!supabase) {
+  supabase = mockSupabaseClient
+}
+
 // Export the configured client or mock client
-export { supabase: supabase || mockSupabaseClient, isSupabaseConfigured }
+export { supabase, isSupabaseConfigured }
 
 export type Database = {
   public: {
