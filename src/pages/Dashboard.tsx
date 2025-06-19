@@ -39,11 +39,9 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Welcome back, {profile?.full_name || 'there'}! 👋
-          </h1>
+          <h1 className="text-3xl font-bold text-white mb-4">Your Learning Dashboard</h1>
           <p className="text-gray-300">
-            Continue your MCP learning journey and track your progress
+            Track your progress and continue your MCP learning journey
           </p>
         </div>
 
