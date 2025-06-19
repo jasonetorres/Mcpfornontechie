@@ -165,12 +165,21 @@ function Community() {
 
   // Load user discussions from localStorage
   const [userDiscussions, setUserDiscussions] = useState<any[]>([]);
+  
+  // Initialize userPosts state
+  const [userPosts, setUserPosts] = useState<any[]>([]);
 
   useEffect(() => {
     if (user) {
       const savedDiscussions = localStorage.getItem(`user-discussions-${user.id}`);
       if (savedDiscussions) {
         setUserDiscussions(JSON.parse(savedDiscussions));
+      }
+      
+      // Load user posts from localStorage
+      const savedPosts = localStorage.getItem(`user-posts-${user.id}`);
+      if (savedPosts) {
+        setUserPosts(JSON.parse(savedPosts));
       }
     }
   }, [user]);
