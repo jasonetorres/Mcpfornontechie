@@ -350,68 +350,7 @@ all tasks assigned to me this week and summarize them."`
           </div>
         </div>
 
-        {/* Popular MCP Servers */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-foreground mb-8">Popular MCP Servers You Should Try</h2>
-          <p className="text-muted-foreground mb-8">
-            With over 3,000 MCP servers available, here are the most popular ones to get you started:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mcpServers.map((server, index) => (
-              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6 hover:bg-card transition-all duration-300">
-                <div className="text-4xl mb-4">{server.icon}</div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{server.name}</h3>
-                <p className="text-muted-foreground mb-3 text-sm">{server.description}</p>
-                <div className="bg-matrix-primary/20 rounded-lg p-3 mb-4">
-                  <p className="text-matrix-primary text-sm">
-                    <strong>Use Case:</strong> {server.useCase}
-                  </p>
-                </div>
-                <a
-                  href={server.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-matrix-primary hover:text-matrix-secondary transition-colors duration-200 flex items-center space-x-1 text-sm"
-                >
-                  <span>View on GitHub</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => handleNavigation('/templates')}
-              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
-            >
-              <span>Browse Templates</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Core Concepts */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-foreground mb-8">Core Concepts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {concepts.map((concept, index) => (
-              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center flex-shrink-0">
-                    <concept.icon className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{concept.title}</h3>
-                    <p className="text-matrix-primary mb-3">{concept.description}</p>
-                    <p className="text-muted-foreground text-sm">{concept.details}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Learning Paths */}
+        {/* Learning Paths - Moved up */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-foreground mb-8">Choose Your Learning Path</h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -466,6 +405,67 @@ all tasks assigned to me this week and summarize them."`
                 </Link>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Core Concepts */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-foreground mb-8">Core Concepts</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {concepts.map((concept, index) => (
+              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-lg flex items-center justify-center flex-shrink-0">
+                    <concept.icon className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{concept.title}</h3>
+                    <p className="text-matrix-primary mb-3">{concept.description}</p>
+                    <p className="text-muted-foreground text-sm">{concept.details}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Popular MCP Servers */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-foreground mb-8">Popular MCP Servers You Should Try</h2>
+          <p className="text-muted-foreground mb-8">
+            With over 3,000 MCP servers available, here are the most popular ones to get you started:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mcpServers.map((server, index) => (
+              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6 hover:bg-card transition-all duration-300">
+                <div className="text-4xl mb-4">{server.icon}</div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{server.name}</h3>
+                <p className="text-muted-foreground mb-3 text-sm">{server.description}</p>
+                <div className="bg-matrix-primary/20 rounded-lg p-3 mb-4">
+                  <p className="text-matrix-primary text-sm">
+                    <strong>Use Case:</strong> {server.useCase}
+                  </p>
+                </div>
+                <a
+                  href={server.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-matrix-primary hover:text-matrix-secondary transition-colors duration-200 flex items-center space-x-1 text-sm"
+                >
+                  <span>View on GitHub</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => handleNavigation('/templates')}
+              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
+            >
+              <span>Browse Templates</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
