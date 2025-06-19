@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Book, Clock, Users, Star, ArrowRight, CheckCircle, Play, Download } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import GuideViewer from '../components/GuideViewer';
 
 function Guides() {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedGuide, setSelectedGuide] = useState<number | null>(null);
+  const { user } = useAuth();
+  const [completedGuides, setCompletedGuides] = useState<number[]>([]);
+
+  // Load completed guides from localStorage
+  useEffect(() => {
+    if (user) {
+      const completed = JSON.parse(localStorage.getItem(`completed-guides-${user.id}`) || '[]');
+      setCompletedGuides(completed);
+    } else {
+      setCompletedGuides([]);
+    }
+  }, [user]);
 
   const categories = [
     { id: 'all', name: 'All Guides' },
@@ -853,8 +868,6 @@ Ready to revolutionize your PM workflow? Try our [Project Status Reporter templa
     }
   };
 
-  const [selectedGuide, setSelectedGuide] = useState<number | null>(null);
-
   const openGuide = (guideId: number) => {
     setSelectedGuide(guideId);
   };
@@ -920,6 +933,12 @@ Ready to revolutionize your PM workflow? Try our [Project Status Reporter templa
                   <Star className="w-4 h-4 text-yellow-400" />
                   <span className="text-yellow-300">4.9/5</span>
                 </div>
+                {completedGuides.includes(1) && (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    <span className="text-green-300">Completed</span>
+                  </div>
+                )}
               </div>
               <button 
                 onClick={() => openGuide(1)}
@@ -978,6 +997,12 @@ Ready to revolutionize your PM workflow? Try our [Project Status Reporter templa
                     <Users className="w-4 h-4 text-green-400" />
                     <span className="text-green-300">{guide.readers.toLocaleString()}</span>
                   </div>
+                  {completedGuides.includes(guide.id) && (
+                    <div className="flex items-center space-x-1">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span className="text-green-300">Completed</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1049,76 +1074,9 @@ Ready to revolutionize your PM workflow? Try our [Project Status Reporter templa
           ))}
         </div>
 
-        {/* Guide Reader Modal */}
-        {selectedGuide && currentGuide && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-white/10 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-              {/* Header */}
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">{currentGuide.title}</h2>
-                    <p className="text-gray-300">by {currentGuide.author}</p>
-                  </div>
-                  <button
-                    onClick={closeGuide}
-                    className="text-gray-400 hover:text-white transition-colors duration-200"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6 overflow-y-auto max-h-[70vh]">
-                <div className="prose prose-invert max-w-none">
-                  <div className="whitespace-pre-wrap text-gray-300 leading-relaxed">
-                    {currentGuide.content}
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="p-6 border-t border-white/10">
-                <div className="flex justify-between">
-                  <div className="flex items-center space-x-4 text-sm text-gray-400">
-                    <span>{currentGuide.readTime} read</span>
-                    <span>•</span>
-                    <span>{currentGuide.readers.toLocaleString()} readers</span>
-                    <span>•</span>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400" />
-                      <span className="text-yellow-400">{currentGuide.rating}</span>
-                    </div>
-                  </div>
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => {
-                        const blob = new Blob([currentGuide.content], { type: 'text/markdown' });
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `${currentGuide.title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}.md`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
-                      }}
-                      className="border border-white/20 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors duration-200"
-                    >
-                      Download
-                    </button>
-                    <button
-                      onClick={closeGuide}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Guide Viewer Modal */}
+        {selectedGuide !== null && currentGuide && (
+          <GuideViewer guide={currentGuide} onClose={closeGuide} />
         )}
 
         {/* Call to Action */}
