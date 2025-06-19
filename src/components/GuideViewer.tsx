@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, X, CheckCircle, Clock, Users, Star, Download } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useXP } from '../hooks/useXP';
+import { useGuideProgress } from '../hooks/useGuideProgress';
 
 interface GuideViewerProps {
   guide: {
@@ -16,8 +16,8 @@ interface GuideViewerProps {
 }
 
 export default function GuideViewer({ guide, onClose }: GuideViewerProps) {
-  const { user, addNotification } = useAuth();
-  const { addXP } = useXP();
+  const { user } = useAuth();
+  const { markGuideCompleted, isGuideCompleted } = useGuideProgress();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [slides, setSlides] = useState<string[]>([]);
@@ -54,6 +54,13 @@ export default function GuideViewer({ guide, onClose }: GuideViewerProps) {
     }
   }, [guide]);
 
+  // Check if guide is already completed
+  useEffect(() => {
+    if (user) {
+      setCompleted(isGuideCompleted(guide.id));
+    }
+  }, [user, guide.id, isGuideCompleted]);
+
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
       setIsAnimating(true);
@@ -62,7 +69,7 @@ export default function GuideViewer({ guide, onClose }: GuideViewerProps) {
         setIsAnimating(false);
       }, 300);
     } else if (!completed && user) {
-      markAsCompleted();
+      handleMarkAsCompleted();
     }
   };
 
@@ -76,40 +83,14 @@ export default function GuideViewer({ guide, onClose }: GuideViewerProps) {
     }
   };
 
-  const markAsCompleted = async () => {
+  const handleMarkAsCompleted = async () => {
     if (!user) return;
     
-    setCompleted(true);
-    
-    // Save completion to localStorage
-    const completedGuides = JSON.parse(localStorage.getItem(`completed-guides-${user.id}`) || '[]');
-    if (!completedGuides.includes(guide.id)) {
-      completedGuides.push(guide.id);
-      localStorage.setItem(`completed-guides-${user.id}`, JSON.stringify(completedGuides));
-      
-      // Award XP
-      const xpAmount = 50;
-      const leveledUp = await addXP(xpAmount, 'lesson_completed', `Completed guide: ${guide.title}`);
-      
-      // Show notification
-      addNotification({
-        id: `guide-completed-${guide.id}`,
-        message: `Guide completed! You earned ${xpAmount} XP`,
-        type: 'success',
-        duration: 5000
-      });
+    const success = await markGuideCompleted(guide.id, guide.title);
+    if (success) {
+      setCompleted(true);
     }
   };
-
-  // Check if guide is already completed
-  useEffect(() => {
-    if (user) {
-      const completedGuides = JSON.parse(localStorage.getItem(`completed-guides-${user.id}`) || '[]');
-      if (completedGuides.includes(guide.id)) {
-        setCompleted(true);
-      }
-    }
-  }, [user, guide.id]);
 
   // Format markdown for display
   const formatMarkdown = (markdown: string) => {
@@ -256,7 +237,7 @@ export default function GuideViewer({ guide, onClose }: GuideViewerProps) {
               </button>
             ) : (
               <button
-                onClick={completed ? onClose : markAsCompleted}
+                onClick={completed ? onClose : handleMarkAsCompleted}
                 className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2 ${
                   completed
                     ? 'bg-muted text-foreground hover:bg-muted/80'

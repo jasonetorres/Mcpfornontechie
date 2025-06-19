@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight, Trophy, Star, Clock, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useXP } from '../hooks/useXP';
+import { useGuideProgress } from '../hooks/useGuideProgress';
 import LevelUpModal from '../components/LevelUpModal';
 
 function Learn() {
@@ -13,6 +14,7 @@ function Learn() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addXP, level } = useXP();
+  const { completedGuides, isGuideCompleted } = useGuideProgress();
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -183,7 +185,8 @@ all tasks assigned to me this week and summarize them."`
       difficulty: 'Beginner',
       tools: ['Zapier', 'Google Sheets', 'ChatGPT'],
       route: '/beginner-path',
-      xp: 100
+      xp: 100,
+      guideId: 1
     },
     {
       title: 'Some Tech Experience',
@@ -199,7 +202,8 @@ all tasks assigned to me this week and summarize them."`
       difficulty: 'Intermediate',
       tools: ['Airtable', 'Notion AI', 'Power Platform'],
       route: '/intermediate-path',
-      xp: 150
+      xp: 150,
+      guideId: 3
     },
     {
       title: 'Power User',
@@ -215,7 +219,8 @@ all tasks assigned to me this week and summarize them."`
       difficulty: 'Advanced',
       tools: ['Custom APIs', 'Advanced Zapier', 'Multiple platforms'],
       route: '/advanced-path',
-      xp: 200
+      xp: 200,
+      guideId: 6
     }
   ];
 
@@ -376,6 +381,13 @@ all tasks assigned to me this week and summarize them."`
                       <span className="text-muted-foreground">•</span>
                       <Trophy className="w-4 h-4 text-yellow-400" />
                       <span className="text-yellow-400">+{path.xp} XP</span>
+                    </>
+                  )}
+                  {path.guideId && isGuideCompleted(path.guideId) && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span className="text-green-400">Guide Completed</span>
                     </>
                   )}
                 </div>
