@@ -354,7 +354,7 @@ function Community() {
       }
     } else {
       // Update sample discussions
-      setRecentDiscussions(recentDiscussions.map(discussion => {
+      const updatedDiscussions = recentDiscussions.map(discussion => {
         if (discussion.id === discussionId) {
           return {
             ...discussion,
@@ -363,7 +363,9 @@ function Community() {
           };
         }
         return discussion;
-      }));
+      });
+      // In a real app, we would update the server here
+      console.log('Updated sample discussion:', updatedDiscussions.find(d => d.id === discussionId));
     }
   };
 
@@ -913,9 +915,13 @@ function Community() {
                         
                         <div className="flex flex-wrap gap-2 mb-4">
                           {discussion.tags.map((tag, tagIndex) => (
-                            <span key={tagIndex} className="badge-secondary">
+                            <button 
+                              key={tagIndex} 
+                              onClick={() => setSearchQuery(tag)}
+                              className="badge-secondary hover:bg-muted/80 transition-colors duration-200"
+                            >
                               #{tag}
-                            </span>
+                            </button>
                           ))}
                         </div>
                         
