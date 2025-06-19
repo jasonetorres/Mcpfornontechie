@@ -51,6 +51,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState<Notification[]>([])
+  const [supabaseAvailable, setSupabaseAvailable] = useState(isSupabaseConfigured)
+
+  // Test Supabase connection
+  const testSupabaseConnection = async (): Promise<boolean> => {
+    if (!isSupabaseConfigured) {
+      return false
+    }
+
+    try {
+      // Try a simple query to test the connection
+      const { error } = await supabase.from('profiles').select('id').limit(1)
+      if (error) {
+        console.warn('⚠️ Supabase connection test failed:', error.message)
+        return false
+      }
+      return true
+    } catch (error) {
+      console.warn('⚠️ Supabase connection test failed:', error)
+      return false
+    }
+  }
 
   useEffect(() => {
     let mounted = true
@@ -60,26 +81,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         console.log('🔄 Initializing auth...')
         
-        // Only try Supabase if it's properly configured
+        // Test Supabase connection first if configured
         if (isSupabaseConfigured) {
-          console.log('✅ Supabase is configured, checking for session...')
+          console.log('✅ Supabase is configured, testing connection...')
+          const connectionWorking = await testSupabaseConnection()
+          setSupabaseAvailable(connectionWorking)
           
-          // Check for existing session in Supabase
-          const { data: sessionData } = await supabase.auth.getSession()
-          
-          if (sessionData?.session) {
-            console.log('✅ Found existing session in Supabase')
-            setSession(sessionData.session)
-            setUser(sessionData.session.user)
-            await fetchProfile(sessionData.session.user.id)
-            setLoading(false)
-            return
+          if (connectionWorking) {
+            console.log('✅ Supabase connection successful, checking for session...')
+            
+            try {
+              // Check for existing session in Supabase
+              const { data: sessionData, error } = await supabase.auth.getSession()
+              
+              if (error) {
+                console.warn('⚠️ Error getting Supabase session:', error.message)
+                throw error
+              }
+              
+              if (sessionData?.session) {
+                console.log('✅ Found existing session in Supabase')
+                setSession(sessionData.session)
+                setUser(sessionData.session.user)
+                await fetchProfile(sessionData.session.user.id)
+                setLoading(false)
+                return
+              }
+            } catch (sessionError) {
+              console.warn('⚠️ Supabase session check failed, falling back to mock:', sessionError)
+              setSupabaseAvailable(false)
+            }
+          } else {
+            console.log('⚠️ Supabase connection failed, using mock authentication')
           }
         } else {
           console.log('⚠️ Supabase not configured, using mock authentication')
         }
         
-        // If no Supabase session or Supabase not configured, check for existing mock user in localStorage
+        // If no Supabase session or Supabase not available, check for existing mock user in localStorage
         const mockUser = localStorage.getItem('mock-user')
         if (mockUser && mounted) {
           const userData = JSON.parse(mockUser)
@@ -133,9 +172,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initializeAuth()
 
-    // Listen for auth changes only if Supabase is configured
+    // Listen for auth changes only if Supabase is available
     let subscription: any = null
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabaseAvailable) {
       const {
         data: { subscription: authSubscription },
       } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -164,14 +203,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         subscription.unsubscribe()
       }
     }
-  }, [])
+  }, [supabaseAvailable])
 
   const fetchProfile = async (userId: string) => {
     try {
       console.log('🔍 Fetching profile for user:', userId)
       
-      // Try to get profile from Supabase only if configured
-      if (isSupabaseConfigured) {
+      // Try to get profile from Supabase only if available
+      if (supabaseAvailable) {
         try {
           const { data: supabaseProfile, error } = await supabase
             .from('profiles')
@@ -184,13 +223,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setProfile(supabaseProfile)
             setLoading(false)
             return
+          } else if (error) {
+            console.warn('⚠️ Supabase profile fetch error:', error.message)
+            // Don't throw here, fall back to localStorage
           }
         } catch (supabaseError) {
           console.warn('⚠️ Supabase profile fetch failed, falling back to localStorage:', supabaseError)
+          setSupabaseAvailable(false)
         }
       }
       
-      // If no Supabase profile or Supabase not configured, check localStorage
+      // If no Supabase profile or Supabase not available, check localStorage
       const mockProfile = localStorage.getItem('mock-profile')
       if (mockProfile) {
         const profileData = JSON.parse(mockProfile)
@@ -233,8 +276,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔄 Signing up user:', email)
       setLoading(true)
       
-      // Try to sign up with Supabase first only if configured
-      if (isSupabaseConfigured) {
+      // Try to sign up with Supabase first only if available
+      if (supabaseAvailable) {
         try {
           const { data: supabaseData, error: supabaseError } = await supabase.auth.signUp({
             email,
@@ -288,9 +331,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
             
             return { error: null }
+          } else if (supabaseError) {
+            console.warn('⚠️ Supabase signup error:', supabaseError.message)
+            throw supabaseError
           }
         } catch (supabaseError) {
           console.warn('⚠️ Supabase signup failed, falling back to mock:', supabaseError)
+          setSupabaseAvailable(false)
         }
       }
       
@@ -375,8 +422,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔄 Signing in user:', email)
       setLoading(true)
       
-      // Try to sign in with Supabase first only if configured
-      if (isSupabaseConfigured) {
+      // Try to sign in with Supabase first only if available
+      if (supabaseAvailable) {
         try {
           const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
             email,
@@ -400,9 +447,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
             
             return { error: null }
+          } else if (supabaseError) {
+            console.warn('⚠️ Supabase signin error:', supabaseError.message)
+            throw supabaseError
           }
         } catch (supabaseError) {
           console.warn('⚠️ Supabase signin failed, falling back to mock:', supabaseError)
+          setSupabaseAvailable(false)
         }
       }
       
@@ -507,8 +558,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
       setSession(null)
       
-      // Try to sign out from Supabase only if configured
-      if (isSupabaseConfigured) {
+      // Try to sign out from Supabase only if available
+      if (supabaseAvailable) {
         try {
           const { error } = await supabase.auth.signOut()
           
@@ -547,8 +598,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return { error: new Error('No user logged in') }
 
     try {
-      // Try to update profile in Supabase first only if configured
-      if (isSupabaseConfigured) {
+      // Try to update profile in Supabase first only if available
+      if (supabaseAvailable) {
         try {
           const { error: supabaseError } = await supabase
             .from('profiles')
@@ -560,9 +611,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           if (!supabaseError) {
             console.log('✅ Profile updated in Supabase')
+          } else {
+            console.warn('⚠️ Supabase profile update error:', supabaseError.message)
+            throw supabaseError
           }
         } catch (supabaseError) {
           console.warn('⚠️ Supabase profile update failed, using localStorage:', supabaseError)
+          setSupabaseAvailable(false)
         }
       }
       
@@ -701,7 +756,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     removeNotification
   }
 
-  console.log('🔄 AuthProvider render - user:', user?.email || 'none', 'profile:', profile?.email || 'none', 'loading:', loading)
+  console.log('🔄 AuthProvider render - user:', user?.email || 'none', 'profile:', profile?.email || 'none', 'loading:', loading, 'supabaseAvailable:', supabaseAvailable)
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
