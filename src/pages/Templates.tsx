@@ -570,6 +570,135 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
 }`
         }
       ]
+    },
+    {
+      id: 9,
+      title: 'Google Keep Notes Manager',
+      description: 'Read, create, update and delete Google Keep notes using AI',
+      category: 'operations',
+      platform: 'make',
+      difficulty: 'Intermediate',
+      rating: 4.6,
+      downloads: 289,
+      dataSource: 'Google Keep',
+      aiModel: 'Claude',
+      features: [
+        'Note search and retrieval',
+        'Create new notes',
+        'Update existing notes',
+        'Delete notes',
+        'Automatic labeling'
+      ],
+      setupTime: '45 minutes',
+      preview: `// Google Keep MCP Configuration
+{
+  "server_config": {
+    "name": "keep-mcp",
+    "credentials": {
+      "google_email": "YOUR_EMAIL",
+      "google_master_token": "YOUR_MASTER_TOKEN"
+    },
+    "safety_features": {
+      "restrict_to_labeled_notes": true,
+      "label": "keep-mcp"
+    }
+  },
+  "operations": ["find", "create_note", "update_note", "delete_note"]
+}`,
+      tags: ['notes', 'productivity', 'google-workspace'],
+      files: [
+        {
+          name: 'keep-mcp-setup.md',
+          content: `# Google Keep MCP Server Setup
+
+## Installation
+1. Install the package using pipx:
+   \`pipx run keep-mcp\`
+
+2. Configure your MCP server with your Google credentials:
+   \`\`\`json
+   "mcpServers": {
+     "keep-mcp-pipx": {
+       "command": "pipx",
+       "args": [
+         "run",
+         "keep-mcp"
+       ],
+       "env": {
+         "GOOGLE_EMAIL": "Your Google Email",
+         "GOOGLE_MASTER_TOKEN": "Your Google Master Token"
+       }
+     }
+   }
+   \`\`\`
+
+3. Obtain a Google Master Token:
+   - Check https://gkeepapi.readthedocs.io/en/latest/#obtaining-a-master-token
+   - Alternative method: https://github.com/simon-weber/gpsoauth?tab=readme-ov-file#alternative-flow
+
+## Features
+- **find**: Search for notes based on a query string
+- **create_note**: Create a new note with title and text (automatically adds keep-mcp label)
+- **update_note**: Update a note's title and text
+- **delete_note**: Mark a note for deletion
+
+## Safety Features
+By default, all destructive and modification operations are restricted to notes that were created by the MCP server (i.e., have the keep-mcp label). Set UNSAFE_MODE to true to bypass this restriction:
+
+\`\`\`json
+"env": {
+  "GOOGLE_EMAIL": "Your Google Email",
+  "GOOGLE_MASTER_TOKEN": "Your Google Master Token",
+  "UNSAFE_MODE": "true"
+}
+\`\`\`
+
+## Troubleshooting
+If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.google.com/ac/devices/settings/general and turn off "Turn off mobile management (Unmanaged)"`
+        },
+        {
+          name: 'make-integration.json',
+          content: `{
+  "scenario": {
+    "name": "AI Note Manager",
+    "trigger": {
+      "type": "webhook",
+      "method": "POST"
+    },
+    "steps": [
+      {
+        "name": "Parse Request",
+        "module": "text-parser",
+        "operation": "parse-json",
+        "input": "{{trigger.body}}"
+      },
+      {
+        "name": "Process with AI",
+        "module": "ai",
+        "operation": "generate",
+        "input": {
+          "prompt": "Based on the user request, determine what action to take with Google Keep notes.",
+          "model": "claude-3-sonnet"
+        }
+      },
+      {
+        "name": "Execute Keep MCP Command",
+        "module": "http",
+        "operation": "make-request",
+        "input": {
+          "url": "http://localhost:8000/keep-mcp",
+          "method": "POST",
+          "body": {
+            "action": "{{2.action}}",
+            "parameters": "{{2.parameters}}"
+          }
+        }
+      }
+    ]
+  }
+}`
+        }
+      ]
     }
   ];
 
@@ -695,6 +824,11 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
       name: 'AgentQL MCP Server',
       description: 'For data extraction capabilities',
       url: 'https://github.com/agentql/agentql-mcp'
+    },
+    {
+      name: 'Google Keep MCP Server',
+      description: 'For Google Keep notes management',
+      url: 'https://github.com/keep-mcp/keep-mcp'
     }
   ];
 
@@ -1015,6 +1149,95 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
                     <Shield className="w-4 h-4 text-red-400" />
                   </div>
                   <span className="text-gray-300">Teams requiring advanced compliance features</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Google Keep MCP Server Highlight */}
+        <div className="mt-12 bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-8">
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="text-4xl">📝</div>
+            <div>
+              <h3 className="text-2xl font-bold text-white">Google Keep MCP Server</h3>
+              <p className="text-green-300">Manage your Google Keep notes with AI-powered assistance</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-lg font-semibold text-white mb-4">Key Features</h4>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Search for notes based on query strings</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Create new notes with title and text content</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Update existing notes with new content</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Delete notes when they're no longer needed</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                  <span className="text-gray-300">Safety features to protect your notes</span>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <a 
+                  href="https://github.com/keep-mcp/keep-mcp" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
+                >
+                  <span>View on GitHub</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+            
+            <div className="bg-slate-900/50 rounded-lg p-6">
+              <h4 className="text-white font-semibold mb-4">Installation</h4>
+              <div className="space-y-4">
+                <div className="bg-slate-800/70 p-3 rounded-lg">
+                  <div className="text-green-300 font-mono text-sm mb-1">pipx run keep-mcp</div>
+                  <div className="text-gray-400 text-xs">Run the MCP server using pipx</div>
+                </div>
+                
+                <div className="bg-slate-800/70 p-3 rounded-lg">
+                  <div className="text-green-300 font-mono text-sm mb-1">
+                    {`"mcpServers": {
+  "keep-mcp-pipx": {
+    "command": "pipx",
+    "args": [
+      "run",
+      "keep-mcp"
+    ],
+    "env": {
+      "GOOGLE_EMAIL": "Your Google Email",
+      "GOOGLE_MASTER_TOKEN": "Your Google Master Token"
+    }
+  }
+}`}
+                  </div>
+                  <div className="text-gray-400 text-xs">Configure in your MCP-compatible application</div>
+                </div>
+                
+                <div className="text-gray-300 text-sm">
+                  <p>Try these example commands:</p>
+                  <div className="bg-slate-800/70 p-3 rounded-lg mt-2 text-green-200 italic">
+                    "Find all my notes about project ideas"<br/>
+                    "Create a new note titled 'Shopping List' with the text 'Milk, Eggs, Bread'"<br/>
+                    "Update my note about meeting agenda with new action items"
+                  </div>
                 </div>
               </div>
             </div>
