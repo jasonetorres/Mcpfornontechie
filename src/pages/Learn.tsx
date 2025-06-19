@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight } from 'lucide-react';
+import { Copy, Check, Lightbulb, Play, Workflow, Database, Shield, Brain, Usb, MessageSquare, ExternalLink, ArrowRight, Trophy, Star } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useXP } from '../hooks/useXP';
+import LevelUpModal from '../components/LevelUpModal';
 
 function Learn() {
   const [activeTab, setActiveTab] = useState('basics');
   const [codeCopied, setCopiedTemplate] = useState('');
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addXP, level } = useXP();
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -16,6 +23,16 @@ function Learn() {
     navigator.clipboard.writeText(code);
     setCopiedTemplate(id);
     setTimeout(() => setCopiedTemplate(''), 2000);
+  };
+
+  const handleCompleteLesson = async () => {
+    if (user) {
+      const leveledUp = await addXP(20, 'lesson_completed', 'Completed MCP Basics lesson');
+      if (leveledUp) {
+        setNewLevel(level + 1);
+        setShowLevelUp(true);
+      }
+    }
   };
 
   const codeExamples = {
@@ -165,7 +182,8 @@ all tasks assigned to me this week and summarize them."`
       ],
       difficulty: 'Beginner',
       tools: ['Zapier', 'Google Sheets', 'ChatGPT'],
-      route: '/beginner-path'
+      route: '/beginner-path',
+      xp: 100
     },
     {
       title: 'Some Tech Experience',
@@ -180,7 +198,8 @@ all tasks assigned to me this week and summarize them."`
       ],
       difficulty: 'Intermediate',
       tools: ['Airtable', 'Notion AI', 'Power Platform'],
-      route: '/intermediate-path'
+      route: '/intermediate-path',
+      xp: 150
     },
     {
       title: 'Power User',
@@ -195,7 +214,8 @@ all tasks assigned to me this week and summarize them."`
       ],
       difficulty: 'Advanced',
       tools: ['Custom APIs', 'Advanced Zapier', 'Multiple platforms'],
-      route: '/advanced-path'
+      route: '/advanced-path',
+      xp: 200
     }
   ];
 
@@ -280,6 +300,19 @@ all tasks assigned to me this week and summarize them."`
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Master the concepts that will transform how you work with AI - the "USB-C for AI"
           </p>
+          
+          {user && (
+            <div className="mt-4 flex items-center justify-center space-x-4">
+              <div className="flex items-center space-x-2 bg-matrix-primary/20 text-matrix-primary px-3 py-1 rounded-full">
+                <Star className="w-4 h-4" />
+                <span>Level {level}</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full">
+                <Trophy className="w-4 h-4" />
+                <span>+20 XP per lesson</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* What is MCP Section */}
@@ -396,7 +429,17 @@ all tasks assigned to me this week and summarize them."`
                 </div>
                 
                 <p className="text-muted-foreground mb-3">{path.description}</p>
-                <p className="text-matrix-primary text-sm mb-4">Duration: {path.duration}</p>
+                <div className="flex items-center space-x-2 text-matrix-primary text-sm mb-4">
+                  <Clock className="w-4 h-4" />
+                  <span>{path.duration}</span>
+                  {user && (
+                    <>
+                      <span className="text-muted-foreground">•</span>
+                      <Trophy className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-400">+{path.xp} XP</span>
+                    </>
+                  )}
+                </div>
                 
                 <div className="space-y-2 mb-4">
                   {path.steps.map((step, stepIndex) => (
@@ -458,6 +501,18 @@ all tasks assigned to me this week and summarize them."`
                 </button>
               ))}
             </div>
+            
+            {user && (
+              <div className="mt-6 pt-6 border-t border-border">
+                <button
+                  onClick={handleCompleteLesson}
+                  className="btn-primary w-full flex items-center justify-center"
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  <span>Mark Lesson Complete (+20 XP)</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Code Example */}
@@ -506,6 +561,18 @@ all tasks assigned to me this week and summarize them."`
           </div>
         </div>
       </div>
+      
+      {/* Level Up Modal */}
+      <LevelUpModal 
+        isOpen={showLevelUp}
+        onClose={() => setShowLevelUp(false)}
+        level={newLevel}
+        rewards={[
+          'Access to Intermediate Templates',
+          'Community Forum Badge',
+          'Bonus XP Multiplier (1.2x)'
+        ]}
+      />
     </div>
   );
 }

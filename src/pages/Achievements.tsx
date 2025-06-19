@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Trophy, Star, Target, Zap, Users, BookOpen, Award, Lock, Play, Download } from 'lucide-react'
+import { Trophy, Star, Target, Zap, Users, BookOpen, Award, Lock, Play, Download, ArrowRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useAchievements } from '../hooks/useAchievements'
+import { useXP } from '../hooks/useXP'
 
 const iconMap = {
   trophy: Trophy,
@@ -19,7 +20,9 @@ const iconMap = {
 export default function Achievements() {
   const { user, profile } = useAuth()
   const { achievements, getTotalPoints, getCompletionPercentage } = useAchievements()
+  const { level, totalXP } = useXP()
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [showConfetti, setShowConfetti] = useState(false)
 
   const earnedAchievements = achievements.filter(a => a.earned)
   const totalPoints = getTotalPoints()
@@ -31,6 +34,15 @@ export default function Achievements() {
   const filteredAchievements = selectedCategory === 'All' 
     ? achievements 
     : achievements.filter(a => a.category === selectedCategory)
+    
+  // Show confetti animation when the page loads if user has achievements
+  useEffect(() => {
+    if (user && earnedAchievements.length > 0) {
+      setShowConfetti(true)
+      const timer = setTimeout(() => setShowConfetti(false), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [user, earnedAchievements.length])
 
   if (!user) {
     return (
@@ -60,6 +72,13 @@ export default function Achievements() {
           <p className="text-gray-300 max-w-2xl mx-auto">
             Track your progress and celebrate your learning milestones
           </p>
+          
+          {/* Level and XP */}
+          <div className="mt-4 inline-flex items-center space-x-3 bg-matrix-primary/20 text-matrix-primary px-4 py-2 rounded-full">
+            <Star className="w-5 h-5" />
+            <span className="text-lg font-semibold">Level {level}</span>
+            <span className="text-sm text-matrix-secondary">{totalXP} XP</span>
+          </div>
         </div>
 
         {/* Stats */}
@@ -196,9 +215,10 @@ export default function Achievements() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/learn"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
             >
-              Continue Learning
+              <span>Continue Learning</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/beginner-path"
@@ -209,6 +229,24 @@ export default function Achievements() {
           </div>
         </div>
       </div>
+      
+      {/* Confetti Effect */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {Array.from({ length: 100 }).map((_, i) => (
+            <div 
+              key={i}
+              className="absolute w-2 h-2 rounded-full animate-matrix-rain"
+              style={{ 
+                left: `${Math.random() * 100}%`, 
+                backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${2 + Math.random() * 3}s`
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
