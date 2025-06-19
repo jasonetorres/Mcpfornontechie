@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Zap, Trophy, ArrowRight, Calendar, Target, Star } from 'lucide-react'
+import { BookOpen, Zap, Trophy, ArrowRight, Calendar, Target, Star, Users } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useAchievements } from '../hooks/useAchievements'
 import DailyStreak from './DailyStreak'
