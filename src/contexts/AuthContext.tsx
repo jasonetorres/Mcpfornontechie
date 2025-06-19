@@ -51,11 +51,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [supabaseAvailable, setSupabaseAvailable] = useState(false)
+  const [supabaseAvailable, setSupabaseAvailable] = useState(isSupabaseConfigured)
 
   // Test Supabase connection with timeout and better error handling
   const testSupabaseConnection = async (): Promise<boolean> => {
     if (!isSupabaseConfigured) {
+      console.log('⚠️ Supabase not configured, using mock authentication')
       return false
     }
 
@@ -74,6 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.warn('⚠️ Supabase connection test failed:', error.message)
         return false
       }
+      
+      console.log('✅ Supabase connection successful')
       return true
     } catch (error: any) {
       console.warn('⚠️ Supabase connection test failed:', error.message || error)
@@ -117,8 +120,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setSession(sessionData.session)
                 setUser(sessionData.session.user)
                 await fetchProfile(sessionData.session.user.id)
-                setLoading(false)
+                if (mounted) setLoading(false)
                 return
+              } else {
+                console.log('⚠️ No Supabase session found, checking localStorage')
               }
             } catch (sessionError: any) {
               console.warn('⚠️ Supabase session check failed, falling back to mock:', sessionError.message || sessionError)
@@ -135,7 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const mockUser = localStorage.getItem('mock-user')
         if (mockUser && mounted) {
           const userData = JSON.parse(mockUser)
-          console.log('✅ Found existing user:', userData.email)
+          console.log('✅ Found existing user in localStorage:', userData.email)
           
           // Create a proper session object
           const mockSession = {
@@ -204,7 +209,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           console.log('👤 No user in auth change, clearing profile')
           setProfile(null)
-          setLoading(false)
         }
       })
       subscription = authSubscription
@@ -241,7 +245,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (supabaseProfile && !error) {
             console.log('✅ Found profile in Supabase:', supabaseProfile.email)
             setProfile(supabaseProfile)
-            setLoading(false)
+            
+            // Also save to localStorage for offline/fallback access
+            localStorage.setItem('mock-profile', JSON.stringify(supabaseProfile))
+            
             return
           } else if (error) {
             console.warn('⚠️ Supabase profile fetch error:', error.message)
@@ -259,7 +266,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const profileData = JSON.parse(mockProfile)
         console.log('✅ Found existing profile in localStorage:', profileData.email)
         setProfile(profileData)
-        setLoading(false)
         return
       }
 
@@ -280,14 +286,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('✅ Created new profile:', basicProfile.email)
         localStorage.setItem('mock-profile', JSON.stringify(basicProfile))
         setProfile(basicProfile)
-        setLoading(false)
-      } else {
-        setLoading(false)
       }
     } catch (error) {
       console.error('❌ Error in fetchProfile:', error)
       setProfile(null)
-      setLoading(false)
     }
   }
 
@@ -346,6 +348,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(supabaseData.user)
             setProfile(profileData)
             setSession(supabaseData.session)
+            
+            // Also save to localStorage for fallback
+            localStorage.setItem('mock-user', JSON.stringify(supabaseData.user))
+            localStorage.setItem('mock-profile', JSON.stringify(profileData))
             
             // Initialize user data
             initializeUserData(supabaseData.user.id)
@@ -468,6 +474,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Update state
             setUser(supabaseData.user)
             setSession(supabaseData.session)
+            
+            // Also save to localStorage for fallback
+            localStorage.setItem('mock-user', JSON.stringify(supabaseData.user))
             
             // Fetch and set profile
             await fetchProfile(supabaseData.user.id)
@@ -749,6 +758,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const likedMembersKey = `liked-members-${userId}`
     if (!localStorage.getItem(likedMembersKey)) {
       localStorage.setItem(likedMembersKey, JSON.stringify([]))
+    }
+    
+    // Initialize XP data
+    const xpKey = `xp-${userId}`
+    if (!localStorage.getItem(xpKey)) {
+      localStorage.setItem(xpKey, JSON.stringify({
+        totalXP: 0,
+        activities: []
+      }))
     }
   }
 
