@@ -369,16 +369,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfile(updated)
       
       // Also update the user metadata if avatar_url is being updated
-      if (updates.avatar_url !== undefined) {
+      if (updates.avatar_url !== undefined || updates.full_name !== undefined || 
+          updates.role !== undefined || updates.company !== undefined) {
         const mockUser = localStorage.getItem('mock-user')
         if (mockUser) {
           const userData = JSON.parse(mockUser)
           userData.user_metadata = { 
             ...userData.user_metadata, 
-            avatar_url: updates.avatar_url,
-            full_name: updates.full_name || userData.user_metadata?.full_name,
-            role: updates.role || userData.user_metadata?.role,
-            company: updates.company || userData.user_metadata?.company
+            avatar_url: updates.avatar_url !== undefined ? updates.avatar_url : userData.user_metadata?.avatar_url,
+            full_name: updates.full_name !== undefined ? updates.full_name : userData.user_metadata?.full_name,
+            role: updates.role !== undefined ? updates.role : userData.user_metadata?.role,
+            company: updates.company !== undefined ? updates.company : userData.user_metadata?.company
           }
           localStorage.setItem('mock-user', JSON.stringify(userData))
         }
