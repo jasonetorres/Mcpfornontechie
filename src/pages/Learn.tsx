@@ -189,7 +189,7 @@ all tasks assigned to me this week and summarize them."`
       guideId: 1
     },
     {
-      title: 'Some Tech Experience',
+      title: 'Some Experience',
       description: 'Comfortable with spreadsheets and online tools',
       duration: '1-2 weeks',
       steps: [
@@ -253,46 +253,53 @@ all tasks assigned to me this week and summarize them."`
 
   const mcpServers = [
     {
-      name: 'Google Drive',
-      description: 'File access and search capabilities for Google Drive',
-      useCase: 'Find documents, search content, organize files',
-      icon: '📁',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive'
+      name: 'Twilio MCP Server',
+      description: 'Connect AI to Twilio for messaging and voice capabilities',
+      useCase: 'SMS notifications, voice interactions, and phone calls',
+      icon: '📱',
+      url: 'https://github.com/twilio-labs/mcp'
     },
     {
-      name: 'YouTube Transcript',
-      description: 'Grab and work with YouTube video transcripts',
-      useCase: 'Summarize videos, extract key points, create content',
-      icon: '🎥',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/youtube-transcript'
-    },
-    {
-      name: 'Google Maps',
-      description: 'Location services, directions, and place details',
-      useCase: 'Track deliveries, find locations, get directions',
-      icon: '🗺️',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps'
-    },
-    {
-      name: 'Asana',
-      description: 'View tasks, projects, workspaces, and comments',
-      useCase: 'Project management, task tracking, team coordination',
-      icon: '✅',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/asana'
-    },
-    {
-      name: 'GitHub',
-      description: 'Tools to read, search, and manage repositories',
-      useCase: 'Code management, documentation, project tracking',
+      name: 'GitHub MCP Server',
+      description: 'Access GitHub repositories, issues, and pull requests',
+      useCase: 'Code management, issue tracking, and project collaboration',
       icon: '🐙',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/github'
+      url: 'https://github.com/github/github-mcp-server'
     },
     {
-      name: 'Speech',
-      description: 'Real-time voice interaction and transcription',
-      useCase: 'Voice commands, meeting transcription, accessibility',
+      name: 'JetBrains MCP Server',
+      description: 'Integrate AI with JetBrains IDEs and tools',
+      useCase: 'Code assistance, project management, and development workflows',
+      icon: '💻',
+      url: 'https://github.com/JetBrains/mcp-jetbrains'
+    },
+    {
+      name: 'Notion MCP Server',
+      description: 'Connect AI to Notion workspaces and databases',
+      useCase: 'Knowledge management, project tracking, and documentation',
+      icon: '📝',
+      url: 'https://github.com/makenotion/notion-mcp-server'
+    },
+    {
+      name: 'Miro MCP Server',
+      description: 'Integrate AI with Miro boards and visual collaboration',
+      useCase: 'Visual brainstorming, diagramming, and team collaboration',
+      icon: '🖌️',
+      url: 'https://github.com/k-jarzyna/mcp-miro'
+    },
+    {
+      name: 'Block Goose',
+      description: 'Secure MCP server for enterprise applications',
+      useCase: 'Enterprise data access with enhanced security controls',
+      icon: '🔒',
+      url: 'https://github.com/block/goose'
+    },
+    {
+      name: 'ElevenLabs MCP',
+      description: 'Voice synthesis and audio generation for AI',
+      useCase: 'Text-to-speech, voice cloning, and audio content creation',
       icon: '🎤',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/speech'
+      url: 'https://github.com/elevenlabs/elevenlabs-mcp'
     }
   ];
 
@@ -346,8 +353,8 @@ all tasks assigned to me this week and summarize them."`
                 </p>
                 <div className="bg-matrix-primary/20 border border-matrix-primary/30 rounded-lg p-4">
                   <p className="text-matrix-primary text-sm">
-                    <strong>With MCP:</strong> You don't need to be a developer to start using them! 
-                    Connect AI to any tool with standardized MCP servers.
+                    <strong>With MCP:</strong> You don't need to be a developer! Connect AI to any tool 
+                    using standardized MCP servers.
                   </p>
                 </div>
               </div>
