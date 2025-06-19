@@ -116,12 +116,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return // Exit the function after creating profile
         } else {
           setLoading(false)
+          return // Exit if there's any other error
         }
-      } else if (data) {
+      }
+      
+      if (data) {
         console.log('✅ Profile fetched successfully:', data.email)
         setProfile(data)
-        setLoading(false)
       }
+      
+      setLoading(false)
     } catch (error) {
       console.error('❌ Error in fetchProfile:', error)
       setProfile(null)
