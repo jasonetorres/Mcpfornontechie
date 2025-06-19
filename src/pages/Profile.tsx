@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { User, Mail, Building, Briefcase, Save, Camera, Download, Shield, HelpCircle, Upload, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
@@ -12,10 +12,25 @@ export default function Profile() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
-    full_name: profile?.full_name || '',
-    role: profile?.role || '',
-    company: profile?.company || '',
+    full_name: '',
+    role: '',
+    company: '',
   })
+
+  // Initialize form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || '',
+        role: profile.role || '',
+        company: profile.company || '',
+      })
+      
+      if (profile.avatar_url) {
+        setImagePreview(profile.avatar_url)
+      }
+    }
+  }, [profile])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -148,7 +163,7 @@ export default function Profile() {
               <div className="w-24 h-24 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
                 {imagePreview || profile?.avatar_url ? (
                   <img 
-                    src={imagePreview || profile.avatar_url} 
+                    src={imagePreview || profile?.avatar_url} 
                     alt="Avatar" 
                     className="w-24 h-24 rounded-full object-cover" 
                   />

@@ -245,41 +245,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Simulate network delay for realistic experience
       await new Promise(resolve => setTimeout(resolve, 800))
       
-      // For demo purposes, create a persistent user ID
-      const userId = `user-${Date.now()}`
+      // Check if there's an existing user with this email
+      const existingUserData = localStorage.getItem('mock-user')
+      let userId: string
+      let mockUser: any
       
-      // Create a mock user
-      const mockUser = {
-        id: userId,
-        email,
-        user_metadata: {
-          full_name: 'Demo User',
-          role: 'Community Member',
-          company: 'MCP Academy'
-        },
-        created_at: new Date().toISOString()
+      if (existingUserData) {
+        // Use existing user data
+        mockUser = JSON.parse(existingUserData)
+        userId = mockUser.id
+        console.log('✅ Found existing user account:', mockUser.email)
+      } else {
+        // Create a new user if none exists
+        userId = `user-${Date.now()}`
+        mockUser = {
+          id: userId,
+          email,
+          user_metadata: {
+            full_name: 'Demo User',
+            role: 'Community Member',
+            company: 'MCP Academy'
+          },
+          created_at: new Date().toISOString()
+        }
+        localStorage.setItem('mock-user', JSON.stringify(mockUser))
+        console.log('✅ Created new user account:', mockUser.email)
       }
       
-      // Store in localStorage
-      localStorage.setItem('mock-user', JSON.stringify(mockUser))
-      
-      // Create profile
-      const mockProfile = {
-        id: userId,
-        email,
-        full_name: 'Demo User',
-        role: 'Community Member',
-        company: 'MCP Academy',
-        avatar_url: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+      // Check for existing profile
+      const existingProfile = localStorage.getItem('mock-profile')
+      if (!existingProfile) {
+        // Create a new profile if none exists
+        const profileData = {
+          id: userId,
+          email,
+          full_name: mockUser.user_metadata?.full_name || 'Demo User',
+          role: mockUser.user_metadata?.role || 'Community Member',
+          company: mockUser.user_metadata?.company || 'MCP Academy',
+          avatar_url: mockUser.user_metadata?.avatar_url || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+        localStorage.setItem('mock-profile', JSON.stringify(profileData))
+        console.log('✅ Created new profile:', profileData.email)
       }
-      
-      localStorage.setItem('mock-profile', JSON.stringify(mockProfile))
       
       // Update state
       setUser(mockUser as User)
-      setProfile(mockProfile)
       
       // Create session
       const mockSession = {
@@ -291,6 +303,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         token_type: 'bearer'
       } as Session
       setSession(mockSession)
+      
+      // Fetch and set profile
+      await fetchProfile(userId)
       
       // Initialize user data
       initializeUserData(userId)
@@ -325,6 +340,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
       setSession(null)
       
+      // Clear localStorage
+      localStorage.removeItem('mock-user')
+      localStorage.removeItem('mock-profile')
+      
       // Then sign out from Supabase (which clears localStorage)
       const { error } = await supabase.auth.signOut()
       
@@ -354,7 +373,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const mockUser = localStorage.getItem('mock-user')
         if (mockUser) {
           const userData = JSON.parse(mockUser)
-          userData.user_metadata = { ...userData.user_metadata, avatar_url: updates.avatar_url }
+          userData.user_metadata = { 
+            ...userData.user_metadata, 
+            avatar_url: updates.avatar_url,
+            full_name: updates.full_name || userData.user_metadata?.full_name,
+            role: updates.role || userData.user_metadata?.role,
+            company: updates.company || userData.user_metadata?.company
+          }
           localStorage.setItem('mock-user', JSON.stringify(userData))
         }
       }
