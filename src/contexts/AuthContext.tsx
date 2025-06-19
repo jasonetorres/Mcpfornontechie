@@ -113,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error.code === 'PGRST116') {
           console.log('Profile not found, creating new profile')
           await createProfile(userId)
+          return // Exit the function after creating profile
         } else {
           setLoading(false)
         }
