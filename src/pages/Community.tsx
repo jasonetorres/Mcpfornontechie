@@ -17,7 +17,35 @@ function Community() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [likedMembers, setLikedMembers] = useState<string[]>([]);
   const formRef = useRef<HTMLDivElement>(null);
+
+  // Initialize userPosts state
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+  // Load user discussions from localStorage
+  const [userDiscussions, setUserDiscussions] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      const savedDiscussions = localStorage.getItem(`user-discussions-${user.id}`);
+      if (savedDiscussions) {
+        setUserDiscussions(JSON.parse(savedDiscussions));
+      }
+      
+      // Load user posts from localStorage
+      const savedPosts = localStorage.getItem(`user-posts-${user.id}`);
+      if (savedPosts) {
+        setUserPosts(JSON.parse(savedPosts));
+      }
+
+      // Load liked members from localStorage
+      const savedLikedMembers = localStorage.getItem(`liked-members-${user.id}`);
+      if (savedLikedMembers) {
+        setLikedMembers(JSON.parse(savedLikedMembers));
+      }
+    }
+  }, [user]);
 
   const communityStats = [
     { label: 'Active Members', value: '2,847', icon: Users },
@@ -28,6 +56,7 @@ function Community() {
 
   const featuredMembers = [
     {
+      id: 'member-1',
       name: 'Sarah Chen',
       role: 'Community Manager',
       company: 'TechCorp',
@@ -37,6 +66,7 @@ function Community() {
       recentProject: 'Built an AI-powered member Q&A system using Google Sheets and Zapier'
     },
     {
+      id: 'member-2',
       name: 'Mike Rodriguez',
       role: 'Marketing Director',
       company: 'GrowthCo',
@@ -46,6 +76,7 @@ function Community() {
       recentProject: 'Created personalized email campaigns using Airtable and Claude API'
     },
     {
+      id: 'member-3',
       name: 'Lisa Park',
       role: 'Project Manager',
       company: 'InnovateLab',
@@ -70,7 +101,7 @@ function Community() {
     'security', 'marketing', 'community', 'project-management', 'sales'
   ];
 
-  const [recentDiscussions, setRecentDiscussions] = useState([
+  const recentDiscussions = [
     {
       id: '1',
       title: 'Best practices for connecting Salesforce to AI?',
@@ -161,28 +192,7 @@ function Community() {
       views: 421,
       isLiked: false
     }
-  ]);
-
-  // Load user discussions from localStorage
-  const [userDiscussions, setUserDiscussions] = useState<any[]>([]);
-  
-  // Initialize userPosts state
-  const [userPosts, setUserPosts] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (user) {
-      const savedDiscussions = localStorage.getItem(`user-discussions-${user.id}`);
-      if (savedDiscussions) {
-        setUserDiscussions(JSON.parse(savedDiscussions));
-      }
-      
-      // Load user posts from localStorage
-      const savedPosts = localStorage.getItem(`user-posts-${user.id}`);
-      if (savedPosts) {
-        setUserPosts(JSON.parse(savedPosts));
-      }
-    }
-  }, [user]);
+  ];
 
   // Combine sample discussions with user discussions
   const allDiscussions = [...userDiscussions, ...recentDiscussions];
@@ -369,6 +379,46 @@ function Community() {
     return matchesSearch && matchesCategory;
   });
 
+  // Handle member like/heart
+  const handleLikeMember = (memberId: string) => {
+    if (!user) return;
+    
+    let updatedLikedMembers;
+    if (likedMembers.includes(memberId)) {
+      updatedLikedMembers = likedMembers.filter(id => id !== memberId);
+    } else {
+      updatedLikedMembers = [...likedMembers, memberId];
+    }
+    
+    setLikedMembers(updatedLikedMembers);
+    localStorage.setItem(`liked-members-${user.id}`, JSON.stringify(updatedLikedMembers));
+  };
+
+  // Filter members by specialty
+  const filteredMembers = selectedSpecialty 
+    ? featuredMembers.filter(member => 
+        member.specialties.some(specialty => 
+          specialty.toLowerCase() === selectedSpecialty.toLowerCase()
+        )
+      )
+    : featuredMembers;
+
+  // Handle specialty selection
+  const handleSpecialtyClick = (specialty: string) => {
+    if (selectedSpecialty === specialty) {
+      setSelectedSpecialty(null);
+    } else {
+      setSelectedSpecialty(specialty);
+    }
+  };
+
+  // Get all unique specialties
+  const allSpecialties = Array.from(
+    new Set(
+      featuredMembers.flatMap(member => member.specialties)
+    )
+  );
+
   // Scroll to form when "Start New Discussion" is clicked
   useEffect(() => {
     if (showNewDiscussionForm && formRef.current) {
@@ -427,12 +477,50 @@ function Community() {
         {/* Tab Content */}
         {activeTab === 'overview' && (
           <div className="space-y-12">
+            {/* Specialty Filter */}
+            {selectedSpecialty && (
+              <div className="glass p-4 rounded-xl animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Tag className="w-4 h-4 text-matrix-primary" />
+                    <span className="text-foreground font-medium">Filtering by specialty: <span className="text-matrix-primary">{selectedSpecialty}</span></span>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedSpecialty(null)}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* All Specialties */}
+            <div className="mb-4">
+              <h3 className="heading-sm mb-4">Popular Specialties</h3>
+              <div className="flex flex-wrap gap-2">
+                {allSpecialties.map((specialty, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSpecialtyClick(specialty)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      selectedSpecialty === specialty
+                        ? 'bg-matrix-primary text-primary-foreground'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
+                  >
+                    {specialty}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Featured Members */}
             <div>
               <h2 className="heading-md mb-8">Featured Community Members</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {featuredMembers.map((member, index) => (
-                  <div key={index} className="glass p-6 hover:bg-card/70 transition-all duration-300">
+                {filteredMembers.map((member, index) => (
+                  <div key={member.id} className="glass p-6 hover:bg-card/70 transition-all duration-300">
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="text-3xl">{member.avatar}</div>
                       <div>
@@ -443,10 +531,15 @@ function Community() {
                     </div>
                     
                     <div className="flex items-center space-x-4 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <Heart className="w-4 h-4 text-red-400" />
-                        <span className="text-red-300 text-sm">{member.contributions}</span>
-                      </div>
+                      <button 
+                        onClick={() => handleLikeMember(member.id)}
+                        className={`flex items-center space-x-1 transition-colors duration-200 ${
+                          likedMembers.includes(member.id) ? 'text-red-400' : 'text-muted-foreground hover:text-red-400'
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${likedMembers.includes(member.id) ? 'fill-current' : ''}`} />
+                        <span className="text-sm">{member.contributions + (likedMembers.includes(member.id) ? 1 : 0)}</span>
+                      </button>
                       <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 text-yellow-400" />
                         <span className="text-yellow-300 text-sm">Top Contributor</span>
@@ -457,9 +550,15 @@ function Community() {
                       <h4 className="text-foreground font-medium mb-2">Specialties:</h4>
                       <div className="flex flex-wrap gap-2">
                         {member.specialties.map((specialty, specIndex) => (
-                          <span key={specIndex} className="badge-primary bg-purple-500/20 text-purple-300 border-purple-500/30">
+                          <button
+                            key={specIndex}
+                            onClick={() => handleSpecialtyClick(specialty)}
+                            className={`badge-primary bg-purple-500/20 text-purple-300 border-purple-500/30 hover:bg-purple-500/30 transition-colors duration-200 cursor-pointer ${
+                              selectedSpecialty === specialty ? 'bg-purple-500/40 border-purple-500/50' : ''
+                            }`}
+                          >
                             {specialty}
-                          </span>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -471,60 +570,6 @@ function Community() {
                   </div>
                 ))}
               </div>
-              
-              {/* User Card - Show if logged in */}
-              {user && profile && (
-                <div className="mt-8">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Your Community Profile</h3>
-                  <div className="glass p-6 hover:bg-card/70 transition-all duration-300">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center overflow-hidden">
-                        {profile.avatar_url ? (
-                          <img src={profile.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
-                        ) : (
-                          <Users className="w-6 h-6 text-primary-foreground" />
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-foreground">{profile.full_name || user.email?.split('@')[0]}</h3>
-                        <p className="text-matrix-primary">{profile.role || 'Community Member'}</p>
-                        <p className="text-muted-foreground text-sm">{profile.company || 'MCP Academy'}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="flex items-center space-x-1">
-                        <Heart className="w-4 h-4 text-red-400" />
-                        <span className="text-red-300 text-sm">{userDiscussions.length + userPosts.length}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <span className="text-yellow-300 text-sm">Active Member</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <h4 className="text-foreground font-medium mb-2">Your Activity:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="badge-primary bg-purple-500/20 text-purple-300 border-purple-500/30">
-                          {userDiscussions.length} Discussions
-                        </span>
-                        <span className="badge-primary bg-blue-500/20 text-blue-300 border-blue-500/30">
-                          {userPosts.length} Posts
-                        </span>
-                        <span className="badge-primary bg-green-500/20 text-green-300 border-green-500/30">
-                          Community Member
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="glass bg-muted/20 rounded-lg p-3">
-                      <h4 className="text-green-300 font-medium text-sm mb-1">Get More Involved:</h4>
-                      <p className="text-muted-foreground text-sm">Share your MCP projects, answer questions, and connect with other members to increase your community standing!</p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Join Community CTA */}
@@ -603,6 +648,60 @@ function Community() {
                 </button>
               </div>
             </div>
+
+            {/* User Card - Show if logged in */}
+            {user && profile && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Your Community Profile</h3>
+                <div className="glass p-6 hover:bg-card/70 transition-all duration-300">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center overflow-hidden">
+                      {profile.avatar_url ? (
+                        <img src={profile.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
+                      ) : (
+                        <Users className="w-6 h-6 text-primary-foreground" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground">{profile.full_name || user.email?.split('@')[0]}</h3>
+                      <p className="text-matrix-primary">{profile.role || 'Community Member'}</p>
+                      <p className="text-muted-foreground text-sm">{profile.company || 'MCP Academy'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="flex items-center space-x-1">
+                      <Heart className="w-4 h-4 text-red-400" />
+                      <span className="text-red-300 text-sm">{userDiscussions.length + userPosts.length}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-300 text-sm">Active Member</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h4 className="text-foreground font-medium mb-2">Your Activity:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="badge-primary bg-purple-500/20 text-purple-300 border-purple-500/30">
+                        {userDiscussions.length} Discussions
+                      </span>
+                      <span className="badge-primary bg-blue-500/20 text-blue-300 border-blue-500/30">
+                        {userPosts.length} Posts
+                      </span>
+                      <span className="badge-primary bg-green-500/20 text-green-300 border-green-500/30">
+                        {likedMembers.length} Connections
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="glass bg-muted/20 rounded-lg p-3">
+                    <h4 className="text-green-300 font-medium text-sm mb-1">Get More Involved:</h4>
+                    <p className="text-muted-foreground text-sm">Share your MCP projects, answer questions, and connect with other members to increase your community standing!</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

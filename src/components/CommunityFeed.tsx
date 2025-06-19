@@ -51,10 +51,10 @@ const samplePosts: CommunityPost[] = [
     id: '2',
     author: {
       name: 'Mike Rodriguez',
-      avatar: '👨‍💻',
       role: 'Marketing Director',
       level: 'MCP Pro'
     },
+    avatar: '👨‍💻',
     content: 'Quick tip: When setting up customer segmentation with MCP, always include a "confidence score" field. This helps the AI indicate how certain it is about each classification. Game changer for our email campaigns!',
     type: 'tip',
     timestamp: '5 hours ago',
@@ -107,6 +107,7 @@ export default function CommunityFeed() {
   const [showNewPostForm, setShowNewPostForm] = useState(false)
   const { user, profile } = useAuth()
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([])
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
 
   // Load user posts from localStorage on component mount
   useEffect(() => {
@@ -237,10 +238,45 @@ export default function CommunityFeed() {
     }
   }
 
-  const filteredPosts = filter === 'all' ? allPosts : allPosts.filter(post => post.type === filter)
+  // Handle tag selection
+  const handleTagClick = (tag: string) => {
+    if (selectedTag === tag) {
+      setSelectedTag(null);
+    } else {
+      setSelectedTag(tag);
+    }
+  }
+
+  // Filter posts by tag if a tag is selected
+  const tagFilteredPosts = selectedTag 
+    ? allPosts.filter(post => post.tags.includes(selectedTag))
+    : allPosts;
+
+  // Then apply the type filter
+  const filteredPosts = filter === 'all' 
+    ? tagFilteredPosts 
+    : tagFilteredPosts.filter(post => post.type === filter);
 
   return (
     <div className="space-y-6">
+      {/* Selected Tag Filter */}
+      {selectedTag && (
+        <div className="glass p-4 rounded-lg animate-fade-in">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Star className="w-4 h-4 text-matrix-primary" />
+              <span className="text-foreground">Filtering by tag: <span className="text-matrix-primary font-medium">#{selectedTag}</span></span>
+            </div>
+            <button 
+              onClick={() => setSelectedTag(null)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Filter Tabs */}
       <div className="flex flex-wrap justify-center gap-2 mb-6">
         {[
@@ -377,9 +413,15 @@ export default function CommunityFeed() {
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {post.tags.map((tag, index) => (
-                  <span key={index} className="badge-secondary">
+                  <button 
+                    key={index} 
+                    onClick={() => handleTagClick(tag)}
+                    className={`badge-secondary hover:bg-muted/80 cursor-pointer transition-colors duration-200 ${
+                      selectedTag === tag ? 'bg-matrix-primary/20 text-matrix-primary border-matrix-primary/30' : ''
+                    }`}
+                  >
                     #{tag}
-                  </span>
+                  </button>
                 ))}
               </div>
 
@@ -425,6 +467,8 @@ export default function CommunityFeed() {
             <p className="text-muted-foreground mb-4">
               {filter !== 'all' 
                 ? `No ${filter.replace('_', ' ')} posts found. Try a different filter.`
+                : selectedTag
+                ? `No posts with tag #${selectedTag} found.`
                 : 'No posts found. Be the first to share something!'}
             </p>
             {user && (
