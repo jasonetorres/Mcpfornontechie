@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Trophy, Star, Confetti, X } from 'lucide-react'
+import { Trophy, Star, SettingsIcon as Confetti, X } from 'lucide-react'
 
 interface LevelUpModalProps {
   isOpen: boolean
