@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calendar, Flame, Trophy, Star } from 'lucide-react'
+import { Calendar, Flame, Trophy, Star, CheckCircle } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 interface DailyStreakProps {
