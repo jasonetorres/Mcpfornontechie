@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink, FileDown, Code } from 'lucide-react';
+import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink, FileDown, Code, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAchievements } from '../hooks/useAchievements';
 
