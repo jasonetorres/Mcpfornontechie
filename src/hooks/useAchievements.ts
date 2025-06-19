@@ -146,8 +146,24 @@ export function useAchievements() {
     try {
       const savedAchievements = localStorage.getItem(`achievements-${user.id}`)
       if (savedAchievements) {
-        const parsed = JSON.parse(savedAchievements)
-        setAchievements(parsed)
+        const savedData = JSON.parse(savedAchievements)
+        
+        // Merge saved data with original achievements to preserve condition functions
+        const mergedAchievements = ACHIEVEMENTS.map(originalAchievement => {
+          const savedAchievement = savedData.find((saved: any) => saved.id === originalAchievement.id)
+          
+          if (savedAchievement) {
+            return {
+              ...originalAchievement,
+              earned: savedAchievement.earned || false,
+              earnedDate: savedAchievement.earnedDate || null
+            }
+          }
+          
+          return originalAchievement
+        })
+        
+        setAchievements(mergedAchievements)
       } else {
         // Initialize with default achievements for new users
         setAchievements(ACHIEVEMENTS)
@@ -163,7 +179,19 @@ export function useAchievements() {
     if (!user) return
 
     try {
-      localStorage.setItem(`achievements-${user.id}`, JSON.stringify(updatedAchievements))
+      // Only save the serializable properties, not the condition functions
+      const serializableAchievements = updatedAchievements.map(achievement => ({
+        id: achievement.id,
+        title: achievement.title,
+        description: achievement.description,
+        category: achievement.category,
+        points: achievement.points,
+        icon: achievement.icon,
+        earned: achievement.earned,
+        earnedDate: achievement.earnedDate
+      }))
+      
+      localStorage.setItem(`achievements-${user.id}`, JSON.stringify(serializableAchievements))
     } catch (error) {
       console.error('Error saving achievements:', error)
     }
