@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink, FileDown, Code, Shield } from 'lucide-react';
+import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink, FileDown, Code, Shield, Search, Tag, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAchievements } from '../hooks/useAchievements';
 
 function Templates() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPlatform, setSelectedPlatform] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [copiedTemplate, setCopiedTemplate] = useState('');
   const [downloadingTemplate, setDownloadingTemplate] = useState('');
   const { user } = useAuth();
@@ -14,21 +15,65 @@ function Templates() {
 
   const categories = [
     { id: 'all', name: 'All Templates', icon: Database },
-    { id: 'community', name: 'Community Management', icon: Users },
-    { id: 'marketing', name: 'Marketing & Growth', icon: MessageSquare },
-    { id: 'project', name: 'Project Management', icon: Workflow },
-    { id: 'sales', name: 'Sales & Business', icon: BarChart3 },
+    { id: 'community', name: 'Community', icon: Users },
+    { id: 'marketing', name: 'Marketing', icon: MessageSquare },
+    { id: 'project', name: 'Project', icon: Workflow },
+    { id: 'sales', name: 'Sales', icon: BarChart3 },
     { id: 'operations', name: 'Operations', icon: Calendar }
   ];
 
   const platforms = [
     { id: 'all', name: 'All Platforms' },
     { id: 'zapier', name: 'Zapier' },
-    { id: 'power-platform', name: 'Microsoft Power Platform' },
+    { id: 'power-platform', name: 'Power Platform' },
     { id: 'airtable', name: 'Airtable' },
     { id: 'notion', name: 'Notion' },
     { id: 'bubble', name: 'Bubble' },
     { id: 'make', name: 'Make.com' }
+  ];
+
+  // MCP Servers list - consistent across the site
+  const mcpServers = [
+    {
+      name: 'Twilio MCP Server',
+      description: 'For messaging and voice capabilities',
+      url: 'https://github.com/twilio-labs/mcp'
+    },
+    {
+      name: 'GitHub MCP Server',
+      description: 'For repository, issue, and PR access',
+      url: 'https://github.com/github/github-mcp-server'
+    },
+    {
+      name: 'JetBrains MCP Server',
+      description: 'For IDE and development tool integration',
+      url: 'https://github.com/JetBrains/mcp-jetbrains'
+    },
+    {
+      name: 'Notion MCP Server',
+      description: 'For workspace and database access',
+      url: 'https://github.com/makenotion/notion-mcp-server'
+    },
+    {
+      name: 'Miro MCP Server',
+      description: 'For visual collaboration',
+      url: 'https://github.com/k-jarzyna/mcp-miro'
+    },
+    {
+      name: 'ElevenLabs MCP',
+      description: 'For voice synthesis and audio generation',
+      url: 'https://github.com/elevenlabs/elevenlabs-mcp'
+    },
+    {
+      name: 'AgentQL MCP Server',
+      description: 'For data extraction capabilities',
+      url: 'https://github.com/agentql/agentql-mcp'
+    },
+    {
+      name: 'Google Keep MCP Server',
+      description: 'For Google Keep notes management',
+      url: 'https://github.com/keep-mcp/keep-mcp'
+    }
   ];
 
   const templates = [
@@ -699,13 +744,318 @@ If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.g
 }`
         }
       ]
+    },
+    {
+      id: 10,
+      title: 'Twilio SMS Automation',
+      description: 'Automate SMS messaging and voice calls with AI-powered responses',
+      category: 'marketing',
+      platform: 'zapier',
+      difficulty: 'Intermediate',
+      rating: 4.7,
+      downloads: 412,
+      dataSource: 'CRM Data',
+      aiModel: 'GPT-4',
+      features: [
+        'Automated SMS campaigns',
+        'AI-generated personalized messages',
+        'Response handling',
+        'Conversation tracking'
+      ],
+      setupTime: '2 hours',
+      preview: `// Twilio MCP Configuration
+{
+  "server_config": {
+    "name": "twilio-mcp",
+    "credentials": {
+      "account_sid": "YOUR_TWILIO_SID",
+      "auth_token": "YOUR_TWILIO_TOKEN"
+    }
+  },
+  "operations": [
+    "send_sms",
+    "make_call",
+    "get_message_history",
+    "handle_response"
+  ]
+}`,
+      tags: ['sms', 'messaging', 'automation', 'customer-engagement'],
+      files: [
+        {
+          name: 'twilio-setup.md',
+          content: `# Twilio MCP Server Setup
+
+## Prerequisites
+- Twilio account with Account SID and Auth Token
+- Zapier account
+- CRM with customer data
+
+## Installation
+1. Configure your MCP server with Twilio credentials:
+   \`\`\`json
+   "mcpServers": {
+     "twilio-mcp": {
+       "command": "npx",
+       "args": [
+         "-y",
+         "twilio-mcp"
+       ],
+       "env": {
+         "TWILIO_ACCOUNT_SID": "YOUR_ACCOUNT_SID",
+         "TWILIO_AUTH_TOKEN": "YOUR_AUTH_TOKEN"
+       }
+     }
+   }
+   \`\`\`
+
+## Features
+- **send_sms**: Send SMS messages to customers
+- **make_call**: Initiate voice calls with AI-generated scripts
+- **get_message_history**: Retrieve conversation history
+- **handle_response**: Process and analyze customer responses
+
+## Example Use Cases
+- Appointment reminders with confirmation requests
+- Order status updates with delivery tracking
+- Customer feedback collection
+- Personalized marketing campaigns
+- Automated support responses`
+        },
+        {
+          name: 'zapier-twilio-integration.json',
+          content: `{
+  "trigger": {
+    "type": "schedule",
+    "frequency": "daily"
+  },
+  "action": {
+    "type": "code",
+    "language": "javascript",
+    "code": "// This code sends personalized messages to customers\\nconst customers = inputData.customers;\\n\\nfor (const customer of customers) {\\n  const message = await generatePersonalizedMessage(customer);\\n  await sendTwilioMessage(customer.phone, message);\\n}\\n\\nasync function generatePersonalizedMessage(customer) {\\n  // Use AI to generate personalized message\\n  const response = await fetch('https://api.openai.com/v1/chat/completions', {\\n    method: 'POST',\\n    headers: {\\n      'Content-Type': 'application/json',\\n      'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY\\n    },\\n    body: JSON.stringify({\\n      model: 'gpt-4',\\n      messages: [\\n        {\\n          role: 'system',\\n          content: 'Generate a personalized SMS message for a customer.'\\n        },\\n        {\\n          role: 'user',\\n          content: `Customer: ${customer.name}, Last purchase: ${customer.lastPurchase}, Interests: ${customer.interests}`\\n        }\\n      ]\\n    })\\n  });\\n\\n  const data = await response.json();\\n  return data.choices[0].message.content;\\n}\\n\\nasync function sendTwilioMessage(phone, message) {\\n  // Use Twilio MCP to send message\\n  // Implementation depends on your Twilio MCP setup\\n}"
+  },
+  "output": {
+    "type": "google_sheets",
+    "spreadsheet": "sms_campaign_results",
+    "worksheet": "daily_sends"
+  }
+}`
+        }
+      ]
+    },
+    {
+      id: 11,
+      title: 'GitHub Repository Assistant',
+      description: 'Manage GitHub repositories, issues, and PRs with AI assistance',
+      category: 'project',
+      platform: 'make',
+      difficulty: 'Intermediate',
+      rating: 4.5,
+      downloads: 356,
+      dataSource: 'GitHub API',
+      aiModel: 'Claude',
+      features: [
+        'Repository search and analysis',
+        'Issue management',
+        'PR review assistance',
+        'Code search capabilities'
+      ],
+      setupTime: '1.5 hours',
+      preview: `// GitHub MCP Configuration
+{
+  "server_config": {
+    "name": "github-mcp",
+    "credentials": {
+      "github_token": "YOUR_GITHUB_TOKEN"
+    },
+    "repositories": [
+      "owner/repo1",
+      "owner/repo2"
+    ]
+  },
+  "operations": [
+    "search_repositories",
+    "search_code",
+    "manage_issues",
+    "review_prs"
+  ]
+}`,
+      tags: ['github', 'development', 'code-management', 'collaboration'],
+      files: [
+        {
+          name: 'github-mcp-setup.md',
+          content: `# GitHub MCP Server Setup
+
+## Prerequisites
+- GitHub account with personal access token
+- Make.com account
+- Claude or other MCP-compatible AI
+
+## Installation
+1. Configure your MCP server with GitHub credentials:
+   \`\`\`json
+   "mcpServers": {
+     "github-mcp": {
+       "command": "npx",
+       "args": [
+         "-y",
+         "github-mcp"
+       ],
+       "env": {
+         "GITHUB_TOKEN": "YOUR_GITHUB_TOKEN"
+       }
+     }
+   }
+   \`\`\`
+
+## Features
+- **search_repositories**: Find repositories based on criteria
+- **search_code**: Search for code within repositories
+- **manage_issues**: Create, update, and close issues
+- **review_prs**: Get PR details and assist with reviews
+
+## Example Use Cases
+- Automated issue triage and assignment
+- Code search and documentation
+- PR review assistance
+- Repository health monitoring
+- Development workflow automation`
+        },
+        {
+          name: 'make-github-integration.json',
+          content: `{
+  "scenario": {
+    "name": "GitHub Issue Manager",
+    "trigger": {
+      "type": "webhook",
+      "method": "POST"
+    },
+    "steps": [
+      {
+        "name": "Parse Request",
+        "module": "text-parser",
+        "operation": "parse-json",
+        "input": "{{trigger.body}}"
+      },
+      {
+        "name": "Process with AI",
+        "module": "ai",
+        "operation": "generate",
+        "input": {
+          "prompt": "Based on the user request, determine what action to take with GitHub repositories.",
+          "model": "claude-3-sonnet"
+        }
+      },
+      {
+        "name": "Execute GitHub MCP Command",
+        "module": "http",
+        "operation": "make-request",
+        "input": {
+          "url": "http://localhost:8000/github-mcp",
+          "method": "POST",
+          "body": {
+            "action": "{{2.action}}",
+            "parameters": "{{2.parameters}}"
+          }
+        }
+      }
+    ]
+  }
+}`
+        }
+      ]
+    },
+    {
+      id: 12,
+      title: 'JetBrains IDE Assistant',
+      description: 'AI-powered coding assistance integrated with JetBrains IDEs',
+      category: 'project',
+      platform: 'power-platform',
+      difficulty: 'Advanced',
+      rating: 4.8,
+      downloads: 278,
+      dataSource: 'Code Repositories',
+      aiModel: 'GPT-4',
+      features: [
+        'Code analysis and suggestions',
+        'Documentation generation',
+        'Bug detection',
+        'Refactoring assistance'
+      ],
+      setupTime: '2 hours',
+      preview: `// JetBrains MCP Configuration
+{
+  "server_config": {
+    "name": "jetbrains-mcp",
+    "ide_integration": {
+      "supported_ides": [
+        "IntelliJ IDEA",
+        "PyCharm",
+        "WebStorm",
+        "Rider"
+      ]
+    }
+  },
+  "operations": [
+    "analyze_code",
+    "generate_documentation",
+    "detect_bugs",
+    "suggest_refactoring"
+  ]
+}`,
+      tags: ['ide', 'development', 'coding', 'productivity'],
+      files: [
+        {
+          name: 'jetbrains-setup.md',
+          content: `# JetBrains MCP Server Setup
+
+## Prerequisites
+- JetBrains IDE (IntelliJ IDEA, PyCharm, WebStorm, etc.)
+- OpenAI API key or other AI provider
+- Code repositories to analyze
+
+## Installation
+1. Configure your MCP server:
+   \`\`\`json
+   "mcpServers": {
+     "jetbrains-mcp": {
+       "command": "npx",
+       "args": [
+         "-y",
+         "jetbrains-mcp"
+       ],
+       "env": {
+         "OPENAI_API_KEY": "YOUR_API_KEY"
+       }
+     }
+   }
+   \`\`\`
+
+## Features
+- **analyze_code**: Get insights and suggestions for your code
+- **generate_documentation**: Create documentation for code
+- **detect_bugs**: Find potential issues and bugs
+- **suggest_refactoring**: Get recommendations for code improvements
+
+## Example Use Cases
+- Automated code reviews
+- Documentation generation
+- Bug detection and fixing
+- Code optimization
+- Learning new programming patterns`
+        }
+      ]
     }
   ];
 
   const filteredTemplates = templates.filter(template => {
     const categoryMatch = selectedCategory === 'all' || template.category === selectedCategory;
     const platformMatch = selectedPlatform === 'all' || template.platform === selectedPlatform;
-    return categoryMatch && platformMatch;
+    const searchMatch = searchQuery === '' || 
+      template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return categoryMatch && platformMatch && searchMatch;
   });
 
   const copyTemplate = (templateId: string, content: string) => {
@@ -788,55 +1138,11 @@ If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.g
     }
   };
 
-  // MCP Servers list - consistent across the site
-  const mcpServers = [
-    {
-      name: 'Twilio MCP Server',
-      description: 'For messaging and voice capabilities',
-      url: 'https://github.com/twilio-labs/mcp'
-    },
-    {
-      name: 'GitHub MCP Server',
-      description: 'For repository, issue, and PR access',
-      url: 'https://github.com/github/github-mcp-server'
-    },
-    {
-      name: 'JetBrains MCP Server',
-      description: 'For IDE and development tool integration',
-      url: 'https://github.com/JetBrains/mcp-jetbrains'
-    },
-    {
-      name: 'Notion MCP Server',
-      description: 'For workspace and database access',
-      url: 'https://github.com/makenotion/notion-mcp-server'
-    },
-    {
-      name: 'Miro MCP Server',
-      description: 'For visual collaboration',
-      url: 'https://github.com/k-jarzyna/mcp-miro'
-    },
-    {
-      name: 'ElevenLabs MCP',
-      description: 'For voice synthesis and audio generation',
-      url: 'https://github.com/elevenlabs/elevenlabs-mcp'
-    },
-    {
-      name: 'AgentQL MCP Server',
-      description: 'For data extraction capabilities',
-      url: 'https://github.com/agentql/agentql-mcp'
-    },
-    {
-      name: 'Google Keep MCP Server',
-      description: 'For Google Keep notes management',
-      url: 'https://github.com/keep-mcp/keep-mcp'
-    }
-  ];
-
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">MCP Template Library</h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Ready-to-use templates to jumpstart your MCP projects. No coding required!
@@ -848,228 +1154,246 @@ If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.g
           )}
         </div>
 
-        {/* MCP Servers Section */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8">Popular MCP Servers You Should Try</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Filters and Search */}
+        <div className="glass rounded-xl p-6 mb-8">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search templates by name, description, or tags..."
+                className="w-full bg-slate-800 border border-white/20 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400"
+              />
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center space-x-2 px-3 py-2 bg-slate-800/70 rounded-lg">
+                <Filter className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-300 text-sm">Filters:</span>
+              </div>
+              
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-slate-800 border border-white/20 rounded-lg px-3 py-2 text-white"
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              
+              <select
+                value={selectedPlatform}
+                onChange={(e) => setSelectedPlatform(e.target.value)}
+                className="bg-slate-800 border border-white/20 rounded-lg px-3 py-2 text-white"
+              >
+                {platforms.map((platform) => (
+                  <option key={platform.id} value={platform.id}>
+                    {platform.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Popular Tags */}
+          <div className="flex flex-wrap gap-2">
+            <div className="flex items-center space-x-1 text-gray-400 mr-2">
+              <Tag className="w-3 h-3" />
+              <span className="text-xs">Popular Tags:</span>
+            </div>
+            {['community', 'marketing', 'automation', 'security', 'productivity', 'reporting'].map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setSearchQuery(tag)}
+                className={`px-2 py-1 rounded-full text-xs ${
+                  searchQuery === tag
+                    ? 'bg-matrix-primary/20 text-matrix-primary border border-matrix-primary/30'
+                    : 'bg-slate-800/70 text-gray-300 hover:bg-slate-700/70'
+                }`}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* MCP Servers Section - Compact Grid */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white">Popular MCP Servers</h2>
+            <a 
+              href="https://github.com/topics/mcp-server" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 text-sm flex items-center"
+            >
+              View all on GitHub <ExternalLink className="w-3 h-3 ml-1" />
+            </a>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {mcpServers.map((server, index) => (
-              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
-                <h3 className="text-lg font-semibold text-white mb-2">{server.name}</h3>
-                <p className="text-gray-300 mb-4">{server.description}</p>
+              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all duration-300">
+                <h3 className="text-sm font-semibold text-white mb-1">{server.name}</h3>
+                <p className="text-gray-400 text-xs mb-2">{server.description}</p>
                 <a
                   href={server.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center space-x-1"
+                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 text-xs flex items-center"
                 >
-                  <span>View on GitHub</span>
-                  <ExternalLink className="w-4 h-4 ml-1" />
+                  GitHub <ExternalLink className="w-3 h-3 ml-1" />
                 </a>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="mb-12">
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-gray-400" />
-              <span className="text-gray-300 font-medium">Filter by:</span>
+        {/* Templates Grid */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white">Templates ({filteredTemplates.length})</h2>
+            <div className="text-gray-400 text-sm">
+              <Clock className="w-4 h-4 inline mr-1" /> Setup time shown for each template
             </div>
           </div>
           
-          {/* Category Filter */}
-          <div className="mb-4">
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    selectedCategory === category.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                  }`}
-                >
-                  <category.icon className="w-4 h-4" />
-                  <span>{category.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTemplates.map((template) => (
+              <div key={template.id} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300 flex flex-col">
+                {/* Header */}
+                <div className="p-4 border-b border-white/10">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-white">{template.title}</h3>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
+                      {template.difficulty}
+                    </span>
+                  </div>
+                  
+                  <p className="text-gray-300 text-sm mb-3 line-clamp-2">{template.description}</p>
+                  
+                  {/* Stats */}
+                  <div className="flex items-center space-x-3 text-xs">
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-3 h-3 text-yellow-400" />
+                      <span className="text-yellow-400">{template.rating}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Download className="w-3 h-3 text-green-400" />
+                      <span className="text-green-400">{template.downloads.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-400">
+                      <Clock className="w-3 h-3" />
+                      <span>{template.setupTime}</span>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Platform Filter */}
-          <div className="flex flex-wrap gap-2">
-            {platforms.map((platform) => (
-              <button
-                key={platform.id}
-                onClick={() => setSelectedPlatform(platform.id)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  selectedPlatform === platform.id
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                }`}
-              >
-                {platform.name}
-              </button>
+                {/* Details */}
+                <div className="p-4 flex-1 flex flex-col">
+                  {/* Tech Stack */}
+                  <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                    <div>
+                      <span className="text-gray-400">Platform:</span>
+                      <div className="text-blue-300 capitalize">{template.platform.replace('-', ' ')}</div>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">AI Model:</span>
+                      <div className="text-purple-300">{template.aiModel}</div>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Data Source:</span>
+                      <div className="text-green-300">{template.dataSource}</div>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Category:</span>
+                      <div className="text-orange-300 capitalize">{template.category.replace('-', ' ')}</div>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div className="mb-3 flex-1">
+                    <h4 className="text-white text-xs font-medium mb-2">Key Features:</h4>
+                    <div className="grid grid-cols-1 gap-1">
+                      {template.features.slice(0, 3).map((feature, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                          <span className="text-gray-300 text-xs">{feature}</span>
+                        </div>
+                      ))}
+                      {template.features.length > 3 && (
+                        <div className="text-gray-400 text-xs">+{template.features.length - 3} more features</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {template.tags.slice(0, 3).map((tag, index) => (
+                      <span key={index} className="px-2 py-0.5 bg-gray-700/50 text-gray-300 rounded text-xs">
+                        #{tag}
+                      </span>
+                    ))}
+                    {template.tags.length > 3 && (
+                      <span className="text-gray-400 text-xs">+{template.tags.length - 3} more</span>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex space-x-2">
+                    <button 
+                      onClick={() => downloadTemplate(template)}
+                      disabled={downloadingTemplate === template.id.toString()}
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-1"
+                    >
+                      {downloadingTemplate === template.id.toString() ? (
+                        <>
+                          <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <span>Downloading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-3 h-3" />
+                          <span>Download</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => copyTemplate(template.id.toString(), template.preview)}
+                      className="px-3 py-2 border border-white/20 text-white rounded-lg text-sm font-medium hover:bg-white/10 transition-colors duration-200 flex items-center justify-center space-x-1"
+                    >
+                      {copiedTemplate === template.id.toString() ? (
+                        <>
+                          <Check className="w-3 h-3" />
+                          <span>Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>Copy Code</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Templates Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {filteredTemplates.map((template) => (
-            <div key={template.id} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 transition-all duration-300">
-              {/* Header */}
-              <div className="p-6 border-b border-white/10">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-semibold text-white">{template.title}</h3>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
-                    {template.difficulty}
-                  </span>
-                </div>
-                
-                <p className="text-gray-300 mb-4">{template.description}</p>
-                
-                {/* Stats */}
-                <div className="flex items-center space-x-4 text-sm">
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-400" />
-                    <span className="text-yellow-400">{template.rating}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Download className="w-4 h-4 text-green-400" />
-                    <span className="text-green-400">{template.downloads.toLocaleString()}</span>
-                  </div>
-                  <div className="text-gray-400">
-                    Setup: {template.setupTime}
-                  </div>
-                </div>
-              </div>
-
-              {/* Details */}
-              <div className="p-6">
-                {/* Tech Stack */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <span className="text-gray-400 text-sm">Platform:</span>
-                    <div className="text-blue-300 font-medium capitalize">{template.platform.replace('-', ' ')}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 text-sm">AI Model:</span>
-                    <div className="text-purple-300 font-medium">{template.aiModel}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 text-sm">Data Source:</span>
-                    <div className="text-green-300 font-medium">{template.dataSource}</div>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 text-sm">Category:</span>
-                    <div className="text-orange-300 font-medium capitalize">{template.category.replace('-', ' ')}</div>
-                  </div>
-                </div>
-
-                {/* Features */}
-                <div className="mb-4">
-                  <h4 className="text-white font-medium mb-2">Key Features:</h4>
-                  <div className="grid grid-cols-2 gap-1">
-                    {template.features.map((feature, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                        <span className="text-gray-300 text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {template.tags.map((tag, index) => (
-                    <span key={index} className="px-2 py-1 bg-gray-700/50 text-gray-300 rounded text-xs">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Preview Code */}
-                <div className="bg-slate-900/50 rounded-lg overflow-hidden mb-4">
-                  <div className="flex items-center justify-between p-3 border-b border-white/10">
-                    <span className="text-gray-300 text-sm font-medium">Configuration Preview</span>
-                    <button
-                      onClick={() => copyTemplate(template.id.toString(), template.preview)}
-                      className="flex items-center space-x-1 text-gray-400 hover:text-white transition-colors duration-200"
-                    >
-                      {copiedTemplate === template.id.toString() ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                      <span className="text-xs">Copy</span>
-                    </button>
-                  </div>
-                  <pre className="p-3 text-xs text-gray-300 overflow-x-auto">
-                    <code>{template.preview}</code>
-                  </pre>
-                </div>
-
-                {/* Template Files Info */}
-                {template.files && template.files.length > 0 && (
-                  <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <FileDown className="w-4 h-4 text-blue-400" />
-                      <span className="text-blue-300 font-medium text-sm">Includes {template.files.length} files:</span>
-                    </div>
-                    <div className="space-y-1">
-                      {template.files.map((file, index) => (
-                        <div key={index} className="text-blue-200 text-xs">
-                          • {file.name}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex space-x-3">
-                  <button 
-                    onClick={() => downloadTemplate(template)}
-                    disabled={downloadingTemplate === template.id.toString()}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
-                  >
-                    {downloadingTemplate === template.id.toString() ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Downloading...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-4 h-4" />
-                        <span>Download Template</span>
-                      </>
-                    )}
-                  </button>
-                  <Link
-                    to="/demo"
-                    className="flex-1 border border-white/20 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors duration-200 flex items-center justify-center space-x-2"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    <span>View Demo</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* No Results */}
         {filteredTemplates.length === 0 && (
-          <div className="text-center py-12">
+          <div className="text-center py-12 glass rounded-xl">
             <div className="text-gray-400 mb-4">No templates found for the selected filters.</div>
             <button
               onClick={() => {
                 setSelectedCategory('all');
                 setSelectedPlatform('all');
+                setSearchQuery('');
               }}
               className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
             >
@@ -1078,247 +1402,115 @@ If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.g
           </div>
         )}
 
-        {/* Block Goose Template */}
-        <div className="mt-12 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="text-4xl">🔒</div>
-            <div>
-              <h3 className="text-2xl font-bold text-white">Block Goose Enterprise Security</h3>
-              <p className="text-blue-300">Secure MCP server for enterprise applications with enhanced security controls</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Enterprise-Grade Security</h4>
-              <div className="space-y-3">
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Role-based access control with fine-grained permissions</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">End-to-end encryption for sensitive data</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Comprehensive audit logging and compliance reporting</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Data residency controls and sovereignty features</span>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <a 
-                  href="https://github.com/block/goose" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
-                >
-                  <span>View on GitHub</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
+        {/* Featured Template Highlights */}
+        <div className="space-y-8 mt-12">
+          {/* Google Keep MCP Server Highlight */}
+          <div className="bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="text-4xl">📝</div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Google Keep MCP Server</h3>
+                <p className="text-green-300">Manage your Google Keep notes with AI-powered assistance</p>
               </div>
             </div>
             
-            <div className="bg-slate-900/50 rounded-lg p-6">
-              <h4 className="text-white font-semibold mb-4">Perfect For:</h4>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <Users className="w-4 h-4 text-blue-400" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-lg font-semibold text-white mb-3">Key Features</h4>
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-2">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                    <span className="text-gray-300">Search for notes based on query strings</span>
                   </div>
-                  <span className="text-gray-300">Enterprise organizations with strict security requirements</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                    <Database className="w-4 h-4 text-green-400" />
+                  <div className="flex items-start space-x-2">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                    <span className="text-gray-300">Create new notes with title and text content</span>
                   </div>
-                  <span className="text-gray-300">Companies handling sensitive customer or financial data</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                    <Code className="w-4 h-4 text-purple-400" />
+                  <div className="flex items-start space-x-2">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                    <span className="text-gray-300">Update existing notes with new content</span>
                   </div>
-                  <span className="text-gray-300">Organizations in regulated industries (healthcare, finance)</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                    <Shield className="w-4 h-4 text-red-400" />
+                  <div className="flex items-start space-x-2">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
+                    <span className="text-gray-300">Delete notes when they're no longer needed</span>
                   </div>
-                  <span className="text-gray-300">Teams requiring advanced compliance features</span>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Google Keep MCP Server Highlight */}
-        <div className="mt-12 bg-gradient-to-r from-green-600/20 to-teal-600/20 border border-green-500/30 rounded-xl p-8">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="text-4xl">📝</div>
-            <div>
-              <h3 className="text-2xl font-bold text-white">Google Keep MCP Server</h3>
-              <p className="text-green-300">Manage your Google Keep notes with AI-powered assistance</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Key Features</h4>
-              <div className="space-y-3">
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Search for notes based on query strings</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Create new notes with title and text content</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Update existing notes with new content</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Delete notes when they're no longer needed</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Safety features to protect your notes</span>
+                
+                <div className="mt-4">
+                  <a 
+                    href="https://github.com/keep-mcp/keep-mcp" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
+                  >
+                    <span>View on GitHub</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
               
-              <div className="mt-6">
-                <a 
-                  href="https://github.com/keep-mcp/keep-mcp" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
-                >
-                  <span>View on GitHub</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-            
-            <div className="bg-slate-900/50 rounded-lg p-6">
-              <h4 className="text-white font-semibold mb-4">Installation</h4>
-              <div className="space-y-4">
-                <div className="bg-slate-800/70 p-3 rounded-lg">
-                  <div className="text-green-300 font-mono text-sm mb-1">pipx run keep-mcp</div>
-                  <div className="text-gray-400 text-xs">Run the MCP server using pipx</div>
-                </div>
-                
-                <div className="bg-slate-800/70 p-3 rounded-lg">
-                  <div className="text-green-300 font-mono text-sm mb-1">
-                    {`"mcpServers": {
-  "keep-mcp-pipx": {
-    "command": "pipx",
-    "args": [
-      "run",
-      "keep-mcp"
-    ],
-    "env": {
-      "GOOGLE_EMAIL": "Your Google Email",
-      "GOOGLE_MASTER_TOKEN": "Your Google Master Token"
-    }
-  }
-}`}
+              <div className="bg-slate-900/50 rounded-lg p-4">
+                <h4 className="text-white font-semibold mb-3">Example Commands</h4>
+                <div className="space-y-2">
+                  <div className="bg-slate-800/70 p-2 rounded-lg text-green-200 text-sm">
+                    "Find all my notes about project ideas"
                   </div>
-                  <div className="text-gray-400 text-xs">Configure in your MCP-compatible application</div>
-                </div>
-                
-                <div className="text-gray-300 text-sm">
-                  <p>Try these example commands:</p>
-                  <div className="bg-slate-800/70 p-3 rounded-lg mt-2 text-green-200 italic">
-                    "Find all my notes about project ideas"<br/>
-                    "Create a new note titled 'Shopping List' with the text 'Milk, Eggs, Bread'"<br/>
+                  <div className="bg-slate-800/70 p-2 rounded-lg text-green-200 text-sm">
+                    "Create a new note titled 'Shopping List' with the text 'Milk, Eggs, Bread'"
+                  </div>
+                  <div className="bg-slate-800/70 p-2 rounded-lg text-green-200 text-sm">
                     "Update my note about meeting agenda with new action items"
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* AgentQL MCP Server Highlight */}
-        <div className="mt-12 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-8">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="text-4xl">🔍</div>
-            <div>
-              <h3 className="text-2xl font-bold text-white">AgentQL MCP Server</h3>
-              <p className="text-purple-300">Extract structured data from websites with AgentQL's powerful data extraction capabilities</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Key Features</h4>
-              <div className="space-y-3">
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Extract structured data from any website</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Define custom data schemas with field-level extraction</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Process multiple pages in batch operations</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
-                  <span className="text-gray-300">Seamless integration with Claude, VS Code, Cursor, and Windsurf</span>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <a 
-                  href="https://github.com/agentql/agentql-mcp" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
-                >
-                  <span>View on GitHub</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
+          {/* AgentQL MCP Server Highlight */}
+          <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="text-4xl">🔍</div>
+              <div>
+                <h3 className="text-xl font-bold text-white">AgentQL MCP Server</h3>
+                <p className="text-purple-300">Extract structured data from websites with powerful data extraction</p>
               </div>
             </div>
             
-            <div className="bg-slate-900/50 rounded-lg p-6">
-              <h4 className="text-white font-semibold mb-4">Installation</h4>
-              <div className="space-y-4">
-                <div className="bg-slate-800/70 p-3 rounded-lg">
-                  <div className="text-purple-300 font-mono text-sm mb-1">npm install -g agentql-mcp</div>
-                  <div className="text-gray-400 text-xs">Install the package globally</div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-lg font-semibold text-white mb-3">Key Features</h4>
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-2">
+                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
+                    <span className="text-gray-300">Extract structured data from any website</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
+                    <span className="text-gray-300">Define custom data schemas with field-level extraction</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2"></div>
+                    <span className="text-gray-300">Process multiple pages in batch operations</span>
+                  </div>
                 </div>
                 
-                <div className="bg-slate-800/70 p-3 rounded-lg">
-                  <div className="text-purple-300 font-mono text-sm mb-1">
-                    {`{
-  "mcpServers": {
-    "agentql": {
-      "command": "npx",
-      "args": ["-y", "agentql-mcp"],
-      "env": {
-        "AGENTQL_API_KEY": "YOUR_API_KEY"
-      }
-    }
-  }
-}`}
-                  </div>
-                  <div className="text-gray-400 text-xs">Configure in Claude Desktop</div>
+                <div className="mt-4">
+                  <a 
+                    href="https://github.com/agentql/agentql-mcp" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
+                  >
+                    <span>View on GitHub</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
-                
-                <div className="text-gray-300 text-sm">
-                  <p>Try an example extraction task:</p>
-                  <div className="bg-slate-800/70 p-3 rounded-lg mt-2 text-purple-200 italic">
-                    "Extract all products from the page https://example.com/products with their names, prices, and descriptions. Format as a markdown table."
-                  </div>
+              </div>
+              
+              <div className="bg-slate-900/50 rounded-lg p-4">
+                <h4 className="text-white font-semibold mb-3">Example Extraction Task</h4>
+                <div className="bg-slate-800/70 p-2 rounded-lg text-purple-200 text-sm">
+                  "Extract all products from the page https://example.com/products with their names, prices, and descriptions. Format as a markdown table."
                 </div>
               </div>
             </div>
@@ -1326,21 +1518,21 @@ If you get "DeviceManagementRequiredOrSyncDisabled" error, check https://admin.g
         </div>
 
         {/* Call to Action */}
-        <div className="mt-16 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-4">Need a Custom Template?</h3>
-          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+        <div className="mt-12 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6 text-center">
+          <h3 className="text-xl font-bold text-white mb-3">Need a Custom Template?</h3>
+          <p className="text-gray-300 mb-4 max-w-2xl mx-auto">
             Don't see exactly what you need? Our community creates new templates regularly, or you can request a custom one.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               to="/request-template"
-              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200"
+              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
             >
               Request Template
             </Link>
             <Link
               to="/submit-template"
-              className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+              className="border border-white/20 text-white px-6 py-2 rounded-lg font-medium hover:bg-white/10 transition-colors duration-200"
             >
               Submit Your Template
             </Link>
