@@ -1,1257 +1,1451 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, FileText, CheckCircle, AlertTriangle, BarChart2, Settings, Shield, Search, Filter, ChevronDown, X, Edit, Trash2, Eye, Clock } from 'lucide-react';
+import { 
+  Users, 
+  FileText, 
+  Flag, 
+  Settings, 
+  BarChart, 
+  Search, 
+  Plus, 
+  Filter, 
+  Download, 
+  Trash2, 
+  Edit, 
+  CheckCircle, 
+  X, 
+  AlertTriangle,
+  Database,
+  Shield,
+  Clock,
+  RefreshCw
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-
-// Admin dashboard tabs
-type AdminTab = 'overview' | 'users' | 'templates' | 'content' | 'settings';
+import AdminUserForm from '../components/AdminUserForm';
+import AdminTemplateReview from '../components/AdminTemplateReview';
+import AdminContentModeration from '../components/AdminContentModeration';
+import { supabase } from '../lib/supabase';
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { user, profile, addNotification } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [users, setUsers] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [flaggedContent, setFlaggedContent] = useState<any[]>([]);
+  const [siteSettings, setSiteSettings] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [userFilter, setUserFilter] = useState('all');
+  const [templateFilter, setTemplateFilter] = useState('all');
+  const [contentFilter, setContentFilter] = useState('all');
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [showTemplateReview, setShowTemplateReview] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [showContentModeration, setShowContentModeration] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    pendingTemplates: 0,
+    flaggedContent: 0,
+    totalTemplates: 0,
+    totalDownloads: 0,
+    totalPosts: 0,
+    totalComments: 0
+  });
 
   // Check if user is admin
   useEffect(() => {
-    if (user && profile) {
-      // In a real app, this would check a role field in the database
-      // For demo purposes, we'll check if the user's role contains "admin"
-      const isUserAdmin = profile.role?.toLowerCase().includes('admin') || false;
-      setIsAdmin(isUserAdmin);
-      
-      // If not admin, redirect to home
-      if (!isUserAdmin) {
-        navigate('/');
-      }
-    } else {
-      // If not logged in, redirect to home
+    if (!user || !profile) {
       navigate('/');
+      return;
+    }
+
+    const isAdmin = profile.role?.toLowerCase().includes('admin');
+    if (!isAdmin) {
+      addNotification({
+        id: 'admin-access-denied',
+        message: 'You do not have permission to access the admin dashboard',
+        type: 'error'
+      });
+      navigate('/');
+    } else {
+      fetchData();
     }
   }, [user, profile, navigate]);
 
-  if (!isAdmin) {
-    return (
-      <div className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="glass p-8 rounded-xl">
-            <Shield className="w-16 h-16 text-matrix-primary mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-foreground mb-4">Admin Access Required</h1>
-            <p className="text-muted-foreground mb-6">
-              You need administrator privileges to access this page.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const fetchData = async () => {
+    setLoading(true);
+    setRefreshing(true);
+    
+    try {
+      // Fetch users from localStorage (in a real app, this would be from Supabase)
+      const mockUsers = [];
+      
+      // Get all mock users from localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('mock-user-')) {
+          try {
+            const userData = JSON.parse(localStorage.getItem(key) || '{}');
+            mockUsers.push(userData);
+          } catch (error) {
+            console.error('Error parsing user data:', error);
+          }
+        }
+      }
+      
+      // If no mock users found, create some sample users
+      if (mockUsers.length === 0) {
+        // Get the current user
+        const currentUser = JSON.parse(localStorage.getItem('mock-user') || '{}');
+        
+        // Create sample users
+        const sampleUsers = [
+          {
+            id: currentUser.id || 'user-1',
+            email: currentUser.email || 'admin@example.com',
+            full_name: profile?.full_name || 'Admin User',
+            role: 'admin',
+            company: profile?.company || 'MCP Academy',
+            status: 'active',
+            created_at: new Date().toISOString(),
+            last_login: new Date().toISOString()
+          },
+          {
+            id: 'user-2',
+            email: 'user@example.com',
+            full_name: 'Regular User',
+            role: 'user',
+            company: 'Example Inc',
+            status: 'active',
+            created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            last_login: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+          },
+          {
+            id: 'user-3',
+            email: 'moderator@example.com',
+            full_name: 'Content Moderator',
+            role: 'moderator',
+            company: 'MCP Academy',
+            status: 'active',
+            created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+            last_login: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+          },
+          {
+            id: 'user-4',
+            email: 'inactive@example.com',
+            full_name: 'Inactive User',
+            role: 'user',
+            company: 'Old Company',
+            status: 'inactive',
+            created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            last_login: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        ];
+        
+        // Store sample users in localStorage
+        sampleUsers.forEach(user => {
+          localStorage.setItem(`mock-user-${user.id}`, JSON.stringify(user));
+        });
+        
+        setUsers(sampleUsers);
+      } else {
+        setUsers(mockUsers);
+      }
+      
+      // Fetch templates
+      const communityTemplates = JSON.parse(localStorage.getItem('community-templates') || '[]');
+      
+      // Fetch template submissions
+      const allSubmissions = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('template-submissions-')) {
+          try {
+            const submissions = JSON.parse(localStorage.getItem(key) || '[]');
+            allSubmissions.push(...submissions);
+          } catch (error) {
+            console.error('Error parsing template submissions:', error);
+          }
+        }
+      }
+      
+      setTemplates([...communityTemplates, ...allSubmissions]);
+      
+      // Create sample flagged content if none exists
+      const existingFlagged = JSON.parse(localStorage.getItem('flagged-content') || '[]');
+      
+      if (existingFlagged.length === 0) {
+        const sampleFlaggedContent = [
+          {
+            id: 'content-1',
+            type: 'post',
+            title: 'Inappropriate Marketing Post',
+            author: 'user@example.com',
+            content: 'This post contains promotional content that violates our guidelines.',
+            reportedBy: 'moderator@example.com',
+            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            status: 'flagged'
+          },
+          {
+            id: 'content-2',
+            type: 'comment',
+            title: 'Offensive Comment',
+            author: 'inactive@example.com',
+            content: 'This comment contains language that may be offensive to other users.',
+            reportedBy: 'user@example.com',
+            date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            status: 'flagged'
+          },
+          {
+            id: 'content-3',
+            type: 'template',
+            title: 'Potentially Harmful Template',
+            author: 'user@example.com',
+            content: 'This template contains instructions that could potentially cause security issues.',
+            reportedBy: 'moderator@example.com',
+            date: new Date().toISOString(),
+            status: 'flagged'
+          }
+        ];
+        
+        localStorage.setItem('flagged-content', JSON.stringify(sampleFlaggedContent));
+        setFlaggedContent(sampleFlaggedContent);
+      } else {
+        setFlaggedContent(existingFlagged);
+      }
+      
+      // Fetch site settings
+      const existingSettings = JSON.parse(localStorage.getItem('site-settings') || '{}');
+      
+      if (Object.keys(existingSettings).length === 0) {
+        const defaultSettings = {
+          siteName: 'MCP4 Everyone',
+          allowRegistration: true,
+          requireEmailVerification: false,
+          autoApproveTemplates: false,
+          moderationEnabled: true,
+          featuredCategories: ['community', 'marketing', 'project'],
+          maintenanceMode: false,
+          analyticsEnabled: true,
+          lastUpdated: new Date().toISOString()
+        };
+        
+        localStorage.setItem('site-settings', JSON.stringify(defaultSettings));
+        setSiteSettings(defaultSettings);
+      } else {
+        setSiteSettings(existingSettings);
+      }
+      
+      // Calculate stats
+      const activeUsers = users.filter(u => u.status === 'active').length;
+      const pendingTemplates = allSubmissions.filter(t => t.status === 'pending').length;
+      const flaggedContentCount = existingFlagged.length;
+      
+      // Get total downloads
+      const totalDownloads = communityTemplates.reduce((sum, template) => sum + (template.downloads || 0), 0);
+      
+      // Get total posts and comments
+      let totalPosts = 0;
+      let totalComments = 0;
+      
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('user-posts-')) {
+          try {
+            const posts = JSON.parse(localStorage.getItem(key) || '[]');
+            totalPosts += posts.length;
+          } catch (error) {
+            console.error('Error parsing user posts:', error);
+          }
+        }
+      }
+      
+      setStats({
+        totalUsers: users.length,
+        activeUsers,
+        pendingTemplates,
+        flaggedContent: flaggedContentCount,
+        totalTemplates: communityTemplates.length,
+        totalDownloads,
+        totalPosts,
+        totalComments
+      });
+      
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+      addNotification({
+        id: 'admin-data-error',
+        message: 'Error fetching admin data',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+      setTimeout(() => setRefreshing(false), 500);
+    }
+  };
+
+  const handleCreateUser = () => {
+    setSelectedUser(null);
+    setShowUserForm(true);
+  };
+
+  const handleEditUser = (user: any) => {
+    setSelectedUser(user);
+    setShowUserForm(true);
+  };
+
+  const handleSaveUser = (userData: any) => {
+    // In a real app, this would update the database
+    // For demo purposes, we'll update localStorage
+    
+    try {
+      // Update users state
+      if (selectedUser) {
+        // Editing existing user
+        setUsers(users.map(u => u.id === userData.id ? userData : u));
+      } else {
+        // Creating new user
+        setUsers([...users, userData]);
+      }
+      
+      // Save to localStorage
+      localStorage.setItem(`mock-user-${userData.id}`, JSON.stringify(userData));
+      
+      addNotification({
+        id: `user-${selectedUser ? 'updated' : 'created'}-${Date.now()}`,
+        message: `User ${selectedUser ? 'updated' : 'created'} successfully`,
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error saving user:', error);
+      addNotification({
+        id: `user-error-${Date.now()}`,
+        message: `Error ${selectedUser ? 'updating' : 'creating'} user`,
+        type: 'error'
+      });
+    }
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        // Remove from users state
+        setUsers(users.filter(u => u.id !== userId));
+        
+        // Remove from localStorage
+        localStorage.removeItem(`mock-user-${userId}`);
+        
+        addNotification({
+          id: `user-deleted-${Date.now()}`,
+          message: 'User deleted successfully',
+          type: 'success'
+        });
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        addNotification({
+          id: `user-delete-error-${Date.now()}`,
+          message: 'Error deleting user',
+          type: 'error'
+        });
+      }
+    }
+  };
+
+  const handleReviewTemplate = (template: any) => {
+    setSelectedTemplate(template);
+    setShowTemplateReview(true);
+  };
+
+  const handleApproveTemplate = (template: any) => {
+    try {
+      // Update template status
+      const updatedTemplates = templates.map(t => 
+        t.id === template.id ? { ...t, status: 'approved', reviewedAt: new Date().toISOString() } : t
+      );
+      setTemplates(updatedTemplates);
+      
+      // If it's a submission, update in localStorage
+      if (template.submittedAt) {
+        // Find the user ID from the submission key
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('template-submissions-')) {
+            try {
+              const submissions = JSON.parse(localStorage.getItem(key) || '[]');
+              const updatedSubmissions = submissions.map((sub: any) => 
+                sub.id === template.id ? { ...sub, status: 'approved', reviewedAt: new Date().toISOString() } : sub
+              );
+              localStorage.setItem(key, JSON.stringify(updatedSubmissions));
+            } catch (error) {
+              console.error('Error updating template submissions:', error);
+            }
+          }
+        }
+      }
+      
+      // Add to community templates if not already there
+      const communityTemplates = JSON.parse(localStorage.getItem('community-templates') || '[]');
+      const existingTemplate = communityTemplates.find((t: any) => t.id === template.id);
+      
+      if (!existingTemplate) {
+        // Create a new template from the submission
+        const newTemplate = {
+          id: template.id,
+          title: template.templateTitle || template.title,
+          description: template.description,
+          category: (template.category || 'other').toLowerCase().replace(/\s+/g, '-'),
+          platform: (template.platform || 'other').toLowerCase().replace(/\s+/g, '-'),
+          difficulty: template.difficulty?.startsWith('Beginner') ? 'Beginner' : 
+                     template.difficulty?.startsWith('Intermediate') ? 'Intermediate' : 'Advanced',
+          rating: 5.0,
+          downloads: 0,
+          dataSource: template.dataSource || template.tools?.split(',')[0] || 'Custom Data Source',
+          aiModel: template.aiModel || 'GPT-4',
+          features: typeof template.features === 'string' ? template.features.split('\n').filter(Boolean) : template.features || [],
+          setupTime: template.setupTime || '30 minutes',
+          preview: template.preview || `// ${template.templateTitle || template.title} Configuration
+{
+  "name": "${template.templateTitle || template.title}",
+  "description": "${template.description}",
+  "author": "${template.name || template.author || 'Community Member'}",
+  "category": "${template.category || 'other'}",
+  "platform": "${template.platform || 'other'}"
+}`,
+          tags: template.tags || (template.category || 'other').toLowerCase().split(/\s+/).filter(Boolean),
+          files: [
+            {
+              name: 'instructions.md',
+              content: template.instructions || 'No instructions provided.'
+            }
+          ],
+          author: template.name || template.author || 'Community Member',
+          approvedAt: new Date().toISOString()
+        };
+        
+        communityTemplates.push(newTemplate);
+        localStorage.setItem('community-templates', JSON.stringify(communityTemplates));
+      }
+      
+      addNotification({
+        id: `template-approved-${Date.now()}`,
+        message: 'Template approved successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error approving template:', error);
+      addNotification({
+        id: `template-approve-error-${Date.now()}`,
+        message: 'Error approving template',
+        type: 'error'
+      });
+    }
+  };
+
+  const handleRejectTemplate = (template: any, reason: string) => {
+    try {
+      // Update template status
+      const updatedTemplates = templates.map(t => 
+        t.id === template.id ? { ...t, status: 'rejected', reviewedAt: new Date().toISOString(), rejectionReason: reason } : t
+      );
+      setTemplates(updatedTemplates);
+      
+      // If it's a submission, update in localStorage
+      if (template.submittedAt) {
+        // Find the user ID from the submission key
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('template-submissions-')) {
+            try {
+              const submissions = JSON.parse(localStorage.getItem(key) || '[]');
+              const updatedSubmissions = submissions.map((sub: any) => 
+                sub.id === template.id ? { ...sub, status: 'rejected', reviewedAt: new Date().toISOString(), rejectionReason: reason } : sub
+              );
+              localStorage.setItem(key, JSON.stringify(updatedSubmissions));
+            } catch (error) {
+              console.error('Error updating template submissions:', error);
+            }
+          }
+        }
+      }
+      
+      addNotification({
+        id: `template-rejected-${Date.now()}`,
+        message: 'Template rejected successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error rejecting template:', error);
+      addNotification({
+        id: `template-reject-error-${Date.now()}`,
+        message: 'Error rejecting template',
+        type: 'error'
+      });
+    }
+  };
+
+  const handleReviewContent = (content: any) => {
+    setSelectedContent(content);
+    setShowContentModeration(true);
+  };
+
+  const handleApproveContent = (content: any) => {
+    try {
+      // Update content status
+      const updatedContent = flaggedContent.map(c => 
+        c.id === content.id ? { ...c, status: 'approved', reviewedAt: new Date().toISOString() } : c
+      );
+      setFlaggedContent(updatedContent);
+      
+      // Update in localStorage
+      localStorage.setItem('flagged-content', JSON.stringify(updatedContent));
+      
+      addNotification({
+        id: `content-approved-${Date.now()}`,
+        message: 'Content approved successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error approving content:', error);
+      addNotification({
+        id: `content-approve-error-${Date.now()}`,
+        message: 'Error approving content',
+        type: 'error'
+      });
+    }
+  };
+
+  const handleRejectContent = (content: any, reason: string) => {
+    try {
+      // Update content status
+      const updatedContent = flaggedContent.map(c => 
+        c.id === content.id ? { ...c, status: 'rejected', reviewedAt: new Date().toISOString(), rejectionReason: reason } : c
+      );
+      setFlaggedContent(updatedContent);
+      
+      // Update in localStorage
+      localStorage.setItem('flagged-content', JSON.stringify(updatedContent));
+      
+      addNotification({
+        id: `content-rejected-${Date.now()}`,
+        message: 'Content rejected successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error rejecting content:', error);
+      addNotification({
+        id: `content-reject-error-${Date.now()}`,
+        message: 'Error rejecting content',
+        type: 'error'
+      });
+    }
+  };
+
+  const handleUpdateSettings = (newSettings: any) => {
+    try {
+      // Update settings
+      const updatedSettings = { ...siteSettings, ...newSettings, lastUpdated: new Date().toISOString() };
+      setSiteSettings(updatedSettings);
+      
+      // Save to localStorage
+      localStorage.setItem('site-settings', JSON.stringify(updatedSettings));
+      
+      addNotification({
+        id: `settings-updated-${Date.now()}`,
+        message: 'Settings updated successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      addNotification({
+        id: `settings-update-error-${Date.now()}`,
+        message: 'Error updating settings',
+        type: 'error'
+      });
+    }
+  };
+
+  // Filter users based on search query and filter
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = searchQuery === '' || 
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.role?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.company?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesFilter = userFilter === 'all' || user.status === userFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  // Filter templates based on search query and filter
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = searchQuery === '' || 
+      (template.title || template.templateTitle)?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.platform?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesFilter = templateFilter === 'all' || template.status === templateFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  // Filter flagged content based on search query and filter
+  const filteredContent = flaggedContent.filter(content => {
+    const matchesSearch = searchQuery === '' || 
+      content.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      content.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      content.type?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesFilter = contentFilter === 'all' || content.status === contentFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Get status badge color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+      case 'approved':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'inactive':
+      case 'rejected':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      case 'pending':
+      case 'flagged':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'suspended':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
+  };
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage users, content, and site settings
-          </p>
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+            <button 
+              onClick={fetchData}
+              className={`p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors duration-200 ${refreshing ? 'animate-spin' : ''}`}
+              disabled={refreshing}
+            >
+              <RefreshCw className="w-5 h-5 text-muted-foreground" />
+            </button>
+          </div>
+          <p className="text-muted-foreground">Manage users, content, and site settings</p>
         </div>
 
-        {/* Admin Navigation */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {[
-            { id: 'overview', name: 'Overview', icon: BarChart2 },
-            { id: 'users', name: 'User Management', icon: Users },
-            { id: 'templates', name: 'Template Approval', icon: FileText },
-            { id: 'content', name: 'Content Moderation', icon: AlertTriangle },
-            { id: 'settings', name: 'Site Settings', icon: Settings }
-          ].map((tab) => (
+        {/* Tabs */}
+        <div className="flex overflow-x-auto mb-8 pb-2">
+          <div className="flex space-x-2">
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as AdminTab)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === tab.id
+              onClick={() => setActiveTab('overview')}
+              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 ${
+                activeTab === 'overview'
                   ? 'bg-matrix-primary text-primary-foreground'
-                  : 'glass text-muted-foreground hover:text-foreground hover:bg-muted'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
-              <tab.icon className="w-4 h-4" />
-              <span className="hidden sm:inline">{tab.name}</span>
-              <span className="sm:hidden">{tab.id === 'overview' ? 'Home' : <tab.icon className="w-4 h-4" />}</span>
+              <BarChart className="w-4 h-4" />
+              <span>Overview</span>
             </button>
-          ))}
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 ${
+                activeTab === 'users'
+                  ? 'bg-matrix-primary text-primary-foreground'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>User Management</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('templates')}
+              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 ${
+                activeTab === 'templates'
+                  ? 'bg-matrix-primary text-primary-foreground'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>Template Approval</span>
+              {stats.pendingTemplates > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-yellow-500 text-white">
+                  {stats.pendingTemplates}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('moderation')}
+              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 ${
+                activeTab === 'moderation'
+                  ? 'bg-matrix-primary text-primary-foreground'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              <Flag className="w-4 h-4" />
+              <span>Content Moderation</span>
+              {stats.flaggedContent > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-red-500 text-white">
+                  {stats.flaggedContent}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 ${
+                activeTab === 'settings'
+                  ? 'bg-matrix-primary text-primary-foreground'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              <span>Site Settings</span>
+            </button>
+          </div>
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'overview' && <AdminOverview />}
-        {activeTab === 'users' && <AdminUsers />}
-        {activeTab === 'templates' && <AdminTemplates />}
-        {activeTab === 'content' && <AdminContent />}
-        {activeTab === 'settings' && <AdminSettings />}
-      </div>
-    </div>
-  );
-}
+        {/* Loading State */}
+        {loading && (
+          <div className="glass p-12 rounded-xl flex items-center justify-center">
+            <div className="loading-spinner mr-3"></div>
+            <span className="text-muted-foreground">Loading admin data...</span>
+          </div>
+        )}
 
-// Overview Tab
-function AdminOverview() {
-  const stats = [
-    { name: 'Total Users', value: '2,847', change: '+12%', icon: Users, color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-    { name: 'Active Subscriptions', value: '156', change: '+5%', icon: CheckCircle, color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-    { name: 'Pending Templates', value: '23', change: '+8%', icon: FileText, color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
-    { name: 'Flagged Content', value: '7', change: '-2%', icon: AlertTriangle, color: 'bg-red-500/20 text-red-400 border-red-500/30' }
-  ];
-
-  const recentActivity = [
-    { action: 'New user registered', user: 'john.smith@example.com', time: '5 minutes ago' },
-    { action: 'Template approved', user: 'admin@mcp4everyone.com', time: '1 hour ago' },
-    { action: 'Content flagged', user: 'moderator@mcp4everyone.com', time: '2 hours ago' },
-    { action: 'User role updated', user: 'admin@mcp4everyone.com', time: '3 hours ago' },
-    { action: 'New subscription', user: 'sarah.jones@example.com', time: '5 hours ago' }
-  ];
-
-  return (
-    <div className="space-y-8">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div key={index} className="glass p-6 rounded-xl">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>
-                <stat.icon className="w-6 h-6" />
+        {/* Overview Tab */}
+        {!loading && activeTab === 'overview' && (
+          <div className="space-y-8">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="glass p-6 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-foreground font-medium">Total Users</h3>
+                  <Users className="w-5 h-5 text-blue-400" />
+                </div>
+                <div className="text-3xl font-bold text-foreground">{stats.totalUsers}</div>
+                <div className="text-muted-foreground text-sm mt-1">{stats.activeUsers} active users</div>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                <div className={`text-sm ${stat.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
-                  {stat.change} this week
+              
+              <div className="glass p-6 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-foreground font-medium">Templates</h3>
+                  <FileText className="w-5 h-5 text-purple-400" />
+                </div>
+                <div className="text-3xl font-bold text-foreground">{stats.totalTemplates}</div>
+                <div className="text-muted-foreground text-sm mt-1">{stats.totalDownloads} total downloads</div>
+              </div>
+              
+              <div className="glass p-6 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-foreground font-medium">Community</h3>
+                  <Users className="w-5 h-5 text-green-400" />
+                </div>
+                <div className="text-3xl font-bold text-foreground">{stats.totalPosts}</div>
+                <div className="text-muted-foreground text-sm mt-1">{stats.totalComments} comments</div>
+              </div>
+              
+              <div className="glass p-6 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-foreground font-medium">Pending Review</h3>
+                  <Flag className="w-5 h-5 text-yellow-400" />
+                </div>
+                <div className="text-3xl font-bold text-foreground">{stats.pendingTemplates + stats.flaggedContent}</div>
+                <div className="text-muted-foreground text-sm mt-1">{stats.pendingTemplates} templates, {stats.flaggedContent} content</div>
+              </div>
+            </div>
+            
+            {/* Database Status */}
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Database Status</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Database className="w-5 h-5 text-blue-400" />
+                    <div>
+                      <div className="text-foreground font-medium">Profiles Table</div>
+                      <div className="text-muted-foreground text-sm">{stats.totalUsers} records</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-green-400 text-sm">Healthy</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Database className="w-5 h-5 text-purple-400" />
+                    <div>
+                      <div className="text-foreground font-medium">Learning Progress Table</div>
+                      <div className="text-muted-foreground text-sm">15 records</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-green-400 text-sm">Healthy</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Database className="w-5 h-5 text-yellow-400" />
+                    <div>
+                      <div className="text-foreground font-medium">Stripe Customers Table</div>
+                      <div className="text-muted-foreground text-sm">2 records</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-green-400 text-sm">Healthy</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Database className="w-5 h-5 text-red-400" />
+                    <div>
+                      <div className="text-foreground font-medium">Stripe Subscriptions Table</div>
+                      <div className="text-muted-foreground text-sm">2 records</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-green-400 text-sm">Healthy</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Database className="w-5 h-5 text-green-400" />
+                    <div>
+                      <div className="text-foreground font-medium">Stripe Orders Table</div>
+                      <div className="text-muted-foreground text-sm">5 records</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-green-400 text-sm">Healthy</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 text-right">
+                <button className="text-matrix-primary hover:text-matrix-secondary transition-colors duration-200 text-sm">
+                  View Database Schema
+                </button>
+              </div>
+            </div>
+            
+            {/* Recent Activity */}
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
+                  <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <Users className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-foreground font-medium">New user registered</div>
+                    <div className="text-muted-foreground text-sm">user@example.com joined the platform</div>
+                    <div className="text-muted-foreground text-xs mt-1">2 hours ago</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="text-foreground font-medium">Template submitted</div>
+                    <div className="text-muted-foreground text-sm">New template "Customer Segmentation Assistant" submitted</div>
+                    <div className="text-muted-foreground text-xs mt-1">5 hours ago</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
+                  <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
+                    <Flag className="w-4 h-4 text-red-400" />
+                  </div>
+                  <div>
+                    <div className="text-foreground font-medium">Content flagged</div>
+                    <div className="text-muted-foreground text-sm">A post was flagged for review by moderator@example.com</div>
+                    <div className="text-muted-foreground text-xs mt-1">1 day ago</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg">
+                  <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                  </div>
+                  <div>
+                    <div className="text-foreground font-medium">Template approved</div>
+                    <div className="text-muted-foreground text-sm">"Project Status Reporter" template was approved</div>
+                    <div className="text-muted-foreground text-xs mt-1">2 days ago</div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="text-muted-foreground">{stat.name}</div>
           </div>
-        ))}
-      </div>
+        )}
 
-      {/* Recent Activity */}
-      <div className="glass p-6 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Recent Activity</h2>
-        <div className="space-y-4">
-          {recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center justify-between p-3 glass rounded-lg">
-              <div>
-                <div className="text-foreground font-medium">{activity.action}</div>
-                <div className="text-muted-foreground text-sm">{activity.user}</div>
-              </div>
-              <div className="text-muted-foreground text-sm">{activity.time}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="glass p-6 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="p-4 glass rounded-lg hover:bg-muted/50 transition-all duration-200 text-left">
-            <Users className="w-6 h-6 text-blue-400 mb-2" />
-            <div className="font-medium text-foreground">Add New Admin</div>
-            <div className="text-muted-foreground text-sm">Create admin account</div>
-          </button>
-          <button className="p-4 glass rounded-lg hover:bg-muted/50 transition-all duration-200 text-left">
-            <FileText className="w-6 h-6 text-green-400 mb-2" />
-            <div className="font-medium text-foreground">Review Templates</div>
-            <div className="text-muted-foreground text-sm">Approve pending templates</div>
-          </button>
-          <button className="p-4 glass rounded-lg hover:bg-muted/50 transition-all duration-200 text-left">
-            <AlertTriangle className="w-6 h-6 text-yellow-400 mb-2" />
-            <div className="font-medium text-foreground">Moderate Content</div>
-            <div className="text-muted-foreground text-sm">Review flagged content</div>
-          </button>
-          <button className="p-4 glass rounded-lg hover:bg-muted/50 transition-all duration-200 text-left">
-            <Settings className="w-6 h-6 text-purple-400 mb-2" />
-            <div className="font-medium text-foreground">Site Settings</div>
-            <div className="text-muted-foreground text-sm">Configure site options</div>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// User Management Tab
-function AdminUsers() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRole, setSelectedRole] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-
-  // Sample user data
-  const users = [
-    { id: 1, name: 'John Smith', email: 'john.smith@example.com', role: 'user', status: 'active', joined: '2025-01-15', lastLogin: '2025-03-10' },
-    { id: 2, name: 'Sarah Chen', email: 'sarah.chen@example.com', role: 'admin', status: 'active', joined: '2024-11-20', lastLogin: '2025-03-12' },
-    { id: 3, name: 'Mike Rodriguez', email: 'mike.r@example.com', role: 'moderator', status: 'active', joined: '2025-01-05', lastLogin: '2025-03-11' },
-    { id: 4, name: 'Lisa Park', email: 'lisa.park@example.com', role: 'user', status: 'inactive', joined: '2025-02-10', lastLogin: '2025-02-28' },
-    { id: 5, name: 'David Kim', email: 'david.kim@example.com', role: 'user', status: 'active', joined: '2025-02-15', lastLogin: '2025-03-09' },
-    { id: 6, name: 'Emma Wilson', email: 'emma.w@example.com', role: 'moderator', status: 'active', joined: '2025-01-25', lastLogin: '2025-03-12' },
-    { id: 7, name: 'Alex Thompson', email: 'alex.t@example.com', role: 'user', status: 'suspended', joined: '2025-01-10', lastLogin: '2025-02-20' }
-  ];
-
-  // Filter users based on search and filters
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = searchQuery === '' || 
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesRole = selectedRole === 'all' || user.role === selectedRole;
-    const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus;
-    
-    return matchesSearch && matchesRole && matchesStatus;
-  });
-
-  const handleEditUser = (user: any) => {
-    setSelectedUser(user);
-    setShowUserModal(true);
-  };
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'moderator': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      default: return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'inactive': return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-      case 'suspended': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Filters */}
-      <div className="glass p-6 rounded-xl">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search users by name or email..."
-                className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground placeholder-muted-foreground"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Role Filter */}
-          <div className="w-full md:w-48">
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-            >
-              <option value="all">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="moderator">Moderator</option>
-              <option value="user">User</option>
-            </select>
-          </div>
-
-          {/* Status Filter */}
-          <div className="w-full md:w-48">
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-            >
-              <option value="all">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="suspended">Suspended</option>
-            </select>
-          </div>
-
-          {/* Add User Button */}
-          <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
-            <Users className="w-4 h-4" />
-            <span>Add User</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Users Table */}
-      <div className="glass rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-muted/50">
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Login</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-muted/30 transition-colors duration-200">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-foreground font-medium">{user.name}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-muted-foreground">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getRoleColor(user.role)}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(user.status)}`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
-                    {new Date(user.joined).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
-                    {new Date(user.lastLogin).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button 
-                        onClick={() => handleEditUser(user)}
-                        className="p-1 text-muted-foreground hover:text-foreground"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="p-1 text-muted-foreground hover:text-destructive">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing <span className="font-medium text-foreground">{filteredUsers.length}</span> of <span className="font-medium text-foreground">{users.length}</span> users
-        </div>
-        <div className="flex items-center space-x-2">
-          <button className="px-3 py-1 glass rounded-md text-muted-foreground hover:text-foreground">
-            Previous
-          </button>
-          <button className="px-3 py-1 glass rounded-md text-muted-foreground hover:text-foreground">
-            Next
-          </button>
-        </div>
-      </div>
-
-      {/* User Edit Modal */}
-      {showUserModal && selectedUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Edit User</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-foreground font-medium mb-1">Name</label>
+        {/* User Management Tab */}
+        {!loading && activeTab === 'users' && (
+          <div className="space-y-6">
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
-                  defaultValue={selectedUser.name}
-                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search users by name, email, role..."
+                  className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground"
                 />
               </div>
               
-              <div>
-                <label className="block text-foreground font-medium mb-1">Email</label>
-                <input
-                  type="email"
-                  defaultValue={selectedUser.email}
-                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-foreground font-medium mb-1">Role</label>
+              <div className="flex space-x-2">
                 <select
-                  defaultValue={selectedUser.role}
-                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
+                  value={userFilter}
+                  onChange={(e) => setUserFilter(e.target.value)}
+                  className="bg-input border border-border rounded-lg px-4 py-2 text-foreground"
                 >
-                  <option value="user">User</option>
-                  <option value="moderator">Moderator</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-foreground font-medium mb-1">Status</label>
-                <select
-                  defaultValue={selectedUser.status}
-                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-                >
+                  <option value="all">All Users</option>
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                   <option value="suspended">Suspended</option>
                 </select>
+                
+                <button
+                  onClick={handleCreateUser}
+                  className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-4 py-2 rounded-lg flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add User</span>
+                </button>
               </div>
             </div>
             
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={() => setShowUserModal(false)}
-                className="px-4 py-2 border border-border rounded-lg text-muted-foreground hover:text-foreground"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowUserModal(false)}
-                className="px-4 py-2 bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground rounded-lg"
-              >
-                Save Changes
+            {/* Users Table */}
+            <div className="glass rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-muted/50">
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Name</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Email</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Role</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Company</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Status</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Created</th>
+                      <th className="px-4 py-3 text-right text-foreground font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.length > 0 ? (
+                      filteredUsers.map((user) => (
+                        <tr key={user.id} className="border-t border-border hover:bg-muted/30 transition-colors duration-200">
+                          <td className="px-4 py-3 text-foreground">{user.full_name || 'N/A'}</td>
+                          <td className="px-4 py-3 text-foreground">{user.email}</td>
+                          <td className="px-4 py-3 text-foreground capitalize">{user.role || 'user'}</td>
+                          <td className="px-4 py-3 text-foreground">{user.company || 'N/A'}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(user.status || 'active')}`}>
+                              {user.status || 'active'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground text-sm">{formatDate(user.created_at)}</td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <button
+                                onClick={() => handleEditUser(user)}
+                                className="p-1 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                                title="Edit User"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="p-1 text-muted-foreground hover:text-destructive transition-colors duration-200"
+                                title="Delete User"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                          No users found matching your criteria
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            {/* Export Users */}
+            <div className="flex justify-end">
+              <button className="flex items-center space-x-2 text-matrix-primary hover:text-matrix-secondary transition-colors duration-200">
+                <Download className="w-4 h-4" />
+                <span>Export Users</span>
               </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
+        )}
 
-// Template Approval Tab
-function AdminTemplates() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('pending');
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
-  const [templates, setTemplates] = useState<any[]>([]);
-
-  // Load templates from localStorage
-  useEffect(() => {
-    // Get all user submissions from localStorage
-    const allSubmissions: any[] = [];
-    
-    // Iterate through localStorage to find all template submissions
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('template-submissions-')) {
-        const userSubmissions = JSON.parse(localStorage.getItem(key) || '[]');
-        allSubmissions.push(...userSubmissions);
-      }
-    }
-    
-    // Get community templates
-    const communityTemplates = JSON.parse(localStorage.getItem('community-templates') || '[]');
-    
-    // Combine all templates
-    setTemplates([...allSubmissions, ...communityTemplates]);
-  }, []);
-
-  // Filter templates based on search and status
-  const filteredTemplates = templates.filter(template => {
-    const matchesSearch = searchQuery === '' || 
-      (template.templateTitle || template.title).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (template.description || '').toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const status = template.status || (template.approvedAt ? 'approved' : 'pending');
-    const matchesStatus = selectedStatus === 'all' || status === selectedStatus;
-    
-    return matchesSearch && matchesStatus;
-  });
-
-  const handleViewTemplate = (template: any) => {
-    setSelectedTemplate(template);
-    setShowTemplateModal(true);
-  };
-
-  const handleApproveTemplate = (template: any) => {
-    // In a real app, this would update the database
-    console.log('Approving template:', template);
-    
-    // For demo purposes, we'll update localStorage
-    if (template.id) {
-      // Find the user ID from the template submissions key
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('template-submissions-')) {
-          const userSubmissions = JSON.parse(localStorage.getItem(key) || '[]');
-          const updatedSubmissions = userSubmissions.map((sub: any) => 
-            sub.id === template.id ? { ...sub, status: 'approved', reviewedAt: new Date().toISOString() } : sub
-          );
-          
-          if (updatedSubmissions.some((sub: any) => sub.id === template.id)) {
-            localStorage.setItem(key, JSON.stringify(updatedSubmissions));
-            
-            // Also add to community templates if not already there
-            const communityTemplates = JSON.parse(localStorage.getItem('community-templates') || '[]');
-            if (!communityTemplates.some((t: any) => t.id === template.id)) {
-              const newTemplate = {
-                id: template.id,
-                title: template.templateTitle,
-                description: template.description,
-                category: template.category.toLowerCase().replace(/\s+/g, '-'),
-                platform: template.platform.toLowerCase().replace(/\s+/g, '-'),
-                difficulty: template.difficulty.startsWith('Beginner') ? 'Beginner' : 
-                           template.difficulty.startsWith('Intermediate') ? 'Intermediate' : 'Advanced',
-                rating: 5.0,
-                downloads: 0,
-                dataSource: template.dataSource || 'Custom Data Source',
-                aiModel: 'GPT-4',
-                features: template.features.split('\n').filter(Boolean),
-                setupTime: template.setupTime,
-                preview: `// ${template.templateTitle} Configuration
-{
-  "name": "${template.templateTitle}",
-  "description": "${template.description}",
-  "author": "${template.name}",
-  "category": "${template.category}",
-  "platform": "${template.platform}"
-}`,
-                tags: template.category.toLowerCase().split(/\s+/).filter(Boolean),
-                files: [
-                  {
-                    name: 'instructions.md',
-                    content: template.instructions
-                  }
-                ],
-                author: template.name,
-                approvedAt: new Date().toISOString()
-              };
+        {/* Template Approval Tab */}
+        {!loading && activeTab === 'templates' && (
+          <div className="space-y-6">
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search templates by title, description, category..."
+                  className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground"
+                />
+              </div>
               
-              communityTemplates.push(newTemplate);
-              localStorage.setItem('community-templates', JSON.stringify(communityTemplates));
-            }
-            
-            // Update local state
-            setTemplates(prev => prev.map(t => 
-              t.id === template.id ? { ...t, status: 'approved', reviewedAt: new Date().toISOString() } : t
-            ));
-            
-            break;
-          }
-        }
-      }
-    }
-  };
-
-  const handleRejectTemplate = (template: any) => {
-    // In a real app, this would update the database
-    console.log('Rejecting template:', template);
-    
-    // For demo purposes, we'll update localStorage
-    if (template.id) {
-      // Find the user ID from the template submissions key
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('template-submissions-')) {
-          const userSubmissions = JSON.parse(localStorage.getItem(key) || '[]');
-          const updatedSubmissions = userSubmissions.map((sub: any) => 
-            sub.id === template.id ? { ...sub, status: 'rejected', reviewedAt: new Date().toISOString() } : sub
-          );
-          
-          if (updatedSubmissions.some((sub: any) => sub.id === template.id)) {
-            localStorage.setItem(key, JSON.stringify(updatedSubmissions));
-            
-            // Update local state
-            setTemplates(prev => prev.map(t => 
-              t.id === template.id ? { ...t, status: 'rejected', reviewedAt: new Date().toISOString() } : t
-            ));
-            
-            break;
-          }
-        }
-      }
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Filters */}
-      <div className="glass p-6 rounded-xl">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search templates..."
-                className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground placeholder-muted-foreground"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              <div className="flex space-x-2">
+                <select
+                  value={templateFilter}
+                  onChange={(e) => setTemplateFilter(e.target.value)}
+                  className="bg-input border border-border rounded-lg px-4 py-2 text-foreground"
                 >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Status Filter */}
-          <div className="w-full md:w-48">
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Templates Table */}
-      <div className="glass rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-muted/50">
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Template</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Author</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Platform</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Submitted</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredTemplates.map((template, index) => {
-                const title = template.templateTitle || template.title;
-                const author = template.name || template.author || 'Unknown';
-                const category = template.category || 'Unknown';
-                const platform = template.platform || 'Unknown';
-                const status = template.status || (template.approvedAt ? 'approved' : 'pending');
-                const submittedAt = template.submittedAt || template.created_at || new Date().toISOString();
-                
-                return (
-                  <tr key={index} className="hover:bg-muted/30 transition-colors duration-200">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-foreground font-medium">{title}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-muted-foreground">{author}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-muted-foreground capitalize">{category}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-muted-foreground capitalize">{platform}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
-                        status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                        status === 'rejected' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
-                        'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                      }`}>
-                        {status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
-                      {new Date(submittedAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button 
-                          onClick={() => handleViewTemplate(template)}
-                          className="p-1 text-muted-foreground hover:text-foreground"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {status === 'pending' && (
-                          <>
-                            <button 
-                              onClick={() => handleApproveTemplate(template)}
-                              className="p-1 text-muted-foreground hover:text-green-400"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => handleRejectTemplate(template)}
-                              className="p-1 text-muted-foreground hover:text-destructive"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Template View Modal */}
-      {showTemplateModal && selectedTemplate && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-border flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-foreground">
-                {selectedTemplate.templateTitle || selectedTemplate.title}
-              </h2>
-              <button
-                onClick={() => setShowTemplateModal(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                <X className="w-6 h-6" />
-              </button>
+                  <option value="all">All Templates</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6">
+            {/* Templates Table */}
+            <div className="glass rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-muted/50">
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Title</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Author</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Category</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Platform</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Status</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Submitted</th>
+                      <th className="px-4 py-3 text-right text-foreground font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTemplates.length > 0 ? (
+                      filteredTemplates.map((template) => (
+                        <tr key={template.id} className="border-t border-border hover:bg-muted/30 transition-colors duration-200">
+                          <td className="px-4 py-3 text-foreground">{template.title || template.templateTitle}</td>
+                          <td className="px-4 py-3 text-foreground">{template.author || template.name || 'N/A'}</td>
+                          <td className="px-4 py-3 text-foreground capitalize">{template.category || 'N/A'}</td>
+                          <td className="px-4 py-3 text-foreground capitalize">{template.platform || 'N/A'}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(template.status || 'pending')}`}>
+                              {template.status || 'pending'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground text-sm">{formatDate(template.submittedAt || template.created_at)}</td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <button
+                                onClick={() => handleReviewTemplate(template)}
+                                className="p-1 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                                title="Review Template"
+                              >
+                                <FileText className="w-4 h-4" />
+                              </button>
+                              {template.status !== 'approved' && (
+                                <button
+                                  onClick={() => handleApproveTemplate(template)}
+                                  className="p-1 text-muted-foreground hover:text-green-400 transition-colors duration-200"
+                                  title="Approve Template"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                </button>
+                              )}
+                              {template.status !== 'rejected' && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedTemplate(template);
+                                    setShowTemplateReview(true);
+                                  }}
+                                  className="p-1 text-muted-foreground hover:text-red-400 transition-colors duration-200"
+                                  title="Reject Template"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                          No templates found matching your criteria
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Content Moderation Tab */}
+        {!loading && activeTab === 'moderation' && (
+          <div className="space-y-6">
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search flagged content..."
+                  className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground"
+                />
+              </div>
+              
+              <div className="flex space-x-2">
+                <select
+                  value={contentFilter}
+                  onChange={(e) => setContentFilter(e.target.value)}
+                  className="bg-input border border-border rounded-lg px-4 py-2 text-foreground"
+                >
+                  <option value="all">All Content</option>
+                  <option value="flagged">Flagged</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* Flagged Content Table */}
+            <div className="glass rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-muted/50">
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Content</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Type</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Author</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Reported By</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Status</th>
+                      <th className="px-4 py-3 text-left text-foreground font-semibold">Date</th>
+                      <th className="px-4 py-3 text-right text-foreground font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredContent.length > 0 ? (
+                      filteredContent.map((content) => (
+                        <tr key={content.id} className="border-t border-border hover:bg-muted/30 transition-colors duration-200">
+                          <td className="px-4 py-3 text-foreground">{content.title}</td>
+                          <td className="px-4 py-3 text-foreground capitalize">{content.type}</td>
+                          <td className="px-4 py-3 text-foreground">{content.author}</td>
+                          <td className="px-4 py-3 text-foreground">{content.reportedBy}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(content.status)}`}>
+                              {content.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground text-sm">{formatDate(content.date)}</td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <button
+                                onClick={() => handleReviewContent(content)}
+                                className="p-1 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                                title="Review Content"
+                              >
+                                <FileText className="w-4 h-4" />
+                              </button>
+                              {content.status === 'flagged' && (
+                                <>
+                                  <button
+                                    onClick={() => handleApproveContent(content)}
+                                    className="p-1 text-muted-foreground hover:text-green-400 transition-colors duration-200"
+                                    title="Approve Content"
+                                  >
+                                    <CheckCircle className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setSelectedContent(content);
+                                      setShowContentModeration(true);
+                                    }}
+                                    className="p-1 text-muted-foreground hover:text-red-400 transition-colors duration-200"
+                                    title="Remove Content"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                          No flagged content found matching your criteria
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Site Settings Tab */}
+        {!loading && activeTab === 'settings' && (
+          <div className="space-y-6">
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4">General Settings</h3>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-foreground font-medium mb-1">Description</h3>
-                  <p className="text-muted-foreground">{selectedTemplate.description}</p>
+                  <label className="block text-foreground font-medium mb-1">Site Name</label>
+                  <input
+                    type="text"
+                    value={siteSettings.siteName || 'MCP4 Everyone'}
+                    onChange={(e) => handleUpdateSettings({ siteName: e.target.value })}
+                    className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
+                  />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-foreground font-medium mb-1">Author</h3>
-                    <p className="text-muted-foreground">{selectedTemplate.name || selectedTemplate.author || 'Unknown'}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Users className="w-5 h-5 text-blue-400" />
+                      <span className="text-foreground">Allow User Registration</span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={siteSettings.allowRegistration !== false}
+                        onChange={(e) => handleUpdateSettings({ allowRegistration: e.target.checked })}
+                      />
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-matrix-primary"></div>
+                    </label>
                   </div>
-                  <div>
-                    <h3 className="text-foreground font-medium mb-1">Email</h3>
-                    <p className="text-muted-foreground">{selectedTemplate.email || 'Not provided'}</p>
+                  
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Shield className="w-5 h-5 text-purple-400" />
+                      <span className="text-foreground">Require Email Verification</span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={siteSettings.requireEmailVerification === true}
+                        onChange={(e) => handleUpdateSettings({ requireEmailVerification: e.target.checked })}
+                      />
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-matrix-primary"></div>
+                    </label>
                   </div>
-                  <div>
-                    <h3 className="text-foreground font-medium mb-1">Category</h3>
-                    <p className="text-muted-foreground capitalize">{selectedTemplate.category}</p>
+                  
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="w-5 h-5 text-green-400" />
+                      <span className="text-foreground">Auto-Approve Templates</span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={siteSettings.autoApproveTemplates === true}
+                        onChange={(e) => handleUpdateSettings({ autoApproveTemplates: e.target.checked })}
+                      />
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-matrix-primary"></div>
+                    </label>
                   </div>
-                  <div>
-                    <h3 className="text-foreground font-medium mb-1">Platform</h3>
-                    <p className="text-muted-foreground capitalize">{selectedTemplate.platform}</p>
+                  
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Flag className="w-5 h-5 text-red-400" />
+                      <span className="text-foreground">Content Moderation</span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={siteSettings.moderationEnabled !== false}
+                        onChange={(e) => handleUpdateSettings({ moderationEnabled: e.target.checked })}
+                      />
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-matrix-primary"></div>
+                    </label>
                   </div>
                 </div>
-                
-                {selectedTemplate.features && (
-                  <div>
-                    <h3 className="text-foreground font-medium mb-1">Features</h3>
-                    <div className="glass p-3 rounded-lg">
-                      {typeof selectedTemplate.features === 'string' ? (
-                        <pre className="text-muted-foreground whitespace-pre-wrap text-sm">{selectedTemplate.features}</pre>
-                      ) : (
-                        <ul className="text-muted-foreground space-y-1">
-                          {selectedTemplate.features.map((feature: string, index: number) => (
-                            <li key={index} className="flex items-start space-x-2">
-                              <div className="w-1.5 h-1.5 bg-matrix-primary rounded-full mt-2 flex-shrink-0"></div>
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                {selectedTemplate.instructions && (
-                  <div>
-                    <h3 className="text-foreground font-medium mb-1">Setup Instructions</h3>
-                    <div className="glass p-3 rounded-lg">
-                      <pre className="text-muted-foreground whitespace-pre-wrap text-sm">{selectedTemplate.instructions}</pre>
-                    </div>
-                  </div>
-                )}
-                
-                {selectedTemplate.preview && (
-                  <div>
-                    <h3 className="text-foreground font-medium mb-1">Preview Code</h3>
-                    <div className="glass p-3 rounded-lg">
-                      <pre className="text-muted-foreground whitespace-pre-wrap text-sm">{selectedTemplate.preview}</pre>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
             
-            <div className="p-6 border-t border-border flex justify-between">
-              <button
-                onClick={() => setShowTemplateModal(false)}
-                className="px-4 py-2 border border-border rounded-lg text-muted-foreground hover:text-foreground"
-              >
-                Close
-              </button>
-              
-              {(selectedTemplate.status === 'pending' || !selectedTemplate.status) && (
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => {
-                      handleRejectTemplate(selectedTemplate);
-                      setShowTemplateModal(false);
-                    }}
-                    className="px-4 py-2 bg-destructive/20 text-destructive border border-destructive/30 rounded-lg hover:bg-destructive/30"
-                  >
-                    Reject
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleApproveTemplate(selectedTemplate);
-                      setShowTemplateModal(false);
-                    }}
-                    className="px-4 py-2 bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground rounded-lg"
-                  >
-                    Approve
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Featured Categories</h3>
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {['community', 'marketing', 'project', 'sales', 'operations'].map((category) => (
+                    <div 
+                      key={category}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ${
+                        siteSettings.featuredCategories?.includes(category)
+                          ? 'bg-matrix-primary text-primary-foreground'
+                          : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                      onClick={() => {
+                        const currentFeatured = siteSettings.featuredCategories || [];
+                        const newFeatured = currentFeatured.includes(category)
+                          ? currentFeatured.filter((c: string) => c !== category)
+                          : [...currentFeatured, category];
+                        handleUpdateSettings({ featuredCategories: newFeatured });
+                      }}
+                    >
+                      {category}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Maintenance Mode</h3>
+              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                <div>
+                  <div className="text-foreground font-medium">Enable Maintenance Mode</div>
+                  <div className="text-muted-foreground text-sm">This will make the site inaccessible to all users except admins</div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={siteSettings.maintenanceMode === true}
+                    onChange={(e) => handleUpdateSettings({ maintenanceMode: e.target.checked })}
+                  />
+                  <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-matrix-primary"></div>
+                </label>
+              </div>
+            </div>
+            
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Database Management</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                  <div>
+                    <div className="text-foreground font-medium">Database Backup</div>
+                    <div className="text-muted-foreground text-sm">Last backup: {formatDate(new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())}</div>
+                  </div>
+                  <button className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors duration-200">
+                    Backup Now
                   </button>
                 </div>
-              )}
+                
+                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                  <div>
+                    <div className="text-foreground font-medium">Run Migrations</div>
+                    <div className="text-muted-foreground text-sm">Apply pending database migrations</div>
+                  </div>
+                  <button className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors duration-200">
+                    Run Migrations
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Analytics</h3>
+              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg mb-4">
+                <div>
+                  <div className="text-foreground font-medium">Enable Analytics</div>
+                  <div className="text-muted-foreground text-sm">Collect anonymous usage data to improve the platform</div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={siteSettings.analyticsEnabled !== false}
+                    onChange={(e) => handleUpdateSettings({ analyticsEnabled: e.target.checked })}
+                  />
+                  <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-matrix-primary"></div>
+                </label>
+              </div>
+              
+              <div className="text-right text-muted-foreground text-sm">
+                Last updated: {formatDate(siteSettings.lastUpdated || new Date().toISOString())}
+              </div>
             </div>
           </div>
-        </div>
+        )}
+      </div>
+      
+      {/* User Form Modal */}
+      {showUserForm && (
+        <AdminUserForm
+          user={selectedUser}
+          onClose={() => setShowUserForm(false)}
+          onSave={handleSaveUser}
+          isNew={!selectedUser}
+        />
       )}
-    </div>
-  );
-}
-
-// Content Moderation Tab
-function AdminContent() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('flagged');
-
-  // Sample content data
-  const contentItems = [
-    { id: 1, title: 'Inappropriate comment', type: 'comment', status: 'flagged', author: 'user123', reportedBy: 'moderator1', date: '2025-03-10' },
-    { id: 2, title: 'Spam post', type: 'post', status: 'flagged', author: 'spammer456', reportedBy: 'user789', date: '2025-03-11' },
-    { id: 3, title: 'Offensive language', type: 'comment', status: 'flagged', author: 'anonymous', reportedBy: 'user456', date: '2025-03-12' },
-    { id: 4, title: 'Misleading information', type: 'post', status: 'flagged', author: 'misinformer', reportedBy: 'moderator2', date: '2025-03-09' },
-    { id: 5, title: 'Duplicate content', type: 'template', status: 'flagged', author: 'copycat', reportedBy: 'admin1', date: '2025-03-08' },
-    { id: 6, title: 'Resolved issue', type: 'comment', status: 'resolved', author: 'user789', reportedBy: 'moderator1', date: '2025-03-07' },
-    { id: 7, title: 'False report', type: 'post', status: 'dismissed', author: 'gooduser', reportedBy: 'mistaken', date: '2025-03-06' }
-  ];
-
-  // Filter content based on search and filters
-  const filteredContent = contentItems.filter(item => {
-    const matchesSearch = searchQuery === '' || 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.author.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesType = selectedType === 'all' || item.type === selectedType;
-    const matchesStatus = selectedStatus === 'all' || item.status === selectedStatus;
-    
-    return matchesSearch && matchesType && matchesStatus;
-  });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'flagged': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'resolved': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'dismissed': return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-      default: return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'comment': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'post': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
-      case 'template': return 'bg-green-500/20 text-green-400 border-green-500/30';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Filters */}
-      <div className="glass p-6 rounded-xl">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search flagged content..."
-                className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-2 text-foreground placeholder-muted-foreground"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Type Filter */}
-          <div className="w-full md:w-48">
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-            >
-              <option value="all">All Types</option>
-              <option value="comment">Comments</option>
-              <option value="post">Posts</option>
-              <option value="template">Templates</option>
-            </select>
-          </div>
-
-          {/* Status Filter */}
-          <div className="w-full md:w-48">
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-            >
-              <option value="all">All Statuses</option>
-              <option value="flagged">Flagged</option>
-              <option value="resolved">Resolved</option>
-              <option value="dismissed">Dismissed</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Content Table */}
-      <div className="glass rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-muted/50">
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Content</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Author</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Reported By</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredContent.map((item) => (
-                <tr key={item.id} className="hover:bg-muted/30 transition-colors duration-200">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-foreground font-medium">{item.title}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getTypeColor(item.type)}`}>
-                      {item.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(item.status)}`}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
-                    {item.author}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
-                    {item.reportedBy}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
-                    {new Date(item.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button className="p-1 text-muted-foreground hover:text-foreground">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      {item.status === 'flagged' && (
-                        <>
-                          <button className="p-1 text-muted-foreground hover:text-green-400">
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
-                          <button className="p-1 text-muted-foreground hover:text-destructive">
-                            <X className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Showing <span className="font-medium text-foreground">{filteredContent.length}</span> of <span className="font-medium text-foreground">{contentItems.length}</span> items
-        </div>
-        <div className="flex items-center space-x-2">
-          <button className="px-3 py-1 glass rounded-md text-muted-foreground hover:text-foreground">
-            Previous
-          </button>
-          <button className="px-3 py-1 glass rounded-md text-muted-foreground hover:text-foreground">
-            Next
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Site Settings Tab
-function AdminSettings() {
-  const [generalSettings, setGeneralSettings] = useState({
-    siteName: 'MCP4 Everyone',
-    siteDescription: 'Learn Model Context Protocol with interactive tutorials, code examples, and hands-on projects.',
-    contactEmail: 'admin@mcp4everyone.com',
-    enableRegistration: true,
-    requireEmailVerification: false,
-    defaultUserRole: 'user'
-  });
-
-  const [featureFlags, setFeatureFlags] = useState({
-    enableCommunity: true,
-    enableTemplateSubmissions: true,
-    enableAchievements: true,
-    enableSubscriptions: true,
-    enableOfficeHours: true
-  });
-
-  const handleGeneralSettingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    
-    setGeneralSettings(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
-  };
-
-  const handleFeatureFlagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    
-    setFeatureFlags(prev => ({
-      ...prev,
-      [name]: checked
-    }));
-  };
-
-  return (
-    <div className="space-y-8">
-      {/* General Settings */}
-      <div className="glass p-6 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground mb-4">General Settings</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-foreground font-medium mb-1">Site Name</label>
-            <input
-              type="text"
-              name="siteName"
-              value={generalSettings.siteName}
-              onChange={handleGeneralSettingChange}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-foreground font-medium mb-1">Site Description</label>
-            <textarea
-              name="siteDescription"
-              value={generalSettings.siteDescription}
-              onChange={handleGeneralSettingChange}
-              rows={3}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground resize-none"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-foreground font-medium mb-1">Contact Email</label>
-            <input
-              type="email"
-              name="contactEmail"
-              value={generalSettings.contactEmail}
-              onChange={handleGeneralSettingChange}
-              className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-foreground font-medium mb-1">Default User Role</label>
-              <select
-                name="defaultUserRole"
-                value={generalSettings.defaultUserRole}
-                onChange={handleGeneralSettingChange}
-                className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
-              >
-                <option value="user">User</option>
-                <option value="moderator">Moderator</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-            
-            <div className="flex flex-col justify-end">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="enableRegistration"
-                  name="enableRegistration"
-                  checked={generalSettings.enableRegistration}
-                  onChange={handleGeneralSettingChange}
-                  className="w-4 h-4 text-matrix-primary bg-input border border-border rounded focus:ring-matrix-primary"
-                />
-                <label htmlFor="enableRegistration" className="text-foreground">Enable User Registration</label>
-              </div>
-              
-              <div className="flex items-center space-x-2 mt-2">
-                <input
-                  type="checkbox"
-                  id="requireEmailVerification"
-                  name="requireEmailVerification"
-                  checked={generalSettings.requireEmailVerification}
-                  onChange={handleGeneralSettingChange}
-                  className="w-4 h-4 text-matrix-primary bg-input border border-border rounded focus:ring-matrix-primary"
-                />
-                <label htmlFor="requireEmailVerification" className="text-foreground">Require Email Verification</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Feature Flags */}
-      <div className="glass p-6 rounded-xl">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Feature Flags</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center justify-between p-4 glass rounded-lg">
-            <div>
-              <div className="text-foreground font-medium">Community Features</div>
-              <div className="text-muted-foreground text-sm">Enable community posts and discussions</div>
-            </div>
-            <div className="relative inline-flex items-center">
-              <input
-                type="checkbox"
-                id="enableCommunity"
-                name="enableCommunity"
-                checked={featureFlags.enableCommunity}
-                onChange={handleFeatureFlagChange}
-                className="sr-only"
-              />
-              <div className={`w-11 h-6 rounded-full transition ${featureFlags.enableCommunity ? 'bg-matrix-primary' : 'bg-muted'}`}>
-                <div className={`w-5 h-5 rounded-full bg-white transform transition ${featureFlags.enableCommunity ? 'translate-x-6' : 'translate-x-1'}`}></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 glass rounded-lg">
-            <div>
-              <div className="text-foreground font-medium">Template Submissions</div>
-              <div className="text-muted-foreground text-sm">Allow users to submit templates</div>
-            </div>
-            <div className="relative inline-flex items-center">
-              <input
-                type="checkbox"
-                id="enableTemplateSubmissions"
-                name="enableTemplateSubmissions"
-                checked={featureFlags.enableTemplateSubmissions}
-                onChange={handleFeatureFlagChange}
-                className="sr-only"
-              />
-              <div className={`w-11 h-6 rounded-full transition ${featureFlags.enableTemplateSubmissions ? 'bg-matrix-primary' : 'bg-muted'}`}>
-                <div className={`w-5 h-5 rounded-full bg-white transform transition ${featureFlags.enableTemplateSubmissions ? 'translate-x-6' : 'translate-x-1'}`}></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 glass rounded-lg">
-            <div>
-              <div className="text-foreground font-medium">Achievements System</div>
-              <div className="text-muted-foreground text-sm">Enable user achievements and badges</div>
-            </div>
-            <div className="relative inline-flex items-center">
-              <input
-                type="checkbox"
-                id="enableAchievements"
-                name="enableAchievements"
-                checked={featureFlags.enableAchievements}
-                onChange={handleFeatureFlagChange}
-                className="sr-only"
-              />
-              <div className={`w-11 h-6 rounded-full transition ${featureFlags.enableAchievements ? 'bg-matrix-primary' : 'bg-muted'}`}>
-                <div className={`w-5 h-5 rounded-full bg-white transform transition ${featureFlags.enableAchievements ? 'translate-x-6' : 'translate-x-1'}`}></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 glass rounded-lg">
-            <div>
-              <div className="text-foreground font-medium">Subscription Features</div>
-              <div className="text-muted-foreground text-sm">Enable premium subscriptions</div>
-            </div>
-            <div className="relative inline-flex items-center">
-              <input
-                type="checkbox"
-                id="enableSubscriptions"
-                name="enableSubscriptions"
-                checked={featureFlags.enableSubscriptions}
-                onChange={handleFeatureFlagChange}
-                className="sr-only"
-              />
-              <div className={`w-11 h-6 rounded-full transition ${featureFlags.enableSubscriptions ? 'bg-matrix-primary' : 'bg-muted'}`}>
-                <div className={`w-5 h-5 rounded-full bg-white transform transition ${featureFlags.enableSubscriptions ? 'translate-x-6' : 'translate-x-1'}`}></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 glass rounded-lg">
-            <div>
-              <div className="text-foreground font-medium">Office Hours</div>
-              <div className="text-muted-foreground text-sm">Enable office hours booking</div>
-            </div>
-            <div className="relative inline-flex items-center">
-              <input
-                type="checkbox"
-                id="enableOfficeHours"
-                name="enableOfficeHours"
-                checked={featureFlags.enableOfficeHours}
-                onChange={handleFeatureFlagChange}
-                className="sr-only"
-              />
-              <div className={`w-11 h-6 rounded-full transition ${featureFlags.enableOfficeHours ? 'bg-matrix-primary' : 'bg-muted'}`}>
-                <div className={`w-5 h-5 rounded-full bg-white transform transition ${featureFlags.enableOfficeHours ? 'translate-x-6' : 'translate-x-1'}`}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <button className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-6 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
-          <Settings className="w-4 h-4" />
-          <span>Save Settings</span>
-        </button>
-      </div>
+      
+      {/* Template Review Modal */}
+      {showTemplateReview && selectedTemplate && (
+        <AdminTemplateReview
+          template={selectedTemplate}
+          onClose={() => setShowTemplateReview(false)}
+          onApprove={handleApproveTemplate}
+          onReject={handleRejectTemplate}
+        />
+      )}
+      
+      {/* Content Moderation Modal */}
+      {showContentModeration && selectedContent && (
+        <AdminContentModeration
+          content={selectedContent}
+          onClose={() => setShowContentModeration(false)}
+          onApprove={handleApproveContent}
+          onReject={handleRejectContent}
+        />
+      )}
     </div>
   );
 }
