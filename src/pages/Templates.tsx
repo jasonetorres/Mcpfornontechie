@@ -543,6 +543,40 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
     }
   };
 
+  // MCP Servers list - consistent across the site
+  const mcpServers = [
+    {
+      name: 'Twilio MCP Server',
+      description: 'For messaging and voice capabilities',
+      url: 'https://github.com/twilio-labs/mcp'
+    },
+    {
+      name: 'GitHub MCP Server',
+      description: 'For repository, issue, and PR access',
+      url: 'https://github.com/github/github-mcp-server'
+    },
+    {
+      name: 'JetBrains MCP Server',
+      description: 'For IDE and development tool integration',
+      url: 'https://github.com/JetBrains/mcp-jetbrains'
+    },
+    {
+      name: 'Notion MCP Server',
+      description: 'For workspace and database access',
+      url: 'https://github.com/makenotion/notion-mcp-server'
+    },
+    {
+      name: 'Miro MCP Server',
+      description: 'For visual collaboration',
+      url: 'https://github.com/k-jarzyna/mcp-miro'
+    },
+    {
+      name: 'ElevenLabs MCP',
+      description: 'For voice synthesis and audio generation',
+      url: 'https://github.com/elevenlabs/elevenlabs-mcp'
+    }
+  ];
+
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -557,6 +591,28 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
               ✅ Signed in - Template usage will be tracked for achievements!
             </div>
           )}
+        </div>
+
+        {/* MCP Servers Section */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-white mb-8">Popular MCP Servers You Should Try</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mcpServers.map((server, index) => (
+              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-white mb-2">{server.name}</h3>
+                <p className="text-gray-300 mb-4">{server.description}</p>
+                <a
+                  href={server.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center space-x-1"
+                >
+                  <span>View on GitHub</span>
+                  <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Filters */}

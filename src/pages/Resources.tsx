@@ -168,29 +168,29 @@ function Resources() {
 
   const mcpPromptLibrary = [
     {
-      category: 'Google Maps',
-      prompt: 'Track the live GPS location of driver ID #{driver_id}. Query Google Maps for real-time traffic data and adjust the estimated delivery time if delays exceed 5 minutes. If ETA changes, update the customer\'s live tracker and send an SMS notification.',
-      useCase: 'Delivery tracking and customer notifications'
+      category: 'Twilio MCP Server',
+      prompt: 'Send a text message to customer ID #{customer_id} with the following message: "Your order #{order_number} has been shipped and will arrive on #{delivery_date}." Then, schedule a follow-up call for 2 days after delivery.',
+      useCase: 'Order notifications and customer follow-up'
     },
     {
-      category: 'YouTube Transcript',
-      prompt: 'Get the transcript from this youtube video [link to video]. Then, summarize it into a blog post with key takeaways and actionable insights.',
-      useCase: 'Content creation and video summarization'
+      category: 'GitHub MCP Server',
+      prompt: 'Find all open pull requests in the repository that have been waiting for review for more than 3 days. For each one, add a comment tagging the assigned reviewers and asking for an update.',
+      useCase: 'Development workflow management'
     },
     {
-      category: 'Google Drive',
-      prompt: 'I have an important marketing budget review meeting in 30 minutes. Find all relevant documents about our marketing budget and performance. Give me a quick summary of our Q1 performance and highlight the key decisions we need to make.',
-      useCase: 'Meeting preparation and document analysis'
+      category: 'JetBrains MCP Server',
+      prompt: 'Analyze the current project for code quality issues. Generate a report of the top 5 areas that need refactoring, with specific recommendations for each.',
+      useCase: 'Code quality improvement'
     },
     {
-      category: 'Asana',
-      prompt: 'Create a new task in my Asana workspace called \'Review Q4 metrics\' and set the due date to next Friday. Then, find all tasks assigned to me that are due this week and summarize them.',
-      useCase: 'Task management and project coordination'
+      category: 'Notion MCP Server',
+      prompt: 'Create a new page in my workspace called "Weekly Status Report". Include sections for project updates, blockers, and next steps. Then, populate it with data from my project database.',
+      useCase: 'Automated documentation and reporting'
     },
     {
-      category: 'GitHub',
-      prompt: 'Create a new branch called hello-world in my angiejones/goose-demo repository. Update the README.md file to say "this was written by goose" and commit it. Open a pull request with your changes.',
-      useCase: 'Code management and version control'
+      category: 'Miro MCP Server',
+      prompt: 'Create a new board for our product roadmap. Add swimlanes for Q1, Q2, Q3, and Q4. Then add sticky notes for each planned feature from our product backlog database.',
+      useCase: 'Visual planning and collaboration'
     }
   ];
 
@@ -215,6 +215,40 @@ function Resources() {
     }
   ];
 
+  // MCP Servers list - consistent across the site
+  const mcpServers = [
+    {
+      name: 'Twilio MCP Server',
+      description: 'For messaging and voice capabilities',
+      url: 'https://github.com/twilio-labs/mcp'
+    },
+    {
+      name: 'GitHub MCP Server',
+      description: 'For repository, issue, and PR access',
+      url: 'https://github.com/github/github-mcp-server'
+    },
+    {
+      name: 'JetBrains MCP Server',
+      description: 'For IDE and development tool integration',
+      url: 'https://github.com/JetBrains/mcp-jetbrains'
+    },
+    {
+      name: 'Notion MCP Server',
+      description: 'For workspace and database access',
+      url: 'https://github.com/makenotion/notion-mcp-server'
+    },
+    {
+      name: 'Miro MCP Server',
+      description: 'For visual collaboration',
+      url: 'https://github.com/k-jarzyna/mcp-miro'
+    },
+    {
+      name: 'ElevenLabs MCP',
+      description: 'For voice synthesis and audio generation',
+      url: 'https://github.com/elevenlabs/elevenlabs-mcp'
+    }
+  ];
+
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -224,6 +258,28 @@ function Resources() {
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Everything you need to master MCP and build amazing AI-powered solutions
           </p>
+        </div>
+
+        {/* MCP Servers Section */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-white mb-8">Popular MCP Servers You Should Try</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mcpServers.map((server, index) => (
+              <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-white mb-2">{server.name}</h3>
+                <p className="text-gray-300 mb-4">{server.description}</p>
+                <a
+                  href={server.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors duration-200 flex items-center space-x-1"
+                >
+                  <span>View on GitHub</span>
+                  <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Talk-Specific Resources */}

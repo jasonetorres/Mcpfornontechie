@@ -59,14 +59,12 @@ Step 4: Get smart, context-aware answers
 // You don't need to be a programmer!
 
 🔥 Top MCP Servers:
-✅ Google Drive: File access and search capabilities
-✅ YouTube Transcript: Grab and work with video transcripts
-✅ Google Maps: Location services, directions, and place details
-✅ Tavily Web Search: Web and local search capabilities
-✅ Asana: View tasks, projects, workspaces, and comments
-✅ Speech: Real-time voice interaction and transcription
-✅ GitHub: Tools to read, search, and manage repositories
-✅ Fetch: Web content fetching and conversion
+✅ Twilio MCP Server - For messaging and voice capabilities
+✅ GitHub MCP Server - For repository, issue, and PR access
+✅ JetBrains MCP Server - For IDE and development tool integration
+✅ Notion MCP Server - For workspace and database access
+✅ Miro MCP Server - For visual collaboration
+✅ ElevenLabs MCP - For voice synthesis and audio generation
 
 No-Code Platforms for MCP:
 ✅ Zapier + AI integrations
@@ -222,77 +220,46 @@ all tasks assigned to me this week and summarize them."`
 
   const mcpServers = [
     {
-      name: 'Google Drive',
-      description: 'File access and search capabilities for Google Drive',
-      useCase: 'Find documents, search content, organize files',
-      icon: '📁',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive'
+      name: 'Twilio MCP Server',
+      description: 'For messaging and voice capabilities',
+      useCase: 'SMS notifications, voice interactions, and phone calls',
+      icon: '📱',
+      url: 'https://github.com/twilio-labs/mcp'
     },
     {
-      name: 'YouTube Transcript',
-      description: 'Grab and work with YouTube video transcripts',
-      useCase: 'Summarize videos, extract key points, create content',
-      icon: '🎥',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/youtube-transcript'
-    },
-    {
-      name: 'Google Maps',
-      description: 'Location services, directions, and place details',
-      useCase: 'Track deliveries, find locations, get directions',
-      icon: '🗺️',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps'
-    },
-    {
-      name: 'Asana',
-      description: 'View tasks, projects, workspaces, and comments',
-      useCase: 'Project management, task tracking, team coordination',
-      icon: '✅',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/asana'
-    },
-    {
-      name: 'GitHub',
-      description: 'Tools to read, search, and manage repositories',
-      useCase: 'Code management, documentation, project tracking',
+      name: 'GitHub MCP Server',
+      description: 'For repository, issue, and PR access',
+      useCase: 'Code management, issue tracking, and project collaboration',
       icon: '🐙',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/github'
+      url: 'https://github.com/github/github-mcp-server'
     },
     {
-      name: 'Speech',
-      description: 'Real-time voice interaction and transcription',
-      useCase: 'Voice commands, meeting transcription, accessibility',
+      name: 'JetBrains MCP Server',
+      description: 'For IDE and development tool integration',
+      useCase: 'Code assistance, project management, and development workflows',
+      icon: '💻',
+      url: 'https://github.com/JetBrains/mcp-jetbrains'
+    },
+    {
+      name: 'Notion MCP Server',
+      description: 'For workspace and database access',
+      useCase: 'Knowledge management, project tracking, and documentation',
+      icon: '📝',
+      url: 'https://github.com/makenotion/notion-mcp-server'
+    },
+    {
+      name: 'Miro MCP Server',
+      description: 'For visual collaboration',
+      useCase: 'Visual brainstorming, diagramming, and team collaboration',
+      icon: '🖌️',
+      url: 'https://github.com/k-jarzyna/mcp-miro'
+    },
+    {
+      name: 'ElevenLabs MCP',
+      description: 'For voice synthesis and audio generation',
+      useCase: 'Text-to-speech, voice cloning, and audio content creation',
       icon: '🎤',
-      url: 'https://github.com/modelcontextprotocol/servers/tree/main/src/speech'
-    }
-  ];
-
-  const realExamples = [
-    {
-      title: 'Community Q&A Assistant',
-      description: 'Sarah Chen automated community member lookups, saving 4 hours daily',
-      impact: '95% faster response time',
-      tools: ['Zapier', 'Google Sheets', 'ChatGPT'],
-      category: 'Community Management'
-    },
-    {
-      title: 'Marketing Campaign Generator',
-      description: 'Mike Rodriguez increased email conversion rates by 300%',
-      impact: '$180K additional monthly revenue',
-      tools: ['Airtable', 'Claude AI', 'Mailchimp'],
-      category: 'Marketing'
-    },
-    {
-      title: 'Project Status Reporter',
-      description: 'Lisa Park eliminated manual reporting, saving 5 hours weekly',
-      impact: '90% improvement in project visibility',
-      tools: ['Notion', 'GPT-4', 'Slack'],
-      category: 'Project Management'
-    },
-    {
-      title: 'Lead Scoring System',
-      description: 'David Kim improved lead qualification accuracy by 60%',
-      impact: '$250K additional quarterly revenue',
-      tools: ['Power Platform', 'Salesforce', 'Azure AI'],
-      category: 'Sales'
+      url: 'https://github.com/elevenlabs/elevenlabs-mcp'
     }
   ];
 
@@ -342,48 +309,6 @@ all tasks assigned to me this week and summarize them."`
           </div>
         </div>
 
-        {/* Real Examples Section */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-foreground mb-8">Real Success Stories</h2>
-          <p className="text-muted-foreground mb-8">
-            See how non-developers are already transforming their work with MCP:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {realExamples.map((example, index) => (
-              <div key={index} className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6 hover:bg-card transition-all duration-300">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-foreground">{example.title}</h3>
-                  <span className="px-2 py-1 bg-matrix-primary/20 text-matrix-primary rounded text-xs">
-                    {example.category}
-                  </span>
-                </div>
-                <p className="text-muted-foreground mb-3">{example.description}</p>
-                <div className="bg-green-500/20 rounded-lg p-3 mb-4">
-                  <p className="text-green-400 font-semibold text-sm">
-                    Impact: {example.impact}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {example.tools.map((tool, toolIndex) => (
-                    <span key={toolIndex} className="px-2 py-1 bg-muted text-muted-foreground rounded text-xs">
-                      {tool}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <Link
-              to="/success-stories"
-              className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
-            >
-              <span>See All Success Stories</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-
         {/* Popular MCP Servers */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-foreground mb-8">Popular MCP Servers You Should Try</h2>
@@ -414,13 +339,13 @@ all tasks assigned to me this week and summarize them."`
             ))}
           </div>
           <div className="mt-8 text-center">
-            <Link
-              to="/templates"
+            <button
+              onClick={() => window.location.href = '/templates'}
               className="bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary text-primary-foreground px-8 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center space-x-2"
             >
               <span>Browse Templates</span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
 
