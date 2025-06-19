@@ -14,7 +14,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [step, setStep] = useState<'form' | 'processing' | 'success'>('form')
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, addNotification } = useAuth()
 
   const [formData, setFormData] = useState({
     email: '',
@@ -122,8 +122,8 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'signin' }: A
           }, 1000)
         }
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred. Please try again.')
       setStep('form')
     } finally {
       setLoading(false)

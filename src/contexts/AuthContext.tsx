@@ -23,6 +23,16 @@ interface AuthContextType {
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>
   refreshProfile: () => Promise<void>
   loading: boolean
+  notifications: Notification[]
+  addNotification: (notification: Notification) => void
+  removeNotification: (id: string) => void
+}
+
+export interface Notification {
+  id: string
+  message: string
+  type: 'success' | 'error' | 'warning' | 'info'
+  duration?: number
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -40,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   useEffect(() => {
     let mounted = true
@@ -113,11 +124,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error.code === 'PGRST116') {
           console.log('Profile not found, creating new profile')
           await createProfile(userId)
-          return // Exit the function after creating profile
         } else {
           setLoading(false)
-          return // Exit if there's any other error
         }
+        return // Exit the function after handling error
       }
       
       if (data) {
@@ -163,17 +173,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) {
         console.error('❌ Error creating profile:', error)
-        throw error
+        setLoading(false)
+        return
       }
       
       console.log('✅ Profile created successfully')
       setProfile(newProfile)
-      setLoading(false)
       
       // Initialize user data
       initializeUserData(userId)
     } catch (error) {
       console.error('❌ Error in createProfile:', error)
+    } finally {
       setLoading(false)
     }
   }
@@ -197,18 +208,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('❌ Error in signUp:', error)
+        addNotification({
+          id: `error-${Date.now()}`,
+          message: error.message,
+          type: 'error'
+        })
         setLoading(false)
         return { error }
       }
 
       if (data.user) {
         console.log('✅ User signed up successfully')
+        addNotification({
+          id: `success-${Date.now()}`,
+          message: 'Account created successfully! Welcome to MCP4 Everyone!',
+          type: 'success'
+        })
         // Profile will be created by the auth state change handler
       }
 
       return { error: null }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error in signUp:', error)
+      addNotification({
+        id: `error-${Date.now()}`,
+        message: error.message || 'An error occurred during sign up',
+        type: 'error'
+      })
       setLoading(false)
       return { error }
     }
@@ -226,18 +252,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) {
         console.error('❌ Error in signIn:', error)
+        addNotification({
+          id: `error-${Date.now()}`,
+          message: error.message,
+          type: 'error'
+        })
         setLoading(false)
         return { error }
       }
       
       if (data.user) {
         console.log('✅ User signed in successfully')
+        addNotification({
+          id: `success-${Date.now()}`,
+          message: 'Welcome back! You are now signed in.',
+          type: 'success'
+        })
         // Profile will be fetched by the auth state change handler
       }
       
       return { error: null }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error in signIn:', error)
+      addNotification({
+        id: `error-${Date.now()}`,
+        message: error.message || 'An error occurred during sign in',
+        type: 'error'
+      })
       setLoading(false)
       return { error }
     }
@@ -258,11 +299,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) {
         console.error('❌ Error signing out:', error)
+        addNotification({
+          id: `error-${Date.now()}`,
+          message: error.message,
+          type: 'error'
+        })
       } else {
         console.log('✅ User signed out successfully')
+        addNotification({
+          id: `success-${Date.now()}`,
+          message: 'You have been signed out successfully',
+          type: 'success'
+        })
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error in signOut:', error)
+      addNotification({
+        id: `error-${Date.now()}`,
+        message: error.message || 'An error occurred during sign out',
+        type: 'error'
+      })
     } finally {
       setLoading(false)
     }
@@ -281,6 +337,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) {
         console.error('❌ Error updating profile:', error)
+        addNotification({
+          id: `error-${Date.now()}`,
+          message: error.message,
+          type: 'error'
+        })
         return { error }
       }
       
@@ -294,9 +355,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
       }
       
+      addNotification({
+        id: `success-${Date.now()}`,
+        message: 'Profile updated successfully',
+        type: 'success'
+      })
+      
       return { error: null }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error in updateProfile:', error)
+      addNotification({
+        id: `error-${Date.now()}`,
+        message: error.message || 'An error occurred while updating profile',
+        type: 'error'
+      })
       return { error }
     } finally {
       setLoading(false)
@@ -337,6 +409,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Notification functions
+  const addNotification = (notification: Notification) => {
+    const newNotification = {
+      ...notification,
+      id: notification.id || `notification-${Date.now()}`
+    }
+    
+    setNotifications(prev => [...prev, newNotification])
+    
+    // Auto-remove notification after duration (default: 4000ms)
+    if (notification.duration !== 0) {
+      setTimeout(() => {
+        removeNotification(newNotification.id)
+      }, notification.duration || 4000)
+    }
+  }
+
+  const removeNotification = (id: string) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id))
+  }
+
   const value = {
     user,
     profile,
@@ -347,6 +440,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateProfile,
     refreshProfile,
     loading,
+    notifications,
+    addNotification,
+    removeNotification
   }
 
   console.log('🔄 AuthProvider render - user:', user?.email || 'none', 'profile:', profile?.email || 'none', 'loading:', loading)

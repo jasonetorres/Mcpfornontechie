@@ -14,11 +14,9 @@ function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const location = useLocation();
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, notifications, removeNotification } = useAuth();
   const { getSubscriptionPlan, isActive } = useSubscription();
 
   const navItems = [
@@ -55,33 +53,9 @@ function Layout({ children }: LayoutProps) {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  // Show notification when user signs in
-  useEffect(() => {
-    if (user && profile && !authLoading) {
-      setNotificationMessage(`Welcome back, ${profile.full_name || profile.email}!`);
-      setShowNotification(true);
-      
-      // Hide notification after 4 seconds
-      const timer = setTimeout(() => {
-        setShowNotification(false);
-      }, 4000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [user, profile, authLoading]);
-
   // Handle auth modal close with success notification for new signups
   const handleAuthModalClose = (wasSuccessfulSignup?: boolean) => {
     setIsAuthModalOpen(false);
-    
-    if (wasSuccessfulSignup) {
-      setNotificationMessage('Account created successfully! Welcome to MCP4 Everyone!');
-      setShowNotification(true);
-      
-      setTimeout(() => {
-        setShowNotification(false);
-      }, 4000);
-    }
   };
 
   const currentPlan = user ? getSubscriptionPlan() : null;
@@ -90,18 +64,34 @@ function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Success Notification */}
-      {showNotification && (
-        <div className="notification-success animate-slide-in-right">
-          <div className="flex items-center space-x-3">
-            <CheckCircle className="w-5 h-5 text-matrix-secondary flex-shrink-0" />
-            <p className="text-matrix-primary font-medium">{notificationMessage}</p>
-            <button
-              onClick={() => setShowNotification(false)}
-              className="text-matrix-primary/80 hover:text-matrix-primary transition-colors duration-200 ml-auto"
+      {notifications && notifications.length > 0 && (
+        <div className="fixed top-4 right-4 z-50 space-y-2 max-w-md">
+          {notifications.map((notification) => (
+            <div 
+              key={notification.id} 
+              className={`notification-${notification.type} animate-slide-in-right flex items-center justify-between p-4 rounded-lg shadow-lg`}
             >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+              <div className="flex items-center space-x-3">
+                {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-matrix-secondary flex-shrink-0" />}
+                {notification.type === 'error' && <X className="w-5 h-5 text-destructive flex-shrink-0" />}
+                {notification.type === 'warning' && <Bell className="w-5 h-5 text-yellow-400 flex-shrink-0" />}
+                {notification.type === 'info' && <Bell className="w-5 h-5 text-blue-400 flex-shrink-0" />}
+                <p className={`font-medium ${
+                  notification.type === 'success' ? 'text-matrix-primary' : 
+                  notification.type === 'error' ? 'text-destructive' :
+                  notification.type === 'warning' ? 'text-yellow-400' : 'text-blue-400'
+                }`}>
+                  {notification.message}
+                </p>
+              </div>
+              <button
+                onClick={() => removeNotification(notification.id)}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-200 ml-2"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -174,7 +164,7 @@ function Layout({ children }: LayoutProps) {
               </button>
 
               {/* Notifications - Only show when logged in */}
-              {user && (
+              {user && notifications.length > 0 && (
                 <button className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors duration-200 relative">
                   <Bell className="w-4 h-4 text-muted-foreground" />
                   <span className="absolute top-0 right-0 w-2 h-2 bg-matrix-primary rounded-full"></span>
