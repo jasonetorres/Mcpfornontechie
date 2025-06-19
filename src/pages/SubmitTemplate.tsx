@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Upload, CheckCircle, Star, Users, Gift, ArrowRight } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 function SubmitTemplate() {
   const [formData, setFormData] = useState({
@@ -20,6 +22,18 @@ function SubmitTemplate() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const { user, profile, addNotification } = useAuth();
+
+  // Pre-fill form with user data if available
+  React.useEffect(() => {
+    if (user && profile) {
+      setFormData(prev => ({
+        ...prev,
+        name: profile.full_name || '',
+        email: user.email || '',
+      }));
+    }
+  }, [user, profile]);
 
   const categories = [
     'Community Management',
@@ -67,8 +81,27 @@ function SubmitTemplate() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Store submission in localStorage for persistence
+    if (user) {
+      const submissions = JSON.parse(localStorage.getItem(`template-submissions-${user.id}`) || '[]');
+      submissions.push({
+        ...formData,
+        submittedAt: new Date().toISOString(),
+        status: 'pending'
+      });
+      localStorage.setItem(`template-submissions-${user.id}`, JSON.stringify(submissions));
+      
+      // Add notification
+      addNotification({
+        id: `template-submitted-${Date.now()}`,
+        message: 'Template submitted successfully! Our team will review it shortly.',
+        type: 'success',
+        duration: 5000
+      });
+    }
+    
     setSubmitted(true);
-    console.log('Template submitted:', formData);
   };
 
   const contributorBenefits = [
@@ -146,9 +179,12 @@ function SubmitTemplate() {
               >
                 Submit Another Template
               </button>
-              <button className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200">
+              <Link 
+                to="/templates"
+                className="border border-white/20 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors duration-200"
+              >
                 View Template Library
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -463,10 +499,13 @@ function SubmitTemplate() {
               <p className="text-blue-200 text-sm mb-4">
                 Our team is here to help you create an amazing template submission.
               </p>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+              <Link
+                to="/office-hours"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+              >
                 <span>Get Submission Help</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
             </div>
           </div>
         </div>
