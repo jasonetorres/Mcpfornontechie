@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { User, Mail, Building, Briefcase, Save, Camera, Download, Shield, HelpCircle, Upload, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
+import TemplateSubmissionsList from '../components/TemplateSubmissionsList'
 
 export default function Profile() {
   const { user, profile, updateProfile } = useAuth()
@@ -9,6 +10,7 @@ export default function Profile() {
   const [success, setSuccess] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('profile')
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
@@ -150,198 +152,241 @@ export default function Profile() {
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Profile Settings</h1>
           <p className="text-muted-foreground">Manage your account information and preferences</p>
         </div>
 
-        <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-8">
-          {/* Avatar Section */}
-          <div className="text-center mb-8">
-            <div className="relative inline-block">
-              <div className="w-24 h-24 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
-                {imagePreview || profile?.avatar_url ? (
-                  <img 
-                    src={imagePreview || profile?.avatar_url} 
-                    alt="Avatar" 
-                    className="w-24 h-24 rounded-full object-cover" 
-                  />
-                ) : (
-                  <User className="w-12 h-12 text-primary-foreground" />
+        {/* Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="flex space-x-2 bg-muted/30 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`px-4 py-2 rounded-md transition-all duration-200 ${
+                activeTab === 'profile' 
+                  ? 'bg-card text-foreground' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => setActiveTab('submissions')}
+              className={`px-4 py-2 rounded-md transition-all duration-200 ${
+                activeTab === 'submissions' 
+                  ? 'bg-card text-foreground' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              My Templates
+            </button>
+            <button
+              onClick={() => setActiveTab('account')}
+              className={`px-4 py-2 rounded-md transition-all duration-200 ${
+                activeTab === 'account' 
+                  ? 'bg-card text-foreground' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Account
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'profile' && (
+          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-8">
+            {/* Avatar Section */}
+            <div className="text-center mb-8">
+              <div className="relative inline-block">
+                <div className="w-24 h-24 bg-gradient-to-r from-matrix-primary to-matrix-secondary rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                  {imagePreview || profile?.avatar_url ? (
+                    <img 
+                      src={imagePreview || profile?.avatar_url} 
+                      alt="Avatar" 
+                      className="w-24 h-24 rounded-full object-cover" 
+                    />
+                  ) : (
+                    <User className="w-12 h-12 text-primary-foreground" />
+                  )}
+                </div>
+                
+                {/* Upload Button */}
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingImage}
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-matrix-primary hover:bg-matrix-secondary rounded-full flex items-center justify-center transition-colors duration-200 disabled:opacity-50"
+                >
+                  {uploadingImage ? (
+                    <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+                  ) : (
+                    <Camera className="w-4 h-4 text-primary-foreground" />
+                  )}
+                </button>
+                
+                {/* Remove Button */}
+                {(imagePreview || profile?.avatar_url) && (
+                  <button 
+                    onClick={removeProfilePicture}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-destructive hover:bg-destructive/80 rounded-full flex items-center justify-center transition-colors duration-200"
+                  >
+                    <X className="w-3 h-3 text-destructive-foreground" />
+                  </button>
                 )}
               </div>
               
-              {/* Upload Button */}
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadingImage}
-                className="absolute bottom-0 right-0 w-8 h-8 bg-matrix-primary hover:bg-matrix-secondary rounded-full flex items-center justify-center transition-colors duration-200 disabled:opacity-50"
+              <h2 className="text-xl font-semibold text-foreground">{profile?.full_name || 'User'}</h2>
+              <p className="text-muted-foreground">{profile?.email}</p>
+              
+              {/* Upload Instructions */}
+              <div className="mt-4 text-center">
+                <p className="text-muted-foreground text-sm mb-2">
+                  Click the camera icon to upload a profile picture
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  Supported formats: JPG, PNG, GIF (max 5MB)
+                </p>
+              </div>
+              
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
+
+            {success && (
+              <div className="bg-matrix-primary/20 border border-matrix-primary/30 rounded-lg p-3 mb-6">
+                <p className="text-matrix-primary text-sm">Profile updated successfully!</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-foreground font-medium mb-2">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    name="full_name"
+                    value={formData.full_name}
+                    onChange={handleInputChange}
+                    className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-3 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
+                    placeholder="Your full name"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-foreground font-medium mb-2">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="email"
+                    value={profile?.email || ''}
+                    disabled
+                    className="w-full bg-muted border border-border rounded-lg pl-10 pr-4 py-3 text-muted-foreground cursor-not-allowed"
+                  />
+                </div>
+                <p className="text-muted-foreground text-sm mt-1">Email cannot be changed</p>
+              </div>
+
+              <div>
+                <label className="block text-foreground font-medium mb-2">Role</label>
+                <div className="relative">
+                  <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleInputChange}
+                    className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-3 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
+                    placeholder="e.g., Community Manager, Marketing Director"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-foreground font-medium mb-2">Company</label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-3 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
+                    placeholder="Your company name"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
               >
-                {uploadingImage ? (
-                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-                ) : (
-                  <Camera className="w-4 h-4 text-primary-foreground" />
-                )}
+                <Save className="w-5 h-5" />
+                <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+              </button>
+            </form>
+          </div>
+        )}
+
+        {activeTab === 'submissions' && (
+          <TemplateSubmissionsList />
+        )}
+
+        {activeTab === 'account' && (
+          <div className="bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Account Actions</h3>
+            <div className="space-y-3">
+              <button 
+                onClick={handleDownloadData}
+                className="w-full text-left px-4 py-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-200"
+              >
+                <div className="flex items-center space-x-3">
+                  <Download className="w-5 h-5 text-matrix-primary" />
+                  <div>
+                    <div className="text-foreground font-medium">Download My Data</div>
+                    <div className="text-muted-foreground text-sm">Export your learning progress and data</div>
+                  </div>
+                </div>
               </button>
               
-              {/* Remove Button */}
-              {(imagePreview || profile?.avatar_url) && (
-                <button 
-                  onClick={removeProfilePicture}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-destructive hover:bg-destructive/80 rounded-full flex items-center justify-center transition-colors duration-200"
-                >
-                  <X className="w-3 h-3 text-destructive-foreground" />
-                </button>
-              )}
+              <Link
+                to="/office-hours"
+                className="w-full text-left px-4 py-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-200 block"
+              >
+                <div className="flex items-center space-x-3">
+                  <HelpCircle className="w-5 h-5 text-matrix-secondary" />
+                  <div>
+                    <div className="text-foreground font-medium">Get Help</div>
+                    <div className="text-muted-foreground text-sm">Join office hours or ask questions</div>
+                  </div>
+                </div>
+              </Link>
+
+              <button className="w-full text-left px-4 py-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-200">
+                <div className="flex items-center space-x-3">
+                  <Shield className="w-5 h-5 text-purple-400" />
+                  <div>
+                    <div className="text-foreground font-medium">Privacy Settings</div>
+                    <div className="text-muted-foreground text-sm">Manage your data and privacy preferences</div>
+                  </div>
+                </div>
+              </button>
+
+              <button className="w-full text-left px-4 py-3 bg-destructive/20 hover:bg-destructive/30 border border-destructive/30 rounded-lg transition-colors duration-200">
+                <div className="text-destructive font-medium">Delete Account</div>
+                <div className="text-destructive/80 text-sm">Permanently delete your account and data</div>
+              </button>
             </div>
-            
-            <h2 className="text-xl font-semibold text-foreground">{profile?.full_name || 'User'}</h2>
-            <p className="text-muted-foreground">{profile?.email}</p>
-            
-            {/* Upload Instructions */}
-            <div className="mt-4 text-center">
-              <p className="text-muted-foreground text-sm mb-2">
-                Click the camera icon to upload a profile picture
-              </p>
-              <p className="text-muted-foreground text-xs">
-                Supported formats: JPG, PNG, GIF (max 5MB)
-              </p>
-            </div>
-            
-            {/* Hidden File Input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
           </div>
-
-          {success && (
-            <div className="bg-matrix-primary/20 border border-matrix-primary/30 rounded-lg p-3 mb-6">
-              <p className="text-matrix-primary text-sm">Profile updated successfully!</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-foreground font-medium mb-2">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  name="full_name"
-                  value={formData.full_name}
-                  onChange={handleInputChange}
-                  className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-3 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
-                  placeholder="Your full name"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-foreground font-medium mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="email"
-                  value={profile?.email || ''}
-                  disabled
-                  className="w-full bg-muted border border-border rounded-lg pl-10 pr-4 py-3 text-muted-foreground cursor-not-allowed"
-                />
-              </div>
-              <p className="text-muted-foreground text-sm mt-1">Email cannot be changed</p>
-            </div>
-
-            <div>
-              <label className="block text-foreground font-medium mb-2">Role</label>
-              <div className="relative">
-                <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleInputChange}
-                  className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-3 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
-                  placeholder="e.g., Community Manager, Marketing Director"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-foreground font-medium mb-2">Company</label>
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  className="w-full bg-input border border-border rounded-lg pl-10 pr-4 py-3 text-foreground placeholder-muted-foreground focus:border-matrix-primary focus:outline-none focus:ring-2 focus:ring-matrix-primary/20"
-                  placeholder="Your company name"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-matrix-primary to-matrix-secondary hover:from-matrix-accent hover:to-matrix-primary disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2"
-            >
-              <Save className="w-5 h-5" />
-              <span>{loading ? 'Saving...' : 'Save Changes'}</span>
-            </button>
-          </form>
-        </div>
-
-        {/* Account Actions */}
-        <div className="mt-8 bg-card/50 backdrop-blur-md border border-border rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Account Actions</h3>
-          <div className="space-y-3">
-            <button 
-              onClick={handleDownloadData}
-              className="w-full text-left px-4 py-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-200"
-            >
-              <div className="flex items-center space-x-3">
-                <Download className="w-5 h-5 text-matrix-primary" />
-                <div>
-                  <div className="text-foreground font-medium">Download My Data</div>
-                  <div className="text-muted-foreground text-sm">Export your learning progress and data</div>
-                </div>
-              </div>
-            </button>
-            
-            <Link
-              to="/office-hours"
-              className="w-full text-left px-4 py-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-200 block"
-            >
-              <div className="flex items-center space-x-3">
-                <HelpCircle className="w-5 h-5 text-matrix-secondary" />
-                <div>
-                  <div className="text-foreground font-medium">Get Help</div>
-                  <div className="text-muted-foreground text-sm">Join office hours or ask questions</div>
-                </div>
-              </div>
-            </Link>
-
-            <button className="w-full text-left px-4 py-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors duration-200">
-              <div className="flex items-center space-x-3">
-                <Shield className="w-5 h-5 text-purple-400" />
-                <div>
-                  <div className="text-foreground font-medium">Privacy Settings</div>
-                  <div className="text-muted-foreground text-sm">Manage your data and privacy preferences</div>
-                </div>
-              </div>
-            </button>
-
-            <button className="w-full text-left px-4 py-3 bg-destructive/20 hover:bg-destructive/30 border border-destructive/30 rounded-lg transition-colors duration-200">
-              <div className="text-destructive font-medium">Delete Account</div>
-              <div className="text-destructive/80 text-sm">Permanently delete your account and data</div>
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )

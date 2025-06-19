@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Upload, CheckCircle, Star, Users, Gift, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Upload, CheckCircle, Star, Users, Gift, ArrowRight, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 function SubmitTemplate() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,10 +23,11 @@ function SubmitTemplate() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [reviewProgress, setReviewProgress] = useState(0);
   const { user, profile, addNotification } = useAuth();
 
   // Pre-fill form with user data if available
-  React.useEffect(() => {
+  useEffect(() => {
     if (user && profile) {
       setFormData(prev => ({
         ...prev,
@@ -54,7 +56,7 @@ function SubmitTemplate() {
     'Notion',
     'Make.com',
     'Bubble',
-    'Multiple Platforms',
+    'No preference',
     'Other'
   ];
 
@@ -85,11 +87,15 @@ function SubmitTemplate() {
     // Store submission in localStorage for persistence
     if (user) {
       const submissions = JSON.parse(localStorage.getItem(`template-submissions-${user.id}`) || '[]');
-      submissions.push({
+      const newSubmission = {
+        id: `template-${Date.now()}`,
         ...formData,
         submittedAt: new Date().toISOString(),
-        status: 'pending'
-      });
+        status: 'pending',
+        reviewedAt: null
+      };
+      
+      submissions.push(newSubmission);
       localStorage.setItem(`template-submissions-${user.id}`, JSON.stringify(submissions));
       
       // Add notification
@@ -99,9 +105,99 @@ function SubmitTemplate() {
         type: 'success',
         duration: 5000
       });
+      
+      // Start the simulated review process
+      setSubmitted(true);
+      simulateReviewProcess(newSubmission);
+    } else {
+      setSubmitted(true);
     }
+  };
+
+  // Simulate a review process with progress updates
+  const simulateReviewProcess = (submission: any) => {
+    const totalTime = 5000; // 5 seconds for the simulation
+    const interval = 100; // Update every 100ms
+    const steps = totalTime / interval;
+    let currentStep = 0;
     
-    setSubmitted(true);
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = Math.min(Math.round((currentStep / steps) * 100), 100);
+      setReviewProgress(progress);
+      
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        
+        // Auto-approve the template after the review process
+        approveTemplate(submission);
+      }
+    }, interval);
+  };
+
+  // Auto-approve the template and add it to the templates library
+  const approveTemplate = (submission: any) => {
+    if (!user) return;
+    
+    try {
+      // Get existing templates from localStorage
+      const allTemplates = JSON.parse(localStorage.getItem('community-templates') || '[]');
+      
+      // Create a new template from the submission
+      const newTemplate = {
+        id: submission.id,
+        title: submission.templateTitle,
+        description: submission.description,
+        category: submission.category.toLowerCase().replace(/\s+/g, '-'),
+        platform: submission.platform.toLowerCase().replace(/\s+/g, '-'),
+        difficulty: submission.difficulty.startsWith('Beginner') ? 'Beginner' : 
+                   submission.difficulty.startsWith('Intermediate') ? 'Intermediate' : 'Advanced',
+        rating: 5.0, // Start with a perfect rating
+        downloads: 0,
+        dataSource: submission.tools.split(',')[0] || 'Custom Data Source',
+        aiModel: 'GPT-4',
+        features: submission.features.split('\n').filter(Boolean),
+        setupTime: submission.setupTime,
+        preview: `// ${submission.templateTitle} Configuration
+{
+  "name": "${submission.templateTitle}",
+  "description": "${submission.description}",
+  "author": "${submission.name}",
+  "category": "${submission.category}",
+  "platform": "${submission.platform}"
+}`,
+        tags: submission.category.toLowerCase().split(/\s+/).filter(Boolean),
+        files: [
+          {
+            name: 'instructions.md',
+            content: submission.instructions
+          }
+        ],
+        author: submission.name,
+        approvedAt: new Date().toISOString()
+      };
+      
+      // Add to templates
+      allTemplates.push(newTemplate);
+      localStorage.setItem('community-templates', JSON.stringify(allTemplates));
+      
+      // Update the submission status
+      const submissions = JSON.parse(localStorage.getItem(`template-submissions-${user.id}`) || '[]');
+      const updatedSubmissions = submissions.map((sub: any) => 
+        sub.id === submission.id ? { ...sub, status: 'approved', reviewedAt: new Date().toISOString() } : sub
+      );
+      localStorage.setItem(`template-submissions-${user.id}`, JSON.stringify(updatedSubmissions));
+      
+      // Notify user
+      addNotification({
+        id: `template-approved-${Date.now()}`,
+        message: 'Your template has been approved and published to the library!',
+        type: 'success',
+        duration: 5000
+      });
+    } catch (error) {
+      console.error('Error approving template:', error);
+    }
   };
 
   const contributorBenefits = [
@@ -154,23 +250,69 @@ function SubmitTemplate() {
       <div className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
           <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-12">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-4">Template Submitted Successfully!</h1>
-            <p className="text-xl text-gray-300 mb-8">
-              Thank you for contributing to the MCP community! Your template will be reviewed and published soon.
-            </p>
-            
-            <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-6 mb-8">
-              <h3 className="text-lg font-semibold text-white mb-2">What happens next?</h3>
-              <div className="space-y-2 text-blue-200">
-                <div>1. Our team reviews your template for quality and completeness</div>
-                <div>2. We test the template to ensure it works as described</div>
-                <div>3. Your template gets published in our library</div>
-                <div>4. You get notified and featured as a contributor</div>
-              </div>
-            </div>
+            {reviewProgress < 100 ? (
+              <>
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Clock className="w-8 h-8 text-white animate-pulse" />
+                </div>
+                <h1 className="text-3xl font-bold text-white mb-4">Reviewing Your Template...</h1>
+                <p className="text-xl text-gray-300 mb-8">
+                  Our team is reviewing your submission for quality and completeness.
+                </p>
+                
+                <div className="mb-8">
+                  <div className="w-full bg-gray-700 rounded-full h-3 mb-2">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${reviewProgress}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-blue-300">{reviewProgress}% complete</div>
+                </div>
+                
+                <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-6 mb-8">
+                  <h3 className="text-lg font-semibold text-white mb-2">Review Process:</h3>
+                  <div className="space-y-2 text-blue-200">
+                    <div className={`flex items-center space-x-2 ${reviewProgress >= 25 ? 'text-green-300' : ''}`}>
+                      <div>{reviewProgress >= 25 ? '✓' : '1.'}</div>
+                      <div>Checking template structure and format</div>
+                    </div>
+                    <div className={`flex items-center space-x-2 ${reviewProgress >= 50 ? 'text-green-300' : ''}`}>
+                      <div>{reviewProgress >= 50 ? '✓' : '2.'}</div>
+                      <div>Validating technical requirements</div>
+                    </div>
+                    <div className={`flex items-center space-x-2 ${reviewProgress >= 75 ? 'text-green-300' : ''}`}>
+                      <div>{reviewProgress >= 75 ? '✓' : '3.'}</div>
+                      <div>Reviewing documentation quality</div>
+                    </div>
+                    <div className={`flex items-center space-x-2 ${reviewProgress >= 100 ? 'text-green-300' : ''}`}>
+                      <div>{reviewProgress >= 100 ? '✓' : '4.'}</div>
+                      <div>Preparing for publication</div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold text-white mb-4">Template Approved!</h1>
+                <p className="text-xl text-gray-300 mb-8">
+                  Your template has been reviewed and published to our library. Thank you for contributing!
+                </p>
+                
+                <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-6 mb-8">
+                  <h3 className="text-lg font-semibold text-white mb-2">What happens next?</h3>
+                  <div className="space-y-2 text-green-200">
+                    <div>✓ Your template is now live in our library</div>
+                    <div>✓ Community members can download and use it</div>
+                    <div>✓ You'll receive feedback and ratings</div>
+                    <div>✓ Your profile will show your contribution</div>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 

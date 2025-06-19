@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Download, Copy, Check, Star, Users, MessageSquare, Workflow, Database, Calendar, BarChart3, Filter, ExternalLink, FileDown, Code, Shield, Search, Tag, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,6 +12,19 @@ function Templates() {
   const [downloadingTemplate, setDownloadingTemplate] = useState('');
   const { user } = useAuth();
   const { markTemplateUsed } = useAchievements();
+  const [allTemplates, setAllTemplates] = useState<any[]>([]);
+
+  // Load community templates on mount
+  useEffect(() => {
+    // Load built-in templates
+    const builtInTemplates = templates;
+    
+    // Load community templates from localStorage
+    const communityTemplates = JSON.parse(localStorage.getItem('community-templates') || '[]');
+    
+    // Combine both sets of templates
+    setAllTemplates([...communityTemplates, ...builtInTemplates]);
+  }, []);
 
   const categories = [
     { id: 'all', name: 'All Templates', icon: Database },
@@ -655,7 +668,7 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
     }
   ];
 
-  const filteredTemplates = templates.filter(template => {
+  const filteredTemplates = allTemplates.filter(template => {
     // Apply category and platform filters
     const categoryMatch = selectedCategory === 'all' || template.category === selectedCategory;
     const platformMatch = selectedPlatform === 'all' || template.platform === selectedPlatform;
@@ -664,7 +677,7 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
     const searchMatch = searchQuery === '' || 
       template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      (template.tags && template.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())));
     
     return categoryMatch && platformMatch && searchMatch;
   });
@@ -927,7 +940,7 @@ Gamma LLC,Finance,25000,10,2022-03-10,info@gamma.com`
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1 mb-3">
-                  {template.tags.map((tag, index) => (
+                  {template.tags && template.tags.map((tag, index) => (
                     <span key={index} className="px-1.5 py-0.5 bg-gray-700/50 text-gray-300 rounded text-xs">
                       #{tag}
                     </span>
